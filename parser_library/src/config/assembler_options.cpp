@@ -97,12 +97,9 @@ void optional_to_json(nlohmann::json& j, std::string name, const std::optional<T
 }
 
 template<typename T>
-void optional_from_json(const nlohmann::json& j, std::string_view name, std::optional<T>& o)
+void optional_from_json(const nlohmann::ordered_json& j, std::optional<T>& o)
 {
-    if (auto it = j.find(name); it != j.end())
-        o = it->get<T>();
-    else
-        o.reset();
+    o = j.get<T>();
 }
 
 void to_json(nlohmann::json& j, const assembler_options& p)
@@ -116,39 +113,53 @@ void to_json(nlohmann::json& j, const assembler_options& p)
 }
 
 namespace {
-std::optional<bool> get_goff_from_json(const nlohmann::json& j)
-{
-    bool present = false;
-    bool goff = false;
-    bool xobject = false;
+using from_json_helper_function = std::function<void(const nlohmann::ordered_json&, assembler_options&)>;
 
-    if (auto it = j.find("GOFF"); it != j.end())
-    {
-        it->get_to(goff);
-        present = true;
-    }
+auto profile_json = from_json_helper_function(
+    [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.profile); });
 
-    if (auto it = j.find("XOBJECT"); it != j.end())
-    {
-        it->get_to(xobject);
-        present = true;
-    }
-    if (present)
-        return goff || xobject; // GOFF and XOBJECTS are synonyms
+auto sysparm_json = from_json_helper_function(
+    [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.sysparm); });
+
+auto system_id_json = from_json_helper_function(
+    [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.system_id); });
+
+auto optable_json = from_json_helper_function(
+    [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.optable); });
+
+auto goff_json = from_json_helper_function([](const nlohmann::ordered_json& val, assembler_options& p) {
+    std::optional<bool> goff = false;
+
+    optional_from_json(val, goff);
+
+    if (!p.goff.has_value())
+        p.goff = goff;
     else
-        return std::nullopt;
-}
+        p.goff = p.goff || goff; // There is already a stored value either from GOFF or XOBJECT option
+});
+
+std::unordered_map<std::string, from_json_helper_function> from_json_map = { { "PROFILE", profile_json },
+    { "SYSPARM", sysparm_json },
+    { "SYSTEM_ID", system_id_json },
+    { "GOFF", goff_json },
+    { "XOBJECT", goff_json },
+    { "OPTABLE", optable_json },
+    { "MACHINE", optable_json } };
 } // namespace
 
-void from_json(const nlohmann::json& j, assembler_options& p)
+void from_json(const nlohmann::ordered_json& j, assembler_options& p)
 {
     if (!j.is_object())
-        throw nlohmann::json::other_error::create(501, "asm_options must be an object.");
+        throw nlohmann::json::other_error::create(501, "asm_options must be an object.", j);
 
-    p.goff = get_goff_from_json(j);
-    optional_from_json(j, "OPTABLE", p.optable);
-    optional_from_json(j, "PROFILE", p.profile);
-    optional_from_json(j, "SYSPARM", p.sysparm);
-    optional_from_json(j, "SYSTEM_ID", p.system_id);
+    for (const auto& item : j.items())
+    {
+        const auto& key = item.key();
+
+        if (auto it = from_json_map.find(key); it != from_json_map.end())
+        {
+            it->second(item.value(), p);
+        }
+    }
 }
 } // namespace hlasm_plugin::parser_library::config

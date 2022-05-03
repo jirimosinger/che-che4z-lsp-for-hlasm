@@ -26,7 +26,7 @@ void to_json(nlohmann::json& j, const library& p)
     if (auto m = nlohmann::json(p.macro_extensions); !m.empty())
         j["macro_extensions"] = std::move(m);
 }
-void from_json(const nlohmann::json& j, library& p)
+void from_json(const nlohmann::ordered_json& j, library& p)
 {
     if (j.is_string())
         j.get_to(p.path);
@@ -39,7 +39,7 @@ void from_json(const nlohmann::json& j, library& p)
             it->get_to(p.macro_extensions);
     }
     else
-        throw nlohmann::json::other_error::create(501, "Unexpected JSON type.");
+        throw nlohmann::json::other_error::create(501, "Unexpected JSON type.", j);
 }
 
 void to_json(nlohmann::json& j, const db2_preprocessor& v)
@@ -60,7 +60,7 @@ void to_json(nlohmann::json& j, const db2_preprocessor& v)
         },
     };
 }
-void from_json(const nlohmann::json& j, db2_preprocessor& v)
+void from_json(const nlohmann::ordered_json& j, db2_preprocessor& v)
 {
     v = db2_preprocessor {};
     if (!j.is_object())
@@ -68,11 +68,11 @@ void from_json(const nlohmann::json& j, db2_preprocessor& v)
     if (auto it = j.find("options"); it != j.end())
     {
         if (!it->is_object())
-            throw nlohmann::json::other_error::create(501, "Object with DB2 options expected.");
+            throw nlohmann::json::other_error::create(501, "Object with DB2 options expected.", j);
         if (auto ver = it->find("version"); ver != it->end())
         {
             if (!ver->is_string())
-                throw nlohmann::json::other_error::create(501, "Version string expected.");
+                throw nlohmann::json::other_error::create(501, "Version string expected.", j);
             v.version = ver->get<std::string>();
         }
     }
@@ -119,11 +119,11 @@ void from_json(const nlohmann::json& j, cics_preprocessor& v)
     if (auto it = j.find("options"); it != j.end())
     {
         if (!it->is_array())
-            throw nlohmann::json::other_error::create(501, "Array of CICS options expected.");
+            throw nlohmann::json::other_error::create(501, "Array of CICS options expected.", j);
         for (const auto& e : *it)
         {
             if (!e.is_string())
-                throw nlohmann::json::other_error::create(501, "CICS option expected.");
+                throw nlohmann::json::other_error::create(501, "CICS option expected.", j);
             if (auto cpo = cics_preprocessor_options.find(e.get<std::string_view>());
                 cpo != cics_preprocessor_options.end())
             {
@@ -154,7 +154,7 @@ void to_json(nlohmann::json& j, const processor_group& p)
     if (!std::holds_alternative<std::monostate>(p.preprocessor.options))
         std::visit(preprocessor_visitor { j["preprocessor"] }, p.preprocessor.options);
 }
-void from_json(const nlohmann::json& j, processor_group& p)
+void from_json(const nlohmann::ordered_json& j, processor_group& p)
 {
     j.at("name").get_to(p.name);
     j.at("libs").get_to(p.libs);
@@ -169,7 +169,7 @@ void from_json(const nlohmann::json& j, processor_group& p)
         else if (it->is_object())
             it->at("name").get_to(p_name);
         else
-            throw nlohmann::json::other_error::create(501, "Unable to identify requested preprocessor.");
+            throw nlohmann::json::other_error::create(501, "Unable to identify requested preprocessor.", j);
 
         std::transform(p_name.begin(), p_name.end(), p_name.begin(), [](unsigned char c) { return (char)toupper(c); });
         if (p_name == "DB2")
@@ -177,7 +177,7 @@ void from_json(const nlohmann::json& j, processor_group& p)
         else if (p_name == "CICS")
             it->get_to(p.preprocessor.options.emplace<cics_preprocessor>());
         else
-            throw nlohmann::json::other_error::create(501, "Unable to identify requested preprocessor.");
+            throw nlohmann::json::other_error::create(501, "Unable to identify requested preprocessor.", j);
     }
 }
 
@@ -187,7 +187,7 @@ void to_json(nlohmann::json& j, const proc_grps& p)
     if (auto m = nlohmann::json(p.macro_extensions); !m.empty())
         j["macro_extensions"] = std::move(m);
 }
-void from_json(const nlohmann::json& j, proc_grps& p)
+void from_json(const nlohmann::ordered_json& j, proc_grps& p)
 {
     j.at("pgroups").get_to(p.pgroups);
     if (auto it = j.find("macro_extensions"); it != j.end())
