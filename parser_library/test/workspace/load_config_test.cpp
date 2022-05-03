@@ -377,38 +377,24 @@ private:
   "pgroups": [
     {
       "name": "P1",
-      "libs": [
-        "C:\\Users\\Desktop\\ASLib",
-        "lib",
-        "libs\\lib2\\",
-		""
-      ],
-                
-                "asm_options": {
+      "asm_options": {
 )" + std::string(asm_opts_content)
                 + R"(
-                }
+      }
     }
   ]
 })"
                             : R"({
-		"pgroups": [
-			{
-				"name": "P1",
-				"libs": [
-					"/home/user/ASLib",
-					"lib",
-					"libs/lib2/",
-			""
-				],
-                
-                "asm_options": {
+  "pgroups": [
+    {
+	  "name": "P1",
+      "asm_options": {
 )" + std::string(asm_opts_content)
                 + R"(
-                }
-			}
-		]
-	})";
+      }
+	}
+  ]
+})";
     }
 };
 
@@ -475,12 +461,12 @@ enum class file_manager_asm_opt_variant
 class file_manager_asm_test : public file_manager_proc_grps_test
 {
     std::string_view opt_mac = R"(
-                 "OPTABLE":"DOS",
-                 "MACHINE":"ZS-9")";
+         "OPTABLE":"DOS",
+         "MACHINE":"ZS-9")";
 
     std::string_view mac_opt = R"(
-                 "MACHINE":"ZS-9",
-                 "OPTABLE":"DOS")";
+         "MACHINE":"ZS-9",
+         "OPTABLE":"DOS")";
 
     void generate_files(file_manager_asm_opt_variant variant)
     {
@@ -529,7 +515,7 @@ TEST(workspace, asm_options_order)
         std::make_tuple(file_manager_asm_opt_variant::proc_optable_machine, pgm_o_file, instruction_set_version::Z15),
         std::make_tuple(file_manager_asm_opt_variant::proc_machine_optable, pgm_o_file, instruction_set_version::DOS) };
 
-    for (auto [variant, file_name, expected_instr_set] : cases)
+    for (const auto& [variant, file_name, expected_instr_set] : cases)
     {
         file_manager_asm_test file_manager(variant);
         lib_config config;
@@ -541,53 +527,3 @@ TEST(workspace, asm_options_order)
         EXPECT_EQ(asm_opts.instr_set, expected_instr_set);
     }
 }
-
-//TEST(workspace, asm_options_order_proc_file)
-//{
-//    file_manager_asm_test file_manager(file_manager_asm_opt_variant::proc_optable_machine);
-//    lib_config config;
-//    workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
-//
-//    ws.open();
-//
-//    const auto& asm_opts = ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm1" : "test_proc_grps_uri/pgm1");
-//    EXPECT_EQ(asm_opts.instr_set, instruction_set_version::Z15);
-//}
-//
-//TEST(workspace, asm_options_order_proc_file_2)
-//{
-//    file_manager_asm_test file_manager(file_manager_asm_opt_variant::proc_machine_optable);
-//    lib_config config;
-//    workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
-//
-//    ws.open();
-//
-//    const auto& asm_opts = ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm1" : "test_proc_grps_uri/pgm1");
-//    EXPECT_EQ(asm_opts.instr_set, instruction_set_version::DOS);
-//}
-//
-//TEST(workspace, asm_options_order_pgm_file)
-//{
-//    file_manager_asm_test file_manager(file_manager_asm_opt_variant::pgm_optable_machine);
-//    lib_config config;
-//    workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
-//
-//    ws.open();
-//
-//    const auto& asm_opts =
-//        ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm_override" : "test_proc_grps_uri/pgm_override");
-//    EXPECT_EQ(asm_opts.instr_set, instruction_set_version::Z15);
-//}
-//
-//TEST(workspace, asm_options_order_pgm_file_2)
-//{
-//    file_manager_asm_test file_manager(file_manager_asm_opt_variant::pgm_machine_optable);
-//    lib_config config;
-//    workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
-//
-//    ws.open();
-//
-//    const auto& asm_opts =
-//        ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm_override" : "test_proc_grps_uri/pgm_override");
-//    EXPECT_EQ(asm_opts.instr_set, instruction_set_version::DOS);
-//}
