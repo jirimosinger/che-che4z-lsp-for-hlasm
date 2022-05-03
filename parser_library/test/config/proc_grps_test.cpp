@@ -24,15 +24,15 @@ using namespace hlasm_plugin::parser_library::config;
 TEST(proc_grps, library_read)
 {
     const auto cases = {
-        std::make_pair(R"("lib")"_json, library { "lib", {}, false }),
-        std::make_pair(R"({"path":"lib"})"_json, library { "lib", {}, false }),
-        std::make_pair(R"({"path":"lib","optional":false})"_json, library { "lib", {}, false }),
-        std::make_pair(R"({"path":"lib","optional":true})"_json, library { "lib", {}, true }),
+        std::make_pair(R"("lib")", library { "lib", {}, false }),
+        std::make_pair(R"({"path":"lib"})", library { "lib", {}, false }),
+        std::make_pair(R"({"path":"lib","optional":false})", library { "lib", {}, false }),
+        std::make_pair(R"({"path":"lib","optional":true})", library { "lib", {}, true }),
     };
 
     for (const auto& [input, expected] : cases)
     {
-        const auto l = input.get<library>();
+        const auto l = nlohmann::ordered_json::parse(input).get<library>();
         EXPECT_EQ(l.path, expected.path);
         EXPECT_EQ(l.optional, expected.optional);
         EXPECT_EQ(l.macro_extensions, expected.macro_extensions);

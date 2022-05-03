@@ -32,7 +32,7 @@ struct library
     bool optional = false;
 };
 void to_json(nlohmann::json& j, const library& p);
-void from_json(const nlohmann::json& j, library& p);
+void from_json(const nlohmann::ordered_json& j, library& p);
 
 struct db2_preprocessor
 {
@@ -44,7 +44,7 @@ struct db2_preprocessor
 };
 
 void to_json(nlohmann::json& j, const db2_preprocessor& p);
-void from_json(const nlohmann::json& j, db2_preprocessor& p);
+void from_json(const nlohmann::ordered_json& j, db2_preprocessor& p);
 
 struct cics_preprocessor
 {
@@ -77,7 +77,7 @@ struct processor_group
     preprocessor_options preprocessor;
 };
 void to_json(nlohmann::json& j, const processor_group& p);
-void from_json(const nlohmann::json& j, processor_group& p);
+void from_json(const nlohmann::ordered_json& j, processor_group& p);
 
 struct proc_grps
 {
@@ -85,7 +85,7 @@ struct proc_grps
     std::vector<std::string> macro_extensions;
 };
 void to_json(nlohmann::json& j, const proc_grps& p);
-void from_json(const nlohmann::json& j, proc_grps& p);
+void from_json(const nlohmann::ordered_json& j, proc_grps& p);
 
 } // namespace hlasm_plugin::parser_library::config
 

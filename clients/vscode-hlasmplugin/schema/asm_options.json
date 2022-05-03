@@ -1,56 +1,115 @@
 {
     "type": "object",
     "description": "List of assembler options",
-    "properties": {
-        "GOFF": {
-            "type": "boolean",
-            "description": "Produces Generalized Object File format dataset."
-        },
-        "OPTABLE": {
-            "type": "string",
-            "description": "Specifies the instruction set to use.",
-            "enum": [
-                "UNI",
-                "DOS",
-                "370",
-                "XA",
-                "ESA",
-                "ZOP",
-                "ZS1",
-                "YOP",
-                "ZS2",
-                "Z9",
-                "ZS3",
-                "Z10",
-                "ZS4",
-                "Z11",
-                "ZS5",
-                "Z12",
-                "ZS6",
-                "Z13",
-                "ZS7",
-                "Z14",
-                "ZS8",
-                "Z15",
-                "ZS9"
-            ]
-        },
-        "SYSPARM": {
-            "type": "string",
-            "description": "Specifies the character string the assembler assigns to the &SYSPARM system variable symbol.",
-            "maxLength": 255
-        },
-        "PROFILE": {
-            "type": "string",
-            "description": "Profile Member to be copied into the source program."
-        },
-        "SYSTEM_ID": {
-            "type": "string",
-            "description": "Provides the value for the SYSTEM_ID system variable. Defaults to 'z/OS 02.04.00' when omitted."
-        },
-        "XOBJECT": {
-            "type": "boolean",
-            "description": "Synonym for the GOFF option."
-        }
+  "properties": {
+    "GOFF": {
+      "type": "boolean",
+      "description": "Produces Generalized Object File format dataset."
+    },
+    "MACHINE": {
+      "type": "string",
+      "description": "Specifies the instruction set to use.",
+      "enum": [
+        "S370",
+        "S370XA",
+        "ARCH-0",
+        "S390",
+        "S390E",
+        "S370ESA",
+        "ARCH-1",
+        "ARCH-2",
+        "ARCH-3",
+        "ARCH-4",
+        "zSeries",
+        "ZS",
+        "z900",
+        "z800",
+        "ARCH-5",
+        "zSeries-1",
+        "ZS-1",
+        "z990",
+        "z890",
+        "ARCH-6",
+        "zSeries-2",
+        "ZS-2",
+        "z9",
+        "ARCH-7",
+        "zSeries-3",
+        "ZS-3",
+        "ARCH-8",
+        "zSeries-4",
+        "ZS-4",
+        "z11",
+        "z196",
+        "z114",
+        "ARCH-9",
+        "zSeries-5",
+        "ZS-5",
+        "z12",
+        "zEC12",
+        "zBC12",
+        "ARCH-10",
+        "zSeries-6",
+        "ZS-6",
+        "z13",
+        "ARCH-11",
+        "zSeries-7",
+        "ZS-7",
+        "z14",
+        "ARCH-12",
+        "zSeries-8",
+        "ZS-8",
+        "z15",
+        "ARCH-13",
+        "zSeries-9",
+        "ZS-9"
+      ]
+    },
+    "OPTABLE": {
+      "type": "string",
+      "description": "Specifies the instruction set to use.",
+      "enum": [
+        "UNI",
+        "DOS",
+        "370",
+        "XA",
+        "ESA",
+        "ZOP",
+        "ZS1",
+        "YOP",
+        "ZS2",
+        "Z9",
+        "ZS3",
+        "Z10",
+        "ZS4",
+        "Z11",
+        "ZS5",
+        "Z12",
+        "ZS6",
+        "Z13",
+        "ZS7",
+        "Z14",
+        "ZS8",
+        "Z15",
+        "ZS9"
+      ]
+    },
+    "SYSPARM": {
+      "type": "string",
+      "description": "Specifies the character string the assembler assigns to the &SYSPARM system variable symbol.",
+      "maxLength": 255
+    },
+    "PROFILE": {
+      "type": "string",
+      "description": "Profile Member to be copied into the source program."
+    },
+    "SYSTEM_ID": {
+      "type": "string",
+      "description": "Provides the value for the SYSTEM_ID system variable. Defaults to 'z/OS 02.04.00' when omitted."
+    },
+    "XOBJECT": {
+      "type": "boolean",
+      "description": "Synonym for the GOFF option."
     }
+  }
 }
