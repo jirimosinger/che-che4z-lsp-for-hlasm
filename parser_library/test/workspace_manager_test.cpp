@@ -16,6 +16,7 @@
 
 #include "gtest/gtest.h"
 
+#include "config/pgm_conf.h"
 #include "lib_config.h"
 #include "message_consumer_mock.h"
 #include "nlohmann/json.hpp"
