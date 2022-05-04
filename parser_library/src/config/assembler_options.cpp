@@ -115,19 +115,19 @@ void to_json(nlohmann::json& j, const assembler_options& p)
 namespace {
 using from_json_helper_function = std::function<void(const nlohmann::ordered_json&, assembler_options&)>;
 
-auto profile_json = from_json_helper_function(
+const auto profile_json = from_json_helper_function(
     [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.profile); });
 
-auto sysparm_json = from_json_helper_function(
+const auto sysparm_json = from_json_helper_function(
     [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.sysparm); });
 
-auto system_id_json = from_json_helper_function(
+const auto system_id_json = from_json_helper_function(
     [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.system_id); });
 
-auto optable_json = from_json_helper_function(
+const auto optable_json = from_json_helper_function(
     [](const nlohmann::ordered_json& val, assembler_options& p) { optional_from_json(val, p.optable); });
 
-auto goff_json = from_json_helper_function([](const nlohmann::ordered_json& val, assembler_options& p) {
+const auto goff_json = from_json_helper_function([](const nlohmann::ordered_json& val, assembler_options& p) {
     std::optional<bool> goff = false;
 
     optional_from_json(val, goff);
@@ -138,13 +138,26 @@ auto goff_json = from_json_helper_function([](const nlohmann::ordered_json& val,
         p.goff = p.goff || goff; // There is already a stored value either from GOFF or XOBJECT option
 });
 
-std::unordered_map<std::string, from_json_helper_function> from_json_map = { { "PROFILE", profile_json },
+struct string_hash
+{
+    using is_transparent = void;
+
+    std::size_t operator()(std::string_view sv) const
+    {
+        std::hash<std::string_view> hasher;
+        return hasher(sv);
+    }
+};
+
+const std::unordered_map<std::string, from_json_helper_function, string_hash, std::equal_to<>> from_json_map = {
+    { "PROFILE", profile_json },
     { "SYSPARM", sysparm_json },
     { "SYSTEM_ID", system_id_json },
     { "GOFF", goff_json },
     { "XOBJECT", goff_json },
     { "OPTABLE", optable_json },
-    { "MACHINE", optable_json } };
+    { "MACHINE", optable_json }
+};
 } // namespace
 
 void from_json(const nlohmann::ordered_json& j, assembler_options& p)
