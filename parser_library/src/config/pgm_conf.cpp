@@ -25,7 +25,7 @@ void to_json(nlohmann::json& j, const program_mapping& p)
         j["asm_options"] = p.opts;
 }
 
-void from_json(const nlohmann::ordered_json& j, program_mapping& p)
+void from_json(const nlohmann::json& j, program_mapping& p)
 {
     j.at("program").get_to(p.program);
     j.at("pgroup").get_to(p.pgroup);
@@ -42,7 +42,7 @@ void to_json(nlohmann::json& j, const pgm_conf& p)
         j["diagnosticsSuppressLimit"] = p.diagnostics_suppress_limit.value();
 }
 
-void from_json(const nlohmann::ordered_json& j, pgm_conf& p)
+void from_json(const nlohmann::json& j, pgm_conf& p)
 {
     j.at("pgms").get_to(p.pgms);
     if (auto it = j.find("alwaysRecognize"); it != j.end())

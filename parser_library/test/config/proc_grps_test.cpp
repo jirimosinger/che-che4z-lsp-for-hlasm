@@ -32,7 +32,7 @@ TEST(proc_grps, library_read)
 
     for (const auto& [input, expected] : cases)
     {
-        const auto l = nlohmann::ordered_json::parse(input).get<library>();
+        const auto l = nlohmann::json::parse(input).get<library>();
         EXPECT_EQ(l.path, expected.path);
         EXPECT_EQ(l.optional, expected.optional);
         EXPECT_EQ(l.macro_extensions, expected.macro_extensions);

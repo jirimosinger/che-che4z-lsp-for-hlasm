@@ -26,7 +26,7 @@ void to_json(nlohmann::json& j, const library& p)
     if (auto m = nlohmann::json(p.macro_extensions); !m.empty())
         j["macro_extensions"] = std::move(m);
 }
-void from_json(const nlohmann::ordered_json& j, library& p)
+void from_json(const nlohmann::json& j, library& p)
 {
     if (j.is_string())
         j.get_to(p.path);
@@ -60,7 +60,7 @@ void to_json(nlohmann::json& j, const db2_preprocessor& v)
         },
     };
 }
-void from_json(const nlohmann::ordered_json& j, db2_preprocessor& v)
+void from_json(const nlohmann::json& j, db2_preprocessor& v)
 {
     v = db2_preprocessor {};
     if (!j.is_object())
@@ -154,7 +154,7 @@ void to_json(nlohmann::json& j, const processor_group& p)
     if (!std::holds_alternative<std::monostate>(p.preprocessor.options))
         std::visit(preprocessor_visitor { j["preprocessor"] }, p.preprocessor.options);
 }
-void from_json(const nlohmann::ordered_json& j, processor_group& p)
+void from_json(const nlohmann::json& j, processor_group& p)
 {
     j.at("name").get_to(p.name);
     j.at("libs").get_to(p.libs);
@@ -187,7 +187,7 @@ void to_json(nlohmann::json& j, const proc_grps& p)
     if (auto m = nlohmann::json(p.macro_extensions); !m.empty())
         j["macro_extensions"] = std::move(m);
 }
-void from_json(const nlohmann::ordered_json& j, proc_grps& p)
+void from_json(const nlohmann::json& j, proc_grps& p)
 {
     j.at("pgroups").get_to(p.pgroups);
     if (auto it = j.find("macro_extensions"); it != j.end())

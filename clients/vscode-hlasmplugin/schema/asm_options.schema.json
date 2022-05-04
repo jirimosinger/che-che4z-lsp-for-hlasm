@@ -112,5 +112,37 @@
       "type": "boolean",
       "description": "Synonym for the GOFF option."
     }
-  }
+  },
+  "allOf": [
+    {
+      "anyOf": [
+        {
+          "required": [ "GOFF" ],
+          "not": { "required": [ "XOBJECT" ] }
+        },
+        {
+          "required": [ "XOBJECT" ],
+          "not": { "required": [ "GOFF" ] }
+        },
+        {
+          "not": { "required": [ "GOFF", "XOBJECT" ] }
+        }
+      ]
+    },
+    {
+      "anyOf": [
+        {
+          "required": [ "MACHINE" ],
+          "not": { "required": [ "OPTABLE" ] }
+        },
+        {
+          "required": [ "OPTABLE" ],
+          "not": { "required": [ "MACHINE" ] }
+        },
+        {
+          "not": { "required": [ "MACHINE", "OPTABLE" ] }
+        }
+      ]
+    }
+  ]
 }

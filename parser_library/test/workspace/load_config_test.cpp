@@ -359,9 +359,9 @@ TEST(workspace, asm_options_invalid)
 class file_proc_grps_asm : public file_proc_grps
 {
 public:
-    file_proc_grps_asm(std::string_view asm_opts_content)
+    file_proc_grps_asm()
         : file_proc_grps()
-        , proc_file(generate_proc_file(asm_opts_content))
+        , proc_file(generate_proc_file())
 
     {}
 
@@ -370,7 +370,7 @@ public:
     std::string proc_file;
 
 private:
-    std::string generate_proc_file(std::string_view asm_opts_content)
+    std::string generate_proc_file()
     {
         return is_windows() ?
                             R"({
@@ -379,8 +379,8 @@ private:
       "name": "P1",
       "libs": [],
       "asm_options": {
-)" + std::string(asm_opts_content)
-                + R"(
+         "OPTABLE":"DOS",
+         "MACHINE":"ZS-9"
       }
     }
   ]
@@ -391,8 +391,8 @@ private:
 	  "name": "P1",
       "libs": [],
       "asm_options": {
-)" + std::string(asm_opts_content)
-                + R"(
+         "OPTABLE":"DOS",
+         "MACHINE":"ZS-9"
       }
 	}
   ]
@@ -400,132 +400,24 @@ private:
     }
 };
 
-class file_pgm_conf_asm : public file_pgm_conf
-{
-public:
-    file_pgm_conf_asm(std::string_view asm_opts_content)
-        : file_pgm_conf()
-        , pgm_file(construct_pgm_file(asm_opts_content))
-    {}
-
-    const std::string& get_text() override { return pgm_file; }
-
-private:
-    std::string pgm_file;
-
-    std::string construct_pgm_file(std::string_view asm_opts_content)
-    {
-        return is_windows() ? R"({
-  "pgms": [
-    {
-      "program": "pgm1",
-      "pgroup": "P1"
-    },
-    {
-      "program": "pgm_override",
-      "pgroup": "P1",
-      "asm_options":
-      {
-)" + std::string(asm_opts_content)
-                + R"(
-      }
-    }
-  ]
-})"
-                            : R"({
-  "pgms": [
-    {
-      "program": "pgm1",
-      "pgroup": "P1"
-    },
-    {
-      "program": "pgm_override",
-      "pgroup": "P1",
-      "asm_options":
-      {
-)" + std::string(asm_opts_content)
-                + R"(
-      }
-    }
-  ]
-})";
-    }
-};
-
-enum class file_manager_asm_opt_variant
-{
-    proc_optable_machine,
-    proc_machine_optable,
-    pgm_optable_machine,
-    pgm_machine_optable,
-};
-
 class file_manager_asm_test : public file_manager_proc_grps_test
 {
-    std::string_view opt_mac = R"(
-         "OPTABLE":"DOS",
-         "MACHINE":"ZS-9")";
-
-    std::string_view mac_opt = R"(
-         "MACHINE":"ZS-9",
-         "OPTABLE":"DOS")";
-
-    void generate_files(file_manager_asm_opt_variant variant)
-    {
-        switch (variant)
-        {
-            case file_manager_asm_opt_variant::proc_optable_machine:
-                proc_grps = std::make_shared<file_proc_grps_asm>(opt_mac);
-                pgm_conf = std::make_shared<file_pgm_conf_asm>("");
-                break;
-            case file_manager_asm_opt_variant::proc_machine_optable:
-                proc_grps = std::make_shared<file_proc_grps_asm>(mac_opt);
-                pgm_conf = std::make_shared<file_pgm_conf_asm>("");
-                break;
-            case file_manager_asm_opt_variant::pgm_optable_machine:
-                proc_grps = std::make_shared<file_proc_grps_asm>("");
-                pgm_conf = std::make_shared<file_pgm_conf_asm>(opt_mac);
-                break;
-            case file_manager_asm_opt_variant::pgm_machine_optable:
-                proc_grps = std::make_shared<file_proc_grps_asm>("");
-                pgm_conf = std::make_shared<file_pgm_conf_asm>(mac_opt);
-                break;
-            default:
-                proc_grps = std::make_shared<file_proc_grps_asm>("");
-                pgm_conf = std::make_shared<file_pgm_conf_asm>("");
-                break;
-        }
-    }
-
 public:
-    file_manager_asm_test(file_manager_asm_opt_variant variant)
+    file_manager_asm_test()
         : file_manager_proc_grps_test()
     {
-        generate_files(variant);
+        proc_grps = std::make_shared<file_proc_grps_asm>();
     };
 };
 
-TEST(workspace, asm_options_order)
+TEST(workspace, asm_options_redefinition)
 {
-    std::string pgm_file = is_windows() ? "test_proc_grps_uri\\pgm1" : "test_proc_grps_uri/pgm1";
+    file_manager_asm_test file_manager;
+    lib_config config;
+    workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
 
-    std::string pgm_o_file = is_windows() ? "test_proc_grps_uri\\pgm_override" : "test_proc_grps_uri/pgm_override";
+    ws.open();
 
-    auto cases = { std::make_tuple(
-                       file_manager_asm_opt_variant::proc_optable_machine, pgm_file, instruction_set_version::Z15),
-        std::make_tuple(file_manager_asm_opt_variant::proc_machine_optable, pgm_file, instruction_set_version::DOS),
-        std::make_tuple(file_manager_asm_opt_variant::proc_optable_machine, pgm_o_file, instruction_set_version::Z15),
-        std::make_tuple(file_manager_asm_opt_variant::proc_machine_optable, pgm_o_file, instruction_set_version::DOS) };
-
-    for (const auto& [variant, file_name, expected_instr_set] : cases)
-    {
-        file_manager_asm_test file_manager(variant);
-        lib_config config;
-        workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
-
-        ws.open();
-
-        const auto& asm_opts = ws.get_asm_options(file_name);
-        EXPECT_EQ(asm_opts.instr_set, expected_instr_set);
-    }
+    ws.collect_diags();
+    EXPECT_EQ(ws.diags()[0].code, "W0002");
 }

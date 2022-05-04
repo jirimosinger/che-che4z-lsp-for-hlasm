@@ -40,6 +40,6 @@ struct assembler_options
     bool has_value() const noexcept;
 };
 void to_json(nlohmann::json& j, const assembler_options& p);
-void from_json(const nlohmann::ordered_json& j, assembler_options& p);
+void from_json(const nlohmann::json& j, assembler_options& p);
 } // namespace hlasm_plugin::parser_library::config
 #endif

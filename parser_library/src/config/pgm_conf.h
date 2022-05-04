@@ -31,7 +31,7 @@ struct program_mapping
     assembler_options opts;
 };
 void to_json(nlohmann::json& j, const program_mapping& p);
-void from_json(const nlohmann::ordered_json& j, program_mapping& p);
+void from_json(const nlohmann::json& j, program_mapping& p);
 
 struct pgm_conf
 {
@@ -40,7 +40,7 @@ struct pgm_conf
     std::optional<unsigned> diagnostics_suppress_limit;
 };
 void to_json(nlohmann::json& j, const pgm_conf& p);
-void from_json(const nlohmann::ordered_json& j, pgm_conf& p);
+void from_json(const nlohmann::json& j, pgm_conf& p);
 
 } // namespace hlasm_plugin::parser_library::config
 
