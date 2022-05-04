@@ -636,7 +636,7 @@ bool workspace::load_config(
 
     try
     {
-        nlohmann::ordered_json::parse(proc_grps_file->get_text()).get_to(proc_groups);
+        nlohmann::json::parse(proc_grps_file->get_text()).get_to(proc_groups);
         proc_grps_.clear();
         for (const auto& pg : proc_groups.pgroups)
         {
@@ -647,7 +647,7 @@ bool workspace::load_config(
                 config_diags_.push_back(diagnostic_s::error_W0006(proc_grps_file->get_file_name(), pg.name));
         }
     }
-    catch (const nlohmann::ordered_json::exception&)
+    catch (const nlohmann::json::exception&)
     {
         // could not load proc_grps
         config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_file_name(), name_));
@@ -662,7 +662,7 @@ bool workspace::load_config(
 
     try
     {
-        nlohmann::ordered_json::parse(pgm_conf_file->get_text()).get_to(pgm_config);
+        nlohmann::json::parse(pgm_conf_file->get_text()).get_to(pgm_config);
         for (const auto& pgm : pgm_config.pgms)
         {
             if (!pgm.opts.valid())
@@ -672,7 +672,7 @@ bool workspace::load_config(
         exact_pgm_conf_.clear();
         regex_pgm_conf_.clear();
     }
-    catch (const nlohmann::ordered_json::exception&)
+    catch (const nlohmann::json::exception&)
     {
         config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_file_name(), name_));
         return false;

@@ -31,19 +31,17 @@ TEST(assembler_options, read)
         std::make_pair(R"({"SYSPARM":"TESTPARM"})", assembler_options { .sysparm = "TESTPARM" }),
         std::make_pair(R"({"MACHINE":"ZSERIES-2"})", assembler_options { .optable = "ZSERIES-2" }),
         std::make_pair(R"({"OPTABLE":"ZS9"})", assembler_options { .optable = "ZS9" }),
-        std::make_pair(R"({"OPTABLE":"ZS9","MACHINE":"ZSERIES-2"})", assembler_options { .optable = "ZSERIES-2" }),
         std::make_pair(R"({"SYSTEM_ID":"VSE"})", assembler_options { .system_id = "VSE" }),
         std::make_pair(R"({"GOFF":true})", assembler_options { .goff = true }),
         std::make_pair(R"({"XOBJECT":true})", assembler_options { .goff = true }),
-        std::make_pair(
-            R"({"GOFF":true,"PROFILE":"MAC","SYSPARM":"TESTPARM","MACHINE":"370XA","OPTABLE":"ZS9","SYSTEM_ID":"VSE","XOBJECT":false})",
+        std::make_pair(R"({"GOFF":true,"PROFILE":"MAC","SYSPARM":"TESTPARM","OPTABLE":"ZS9","SYSTEM_ID":"VSE"})",
             assembler_options {
                 .sysparm = "TESTPARM", .profile = "MAC", .optable = "ZS9", .system_id = "VSE", .goff = true }),
     };
 
     for (const auto& [input, expected] : cases)
     {
-        auto j = nlohmann::ordered_json::parse(input);
+        auto j = nlohmann::json::parse(input);
         EXPECT_EQ(j.get<assembler_options>(), expected);
     }
 }
