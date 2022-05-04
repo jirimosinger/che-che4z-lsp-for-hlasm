@@ -377,6 +377,7 @@ private:
   "pgroups": [
     {
       "name": "P1",
+      "libs": [],
       "asm_options": {
 )" + std::string(asm_opts_content)
                 + R"(
@@ -388,6 +389,7 @@ private:
   "pgroups": [
     {
 	  "name": "P1",
+      "libs": [],
       "asm_options": {
 )" + std::string(asm_opts_content)
                 + R"(
