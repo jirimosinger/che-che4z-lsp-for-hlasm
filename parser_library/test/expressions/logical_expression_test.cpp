@@ -273,3 +273,92 @@ TEST(logical_expressions, parenthesis_around_expressions)
     EXPECT_EQ(diags.size(), (size_t)2);
     EXPECT_TRUE(std::all_of(diags.begin(), diags.end(), [](const auto& d) { return d.code == "CE016"; }));
 }
+
+TEST(logical_expressions, operator_precedence)
+{
+    for (const auto& [args, expected] : std::initializer_list<std::pair<std::string, bool>> {
+             { "0,0", true },
+             { "0,1", true },
+             { "1,0", false },
+             { "1,1", true },
+         })
+    {
+        std::string input =
+            R"(
+        MACRO
+        TEST    &A,&B 
+        AIF     (&A EQ 0 OR &A EQ 1 AND &B EQ 1).END    
+        MNOTE   8,'ERROR'
+.END    ANOP
+        MEND
+
+        TEST    )"
+            + args;
+        analyzer a(input);
+        a.analyze();
+        a.collect_diags();
+
+        EXPECT_EQ(a.diags().empty(), expected) << args;
+    }
+}
+
+TEST(logical_expressions, symbol_after_substitution)
+{
+    std::string input =
+        R"(
+AAA EQU 1
+&T SETC 'AAA'
+&B SETB (&T EQ &T)
+)";
+    analyzer a(input);
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty());
+    EXPECT_EQ(get_var_value<B_t>(a.hlasm_ctx(), "B"), true);
+}
+
+TEST(logical_expressions, type_mismatch_1)
+{
+    std::string input =
+        R"(
+AAA EQU 1
+&T SETC 'AAA'
+&B SETB (&T EQ '&T')
+)";
+    analyzer a(input);
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(matches_message_codes(a.diags(), { "CE004" }));
+}
+
+TEST(logical_expressions, type_mismatch_2)
+{
+    std::string input =
+        R"(
+AAA EQU 1
+&T SETC 'AAA'
+&B SETB ('&T' EQ &T)
+)";
+    analyzer a(input);
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(matches_message_codes(a.diags(), { "CE017" }));
+}
+
+TEST(logical_expressions, simple_string_equality)
+{
+    std::string input =
+        R"(
+&T SETC 'AAA'
+&B SETB ('&T' EQ '&T')
+)";
+    analyzer a(input);
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty());
+    EXPECT_EQ(get_var_value<B_t>(a.hlasm_ctx(), "B"), true);
+}

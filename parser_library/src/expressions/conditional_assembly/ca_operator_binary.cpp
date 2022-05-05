@@ -77,9 +77,6 @@ void ca_function_binary_operator::resolve_expression_tree(context::SET_t_enum ki
 {
     if (expr_kind != kind)
         diags.add_diagnostic(diagnostic_op::error_CE004(expr_range));
-    else if ((function == ca_expr_ops::FIND || function == ca_expr_ops::INDEX)
-        && !left_expr->is_character_expression(character_expression_purpose::function_parameter))
-        diags.add_diagnostic(diagnostic_op::error_CE004(left_expr->expr_range));
     else
     {
         context::SET_t_enum operands_kind;
@@ -205,12 +202,6 @@ context::SET_t ca_function_binary_operator::operation(
                 return lhs.access_b() || rhs.access_b();
             case ca_expr_ops::XOR:
                 return lhs.access_b() != rhs.access_b();
-            case ca_expr_ops::AND_NOT:
-                return lhs.access_b() && !rhs.access_b();
-            case ca_expr_ops::OR_NOT:
-                return lhs.access_b() || !rhs.access_b();
-            case ca_expr_ops::XOR_NOT:
-                return lhs.access_b() != !rhs.access_b();
             default:
                 break;
         }
