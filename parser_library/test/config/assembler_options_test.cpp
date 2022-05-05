@@ -77,6 +77,7 @@ TEST(assembler_options, validate)
         std::make_pair(assembler_options { .optable = "UNI" }, true),
         std::make_pair(assembler_options { .optable = "A" }, false),
         std::make_pair(assembler_options { .machine = "zSeries-2" }, true),
+        std::make_pair(assembler_options { .machine = "ZsErieS-2" }, true),
         std::make_pair(assembler_options { .machine = "A" }, false),
         std::make_pair(assembler_options { .goff = false }, true),
         std::make_pair(assembler_options { .goff = true }, true),

@@ -77,6 +77,21 @@ constexpr std::array<std::pair<std::string_view, instruction_set_version>, 54> i
     { std::string_view("S370XA"), instruction_set_version::XA },
     { std::string_view("S390"), instruction_set_version::ESA },
     { std::string_view("S390E"), instruction_set_version::ESA },
+    { std::string_view("Z10"), instruction_set_version::Z10 },
+    { std::string_view("Z11"), instruction_set_version::Z11 },
+    { std::string_view("Z114"), instruction_set_version::Z11 },
+    { std::string_view("Z12"), instruction_set_version::Z12 },
+    { std::string_view("Z13"), instruction_set_version::Z13 },
+    { std::string_view("Z14"), instruction_set_version::Z14 },
+    { std::string_view("Z15"), instruction_set_version::Z15 },
+    { std::string_view("Z196"), instruction_set_version::Z11 },
+    { std::string_view("Z800"), instruction_set_version::ZOP },
+    { std::string_view("Z890"), instruction_set_version::YOP },
+    { std::string_view("Z9"), instruction_set_version::Z9 },
+    { std::string_view("Z900"), instruction_set_version::ZOP },
+    { std::string_view("Z990"), instruction_set_version::YOP },
+    { std::string_view("ZBC12"), instruction_set_version::Z12 },
+    { std::string_view("ZEC12"), instruction_set_version::Z12 },
     { std::string_view("ZS"), instruction_set_version::ZOP },
     { std::string_view("ZS-1"), instruction_set_version::ZOP },
     { std::string_view("ZS-2"), instruction_set_version::YOP },
@@ -87,31 +102,16 @@ constexpr std::array<std::pair<std::string_view, instruction_set_version>, 54> i
     { std::string_view("ZS-7"), instruction_set_version::Z13 },
     { std::string_view("ZS-8"), instruction_set_version::Z14 },
     { std::string_view("ZS-9"), instruction_set_version::Z15 },
-    { std::string_view("z10"), instruction_set_version::Z10 },
-    { std::string_view("z11"), instruction_set_version::Z11 },
-    { std::string_view("z114"), instruction_set_version::Z11 },
-    { std::string_view("z12"), instruction_set_version::Z12 },
-    { std::string_view("z13"), instruction_set_version::Z13 },
-    { std::string_view("z14"), instruction_set_version::Z14 },
-    { std::string_view("z15"), instruction_set_version::Z15 },
-    { std::string_view("z196"), instruction_set_version::Z11 },
-    { std::string_view("z800"), instruction_set_version::ZOP },
-    { std::string_view("z890"), instruction_set_version::YOP },
-    { std::string_view("z9"), instruction_set_version::Z9 },
-    { std::string_view("z900"), instruction_set_version::ZOP },
-    { std::string_view("z990"), instruction_set_version::YOP },
-    { std::string_view("zBC12"), instruction_set_version::Z12 },
-    { std::string_view("zEC12"), instruction_set_version::Z12 },
-    { std::string_view("zSeries"), instruction_set_version::ZOP },
-    { std::string_view("zSeries-1"), instruction_set_version::ZOP },
-    { std::string_view("zSeries-2"), instruction_set_version::YOP },
-    { std::string_view("zSeries-3"), instruction_set_version::Z9 },
-    { std::string_view("zSeries-4"), instruction_set_version::Z10 },
-    { std::string_view("zSeries-5"), instruction_set_version::Z11 },
-    { std::string_view("zSeries-6"), instruction_set_version::Z12 },
-    { std::string_view("zSeries-7"), instruction_set_version::Z13 },
-    { std::string_view("zSeries-8"), instruction_set_version::Z14 },
-    { std::string_view("zSeries-9"), instruction_set_version::Z15 },
+    { std::string_view("ZSERIES"), instruction_set_version::ZOP },
+    { std::string_view("ZSERIES-1"), instruction_set_version::ZOP },
+    { std::string_view("ZSERIES-2"), instruction_set_version::YOP },
+    { std::string_view("ZSERIES-3"), instruction_set_version::Z9 },
+    { std::string_view("ZSERIES-4"), instruction_set_version::Z10 },
+    { std::string_view("ZSERIES-5"), instruction_set_version::Z11 },
+    { std::string_view("ZSERIES-6"), instruction_set_version::Z12 },
+    { std::string_view("ZSERIES-7"), instruction_set_version::Z13 },
+    { std::string_view("ZSERIES-8"), instruction_set_version::Z14 },
+    { std::string_view("ZSERIES-9"), instruction_set_version::Z15 },
 } };
 
 #if __cpp_lib_ranges
@@ -123,9 +123,17 @@ static_assert(std::is_sorted(std::begin(instr_set_machine_equivalents),
     [](const auto& l, const auto& r) { return l.first < r.first; }));
 #endif
 
-template<typename INSTR_SET_EQUIVALENTS>
-bool instr_set_equivalent_valid(std::string_view instr_set_name, const INSTR_SET_EQUIVALENTS& equivalents) noexcept
+void to_upper(std::string& s)
 {
+    for (auto& c : s)
+        c = static_cast<char>(std::toupper((unsigned char)c));
+}
+
+template<typename INSTR_SET_EQUIVALENTS>
+bool instr_set_equivalent_valid(std::string instr_set_name, const INSTR_SET_EQUIVALENTS& equivalents) noexcept
+{
+    to_upper(instr_set_name);
+
 #ifdef __cpp_lib_ranges
     return instr_set_name.size() == 0
         || std::ranges::any_of(equivalents, [instr_set_name](auto item) { return instr_set_name == item.first; });
@@ -154,8 +162,10 @@ bool assembler_options::valid() const noexcept
 namespace {
 template<typename INSTR_SET_EQUIVALENTS>
 std::optional<instruction_set_version> find_instruction_set(
-    std::string_view instr_set_name, const INSTR_SET_EQUIVALENTS& equivalents)
+    std::string instr_set_name, const INSTR_SET_EQUIVALENTS& equivalents)
 {
+    to_upper(instr_set_name);
+
 #ifdef __cpp_lib_ranges
     auto it = std::ranges::lower_bound(equivalents, instr_set_name, {}, [](const auto& instr) { return instr.first; });
 #else
