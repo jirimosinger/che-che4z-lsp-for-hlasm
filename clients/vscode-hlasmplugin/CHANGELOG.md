@@ -10,7 +10,6 @@
 - Basic GOFF, XOBJECT and SYSOPT_XOBJECT support
 - MNOTE support
 - Assembler options can be specified in pgm_conf.json to override values from proc_grps.json
-- User is now prevented from entering synonymous assembler option entries
 
 #### Fixed
 - Fixed an issue preventing correct N' attribute evaluation of empty subscript arrays

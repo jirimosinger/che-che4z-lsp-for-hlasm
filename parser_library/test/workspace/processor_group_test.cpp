@@ -176,7 +176,23 @@ TEST(processor_group, asm_options_machine_valid)
 
     for (const auto& [input, expected] : cases)
     {
-        EXPECT_EQ(asm_options({ .optable = input }).instr_set, expected)
+        EXPECT_EQ(asm_options({ .machine = input }).instr_set, expected)
+            << "Input: " << input << " Expected: " << int(expected);
+    }
+}
+
+TEST(processor_group, asm_options_machine_invalid)
+{
+    const auto cases = {
+        std::make_pair("klgadh", instruction_set_version::UNI),
+        std::make_pair("ZS5ZS6", instruction_set_version::UNI),
+        std::make_pair("ZS-0", instruction_set_version::UNI),
+        std::make_pair("zSeries-0", instruction_set_version::UNI),
+    };
+
+    for (const auto& [input, expected] : cases)
+    {
+        EXPECT_EQ(asm_options({ .machine = input }).instr_set, expected)
             << "Input: " << input << " Expected: " << int(expected);
     }
 }
