@@ -22,7 +22,9 @@
 namespace hlasm_plugin::parser_library::config {
 
 namespace {
-constexpr std::array<std::pair<std::string_view, instruction_set_version>, 23> instr_set_optable_equivalents = {
+using instr_set_equivalent_pair = std::pair<std::string_view, instruction_set_version>;
+
+constexpr std::array<instr_set_equivalent_pair, 23> instr_set_optable_equivalents = {
     { { std::string_view("370"), instruction_set_version::_370 },
         { std::string_view("DOS"), instruction_set_version::DOS },
         { std::string_view("ESA"), instruction_set_version::ESA },
@@ -49,15 +51,14 @@ constexpr std::array<std::pair<std::string_view, instruction_set_version>, 23> i
 };
 
 #if __cpp_lib_ranges
-static_assert(std::ranges::is_sorted(
-    instr_set_optable_equivalents, {}, &std::pair<std::string_view, instruction_set_version>::first));
+static_assert(std::ranges::is_sorted(instr_set_optable_equivalents, {}, &instr_set_equivalent_pair::first));
 #else
 static_assert(std::is_sorted(std::begin(instr_set_optable_equivalents),
     std::end(instr_set_optable_equivalents),
     [](const auto& l, const auto& r) { return l.first < r.first; }));
 #endif
 
-constexpr std::array<std::pair<std::string_view, instruction_set_version>, 54> instr_set_machine_equivalents = { {
+constexpr std::array<instr_set_equivalent_pair, 54> instr_set_machine_equivalents = { {
     { std::string_view("ARCH-0"), instruction_set_version::XA },
     { std::string_view("ARCH-1"), instruction_set_version::ESA },
     { std::string_view("ARCH-10"), instruction_set_version::Z12 },
@@ -115,8 +116,7 @@ constexpr std::array<std::pair<std::string_view, instruction_set_version>, 54> i
 } };
 
 #if __cpp_lib_ranges
-static_assert(std::ranges::is_sorted(
-    instr_set_machine_equivalents, {}, &std::pair<std::string_view, instruction_set_version>::first));
+static_assert(std::ranges::is_sorted(instr_set_machine_equivalents, {}, &instr_set_equivalent_pair::first));
 #else
 static_assert(std::is_sorted(std::begin(instr_set_machine_equivalents),
     std::end(instr_set_machine_equivalents),
@@ -129,8 +129,8 @@ void to_upper(std::string& s)
         c = static_cast<char>(std::toupper((unsigned char)c));
 }
 
-template<typename INSTR_SET_EQUIVALENTS>
-bool instr_set_equivalent_valid(std::string instr_set_name, const INSTR_SET_EQUIVALENTS& equivalents) noexcept
+bool instr_set_equivalent_valid(
+    std::string instr_set_name, std::span<const instr_set_equivalent_pair> equivalents) noexcept
 {
     to_upper(instr_set_name);
 
@@ -160,9 +160,8 @@ bool assembler_options::valid() const noexcept
 }
 
 namespace {
-template<typename INSTR_SET_EQUIVALENTS>
 std::optional<instruction_set_version> find_instruction_set(
-    std::string instr_set_name, const INSTR_SET_EQUIVALENTS& equivalents)
+    std::string instr_set_name, const std::span<const instr_set_equivalent_pair> equivalents)
 {
     to_upper(instr_set_name);
 
@@ -196,8 +195,8 @@ void assembler_options::apply(asm_option& opts) const
     {
         const auto& instr_set_name = machine.has_value() ? machine.value() : optable.value();
         const auto& instr_set_equivalents = machine.has_value()
-            ? std::span<const std::pair<std::string_view, instruction_set_version>> { instr_set_machine_equivalents }
-            : std::span<const std::pair<std::string_view, instruction_set_version>> { instr_set_optable_equivalents };
+            ? std::span<const instr_set_equivalent_pair> { instr_set_machine_equivalents }
+            : std::span<const instr_set_equivalent_pair> { instr_set_optable_equivalents };
 
         if (auto translated = find_instruction_set(instr_set_name, instr_set_equivalents); translated.has_value())
         {
@@ -255,11 +254,5 @@ void from_json(const nlohmann::json& j, assembler_options& p)
     optional_from_json(j, "SYSPARM", p.sysparm);
     optional_from_json(j, "SYSTEM_ID", p.system_id);
     optional_from_json(j, "XOBJECT", p.goff);
-
-    // Machine and OPTABLE are basically synonyms
-    if (p.machine.has_value() && p.optable.has_value())
-    {
-        throw nlohmann::json::other_error::create(501, "MACHINE and OPTABLE cannot be used in parallel", j);
-    }
 }
 } // namespace hlasm_plugin::parser_library::config
