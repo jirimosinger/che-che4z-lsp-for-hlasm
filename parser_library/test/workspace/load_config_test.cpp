@@ -359,9 +359,9 @@ TEST(workspace, asm_options_invalid)
 class file_proc_grps_asm : public file_proc_grps
 {
 public:
-    file_proc_grps_asm(std::string_view asm_opts_contents)
+    file_proc_grps_asm()
         : file_proc_grps()
-        , proc_file(generate_proc_file(asm_opts_contents))
+        , proc_file(generate_proc_file())
 
     {}
 
@@ -370,79 +370,38 @@ public:
     std::string proc_file;
 
 private:
-    std::string generate_proc_file(std::string_view asm_opts_contents)
+    std::string generate_proc_file()
     {
-        return is_windows() ?
-                            R"({
+        return
+            R"({
   "pgroups": [
     {
       "name": "P1",
       "libs": [],
-      "asm_options": {)"
-                + std::string(asm_opts_contents) + R"(
+      "asm_options": {
+         "GOFF":true,
+         "XOBJECT":true
       }
     }
-  ]
-})"
-                            : R"({
-  "pgroups": [
-    {
-	  "name": "P1",
-      "libs": [],
-      "asm_options": {)"
-                + std::string(asm_opts_contents) + R"(
-      }
-	}
   ]
 })";
     }
 };
 
-namespace {
-enum class file_manager_opt_variant
-{
-    OPTABLE_MACHINE_ERROR,
-    GOFF_XOBJECT_ERROR
-};
-
-std::string optable_machine_err_asm_opt = R"(
-         "OPTABLE":"DOS",
-         "MACHINE":"ZS-9")";
-
-std::string goff_xobject_err_asm_opt = R"(
-         "GOFF":true,
-         "XOBJECT":true)";
-
-} // namespace
-
 class file_manager_asm_test : public file_manager_proc_grps_test
 {
 public:
-    file_manager_asm_test(file_manager_opt_variant variant)
+    file_manager_asm_test()
         : file_manager_proc_grps_test()
     {
-        switch (variant)
-        {
-            case file_manager_opt_variant::OPTABLE_MACHINE_ERROR:
-                proc_grps = std::make_shared<file_proc_grps_asm>(optable_machine_err_asm_opt);
-                break;
-            case file_manager_opt_variant::GOFF_XOBJECT_ERROR:
-                proc_grps = std::make_shared<file_proc_grps_asm>(goff_xobject_err_asm_opt);
-                break;
-            default:
-                throw std::logic_error("Not implemented");
-                break;
-        }
+        proc_grps = std::make_shared<file_proc_grps_asm>();
     };
 };
 
-TEST(workspace, asm_options_redefinition)
+TEST(workspace, asm_options_goff_xobject_redefinition)
 {
-    auto variants = { file_manager_opt_variant::OPTABLE_MACHINE_ERROR, file_manager_opt_variant::GOFF_XOBJECT_ERROR };
-
-    for (auto v : variants)
     {
-        file_manager_asm_test file_manager(v);
+        file_manager_asm_test file_manager;
         lib_config config;
         workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
 
