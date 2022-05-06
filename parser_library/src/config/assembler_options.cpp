@@ -136,10 +136,10 @@ bool instr_set_equivalent_valid(std::string instr_set_name, const INSTR_SET_EQUI
 
 #ifdef __cpp_lib_ranges
     return instr_set_name.size() == 0
-        || std::ranges::any_of(equivalents, [instr_set_name](auto item) { return instr_set_name == item.first; });
+        || std::ranges::any_of(equivalents, [&instr_set_name](auto item) { return instr_set_name == item.first; });
 #else
     return instr_set_name.size() == 0
-        || std::any_of(std::begin(equivalents), std::end(equivalents), [instr_set_name](auto item) {
+        || std::any_of(std::begin(equivalents), std::end(equivalents), [&instr_set_name](auto item) {
                return instr_set_name == item.first;
            });
 #endif
