@@ -27,14 +27,14 @@
 
 namespace hlasm_plugin::parser_library::workspaces {
 
-file_impl::file_impl(file_uri uri)
-    : file_name_(std::move(uri))
+file_impl::file_impl(utils::path::external_resource uri)
+    : file_(std::move(uri))
     , text_()
 {}
 
 void file_impl::collect_diags() const {}
 
-const file_uri& file_impl::get_file_name() { return file_name_; }
+const file_uri& file_impl::get_file_name() { return file_.get_url(); }
 
 const std::string& file_impl::get_text()
 {
@@ -45,7 +45,7 @@ const std::string& file_impl::get_text()
 
 void file_impl::load_text()
 {
-    std::ifstream fin(file_name_, std::ios::in | std::ios::binary);
+    std::ifstream fin(file_.get_absolute_path(), std::ios::in | std::ios::binary);
 
     if (fin)
     {
@@ -66,6 +66,7 @@ void file_impl::load_text()
         text_ = "";
         up_to_date_ = false;
         bad_ = true;
+        // todo
         // add_diagnostic(diagnostic_s{file_name_, {}, diagnostic_severity::error,
         //	"W0001", "HLASM plugin", "Could not open file" + file_name_, {} });
     }

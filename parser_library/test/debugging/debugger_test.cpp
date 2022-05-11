@@ -24,12 +24,14 @@
 #include "debugger.h"
 #include "debugging/debug_types.h"
 #include "protocol.h"
+#include "utils/external_resource.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/workspace.h"
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::debugging;
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 
 
 TEST(debugger, stopped_on_entry)
@@ -42,7 +44,9 @@ TEST(debugger, stopped_on_entry)
     debugger d;
     d.set_event_consumer(&m);
     std::string file_name = "test_workspace\\test";
-    file_manager.did_open_file(file_name, 0, "   LR 1,2");
+    external_resource file_res(file_name, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, "   LR 1,2");
     d.launch(file_name.c_str(), ws, true);
     m.wait_for_stopped();
 
@@ -77,7 +81,9 @@ TEST(debugger, disconnect)
     debugger d;
     d.set_event_consumer(&m);
     std::string file_name = "test_workspace\\test";
-    file_manager.did_open_file(file_name, 0, "   LR 1,2");
+    external_resource file_res(file_name, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, "   LR 1,2");
     d.launch(file_name.c_str(), ws, true);
     m.wait_for_stopped();
 
@@ -315,7 +321,8 @@ public:
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override
     {
-        std::shared_ptr<processor> found = get_file_manager().add_processor_file(library);
+        std::shared_ptr<processor> found =
+            get_file_manager().add_processor_file(external_resource(library, uri_type::UNKNOWN));
         if (found)
             return found->parse_no_lsp_update(*this, std::move(ctx), data);
 
@@ -345,11 +352,13 @@ TEST(debugger, test)
         LR 1,1
 )";
     std::string copy1_filename = "COPY1";
+    external_resource copy1_file_res(copy1_filename, uri_type::RELATIVE_PATH);
     std::string copy1_source = R"(
         COPY COPY2
 )";
 
     std::string copy2_filename = "COPY2";
+    external_resource copy2_file_res(copy2_filename, uri_type::RELATIVE_PATH);
     std::string copy2_source = R"(
 
         ANOP
@@ -357,15 +366,17 @@ TEST(debugger, test)
 
 
     file_manager_impl file_manager;
-    file_manager.did_open_file(copy1_filename, 0, copy1_source);
-    file_manager.did_open_file(copy2_filename, 0, copy2_source);
+    file_manager.did_open_file(copy1_file_res, 0, copy1_source);
+    file_manager.did_open_file(copy2_file_res, 0, copy2_source);
     workspace_mock lib_provider(file_manager);
 
     debug_event_consumer_s_mock m;
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    file_manager.did_open_file(filename, 0, open_code);
+    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
     std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", filename } };
@@ -452,7 +463,9 @@ TEST(debugger, sysstmt)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    file_manager.did_open_file(filename, 0, open_code);
+    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
     std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", filename } };
@@ -499,19 +512,22 @@ A  MAC_IN ()
 )";
 
     std::string copy1_filename = "COPY1";
+    external_resource copy1_file_res(copy1_filename, uri_type::RELATIVE_PATH);
     std::string copy1_source = R"(
            LR 1,1
 )";
 
     file_manager_impl file_manager;
-    file_manager.did_open_file(copy1_filename, 0, copy1_source);
+    file_manager.did_open_file(copy1_file_res, 0, copy1_source);
     workspace_mock lib_provider(file_manager);
 
     debug_event_consumer_s_mock m;
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    file_manager.did_open_file(filename, 0, open_code);
+    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
     std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", filename } };
@@ -675,7 +691,9 @@ TEST(debugger, positional_parameters)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    file_manager.did_open_file(filename, 0, open_code);
+    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, open_code);
 
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
@@ -794,7 +812,9 @@ TEST(debugger, arrays)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    file_manager.did_open_file(filename, 0, open_code);
+    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, open_code);
 
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
@@ -848,7 +868,9 @@ B EQU A
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    file_manager.did_open_file(filename, 0, open_code);
+    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+
+    file_manager.did_open_file(file_res, 0, open_code);
 
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
@@ -872,6 +894,7 @@ TEST(debugger, concurrent_next_and_file_change)
     COPY COPY1
 )";
     std::string copy1_filename = "COPY1";
+    external_resource copy1_file_res(copy1_filename, uri_type::RELATIVE_PATH);
     std::string copy1_source = R"(
         LR 1,1
         LR 1,1
@@ -883,15 +906,16 @@ TEST(debugger, concurrent_next_and_file_change)
 
 
     file_manager_impl file_manager;
-    file_manager.did_open_file(copy1_filename, 0, copy1_source);
+    file_manager.did_open_file(copy1_file_res, 0, copy1_source);
     workspace_mock lib_provider(file_manager);
 
     debug_event_consumer_s_mock m;
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
+    external_resource file_res(filename, uri_type::RELATIVE_PATH);
 
-    file_manager.did_open_file(filename, 0, open_code);
+    file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
     std::string new_string = "SOME NEW FILE DOES NOT MATTER";
@@ -899,8 +923,8 @@ TEST(debugger, concurrent_next_and_file_change)
     chs.emplace_back(new_string.c_str(), new_string.size());
     d.next();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::thread t([&file_manager, &copy1_filename, &chs]() {
-        file_manager.did_change_file(copy1_filename, 0, chs.data(), chs.size());
+    std::thread t([&file_manager, &copy1_file_res, &chs]() {
+        file_manager.did_change_file(copy1_file_res, 0, chs.data(), chs.size());
     });
     m.wait_for_stopped();
 

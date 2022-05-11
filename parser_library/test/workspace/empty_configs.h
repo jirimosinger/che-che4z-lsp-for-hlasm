@@ -17,10 +17,15 @@
 
 #include <filesystem>
 
+#include "utils/external_resource.h"
 #include "utils/path.h"
 
-inline std::string pgm_conf_name = hlasm_plugin::utils::path::join(".hlasmplugin", "pgm_conf.json").string();
-inline std::string proc_grps_name = hlasm_plugin::utils::path::join(".hlasmplugin", "proc_grps.json").string();
+inline auto pgm_conf_name = hlasm_plugin::utils::path::external_resource(
+    hlasm_plugin::utils::path::join(".hlasmplugin", "pgm_conf.json").string(),
+    hlasm_plugin::utils::path::uri_type::UNKNOWN);
+inline auto proc_grps_name = hlasm_plugin::utils::path::external_resource(
+    hlasm_plugin::utils::path::join(".hlasmplugin", "proc_grps.json").string(),
+    hlasm_plugin::utils::path::uri_type::UNKNOWN);
 inline std::string empty_pgm_conf = R"({ "pgms": []})";
 inline std::string empty_proc_grps = R"({ "pgroups": []})";
 

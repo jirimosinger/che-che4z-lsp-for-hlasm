@@ -94,7 +94,8 @@ std::shared_ptr<processor> library_local::find_file(const std::string& file_name
         load_files();
 
     if (auto found = files_.find(file_name); found != files_.end())
-        return file_manager_.add_processor_file(utils::path::join(lib_path_, found->second).string());
+        return file_manager_.add_processor_file(utils::path::external_resource(
+            utils::path::join(lib_path_, found->second).string(), utils::path::uri_type::ABSOLUTE_PATH));
     else
         return nullptr;
 }

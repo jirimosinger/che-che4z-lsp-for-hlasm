@@ -248,7 +248,7 @@ public:
 
     void disconnect()
     {
-        // set cancelation token and wake up the thread,
+        // set cancellation token and wake up the thread,
         // so it peacefully finishes, we then wait for it and join
         {
             std::lock_guard<std::mutex> lck(control_mtx);

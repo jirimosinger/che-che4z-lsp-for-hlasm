@@ -34,6 +34,7 @@
 #include "message_consumer.h"
 #include "processor.h"
 #include "processor_group.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -68,11 +69,11 @@ public:
     // Creates just a dummy workspace with no libraries - no dependencies
     // between files.
     workspace(file_manager& file_manager, const lib_config& global_config, std::atomic<bool>* cancel = nullptr);
-    workspace(const ws_uri& uri,
+    workspace(const utils::path::external_resource& uri,
         file_manager& file_manager,
         const lib_config& global_config,
         std::atomic<bool>* cancel = nullptr);
-    workspace(const ws_uri& uri,
+    workspace(const utils::path::external_resource& uri,
         const std::string& name,
         file_manager& file_manager,
         const lib_config& global_config,
@@ -94,10 +95,11 @@ public:
 
     workspace_file_info parse_file(const std::string& file_uri);
     void refresh_libraries();
-    workspace_file_info did_open_file(const std::string& file_uri);
-    void did_close_file(const std::string& file_uri);
-    void did_change_file(const std::string& document_uri, const document_change* changes, size_t ch_size);
-    void did_change_watched_files(const std::string& file_uri);
+    workspace_file_info did_open_file(const utils::path::external_resource& file_uri);
+    void did_close_file(const utils::path::external_resource& file_uri);
+    void did_change_file(
+        const utils::path::external_resource& document_uri, const document_change* changes, size_t ch_size);
+    void did_change_watched_files(const utils::path::external_resource& file_uri);
 
     location definition(const std::string& document_uri, position pos) const override;
     location_list references(const std::string& document_uri, position pos) const override;
@@ -133,7 +135,7 @@ private:
     std::atomic<bool>* cancel_;
 
     std::string name_;
-    ws_uri uri_;
+    utils::path::external_resource uri_;
     file_manager& file_manager_;
     file_manager_vfm fm_vfm_;
 
@@ -142,7 +144,6 @@ private:
     std::vector<std::pair<program, std::regex>> regex_pgm_conf_;
     processor_group implicit_proc_grp;
 
-    std::filesystem::path ws_path_;
     std::filesystem::path proc_grps_path_;
     std::filesystem::path pgm_conf_path_;
 
@@ -167,7 +168,7 @@ private:
     // files, that depend on others (e.g. open code files that use macros)
     std::set<std::string, std::less<>> dependants_;
 
-    std::set<std::string, std::less<>> opened_files_;
+    std::set<utils::path::external_resource, utils::path::external_resource_comp> opened_files_;
 
     diagnostic_container config_diags_;
 

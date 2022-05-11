@@ -30,7 +30,7 @@ void file_manager_impl::collect_diags() const
     }
 }
 
-file_ptr file_manager_impl::add_file(const file_uri& uri)
+file_ptr file_manager_impl::add_file(const utils::path::external_resource& uri)
 {
     std::lock_guard guard(files_mutex);
     auto ret = files_.emplace(uri, std::make_shared<file_impl>(uri));
@@ -50,7 +50,7 @@ processor_file_ptr file_manager_impl::change_into_processor_file_if_not_already_
     }
 }
 
-processor_file_ptr file_manager_impl::add_processor_file(const file_uri& uri)
+processor_file_ptr file_manager_impl::add_processor_file(const utils::path::external_resource& uri)
 {
     std::lock_guard guard(files_mutex);
     auto ret = files_.find(uri);
@@ -67,16 +67,17 @@ processor_file_ptr file_manager_impl::add_processor_file(const file_uri& uri)
 processor_file_ptr file_manager_impl::get_processor_file(const file_uri& uri)
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.find(uri);
+    auto ret = files_.find(utils::path::external_resource(uri, utils::path::uri_type::UNKNOWN));
     if (ret == files_.end())
     {
-        return std::make_shared<processor_file_impl>(uri, *this);
+        return std::make_shared<processor_file_impl>(
+            utils::path::external_resource(uri, utils::path::uri_type::UNKNOWN), *this);
     }
     else
         return change_into_processor_file_if_not_already_(ret->second);
 }
 
-void file_manager_impl::remove_file(const file_uri& document_uri)
+void file_manager_impl::remove_file(const utils::path::external_resource& document_uri)
 {
     std::lock_guard guard(files_mutex);
     auto file = files_.find(document_uri);
@@ -90,14 +91,14 @@ void file_manager_impl::remove_file(const file_uri& document_uri)
 file_ptr file_manager_impl::find(const std::string& key) const
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.find(key);
+    auto ret = files_.find(utils::path::external_resource(key, utils::path::uri_type::UNKNOWN));
     if (ret == files_.end())
         return nullptr;
 
     return ret->second;
 }
 
-processor_file_ptr file_manager_impl::find_processor_file(const std::string& key)
+processor_file_ptr file_manager_impl::find_processor_file(const utils::path::external_resource& key)
 {
     std::lock_guard guard(files_mutex);
     auto ret = files_.find(key);
@@ -130,7 +131,8 @@ void file_manager_impl::prepare_file_for_change_(std::shared_ptr<file_impl>& fil
         file = std::make_shared<file_impl>(*file);
 }
 
-void file_manager_impl::did_open_file(const std::string& document_uri, version_t version, std::string text)
+void file_manager_impl::did_open_file(
+    const utils::path::external_resource& document_uri, version_t version, std::string text)
 {
     std::lock_guard guard(files_mutex);
     auto ret = files_.emplace(document_uri, std::make_shared<file_impl>(document_uri));
@@ -139,7 +141,7 @@ void file_manager_impl::did_open_file(const std::string& document_uri, version_t
 }
 
 void file_manager_impl::did_change_file(
-    const std::string& document_uri, version_t, const document_change* changes, size_t ch_size)
+    const utils::path::external_resource& document_uri, version_t, const document_change* changes, size_t ch_size)
 {
     // TODO
     // the version is the version after the changes -> I don't see how is that useful
@@ -164,7 +166,7 @@ void file_manager_impl::did_change_file(
     }
 }
 
-void file_manager_impl::did_close_file(const std::string& document_uri)
+void file_manager_impl::did_close_file(const utils::path::external_resource& document_uri)
 {
     std::lock_guard guard(files_mutex);
     auto file = files_.find(document_uri);

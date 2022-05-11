@@ -16,3 +16,6 @@ target_include_directories(hlasm_utils PUBLIC include)
 
 add_subdirectory(include)
 add_subdirectory(src)
+
+# link executable with libraries
+target_link_libraries(hlasm_utils network-uri)

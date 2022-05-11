@@ -20,6 +20,7 @@
 #include "../response_provider_mock.h"
 #include "../ws_mngr_mock.h"
 #include "lsp/feature_language_features.h"
+#include "utils/external_resource.h"
 #include "utils/platform.h"
 
 using hlasm_plugin::utils::platform::is_windows;
@@ -114,8 +115,10 @@ TEST(language_features, document_symbol)
     f.register_methods(notifs);
 
     std::string file_text = "A EQU 1";
-    ws_mngr.did_open_file("test", 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + feature::path_to_uri("test") + "\"}}");
+    std::string file_res = utils::path::path_to_uri(path);
+
+    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
 
     json r = { { "start", { { "line", 0 }, { "character", 0 } } }, { "end", { { "line", 0 }, { "character", 0 } } } };
     json response = json::array();
@@ -135,8 +138,10 @@ TEST(language_features, semantic_tokens)
     f.register_methods(notifs);
 
     std::string file_text = "A EQU 1\n SAM31";
-    ws_mngr.did_open_file("test", 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + feature::path_to_uri("test") + "\"}}");
+    std::string file_res = utils::path::path_to_uri(path);
+
+    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
 
     json response { { "data", { 0, 0, 1, 0, 0, 0, 2, 3, 1, 0, 0, 4, 1, 10, 0, 1, 1, 5, 1, 0 } } };
     EXPECT_CALL(response_mock, respond(json(""), std::string(""), response));
@@ -157,9 +162,10 @@ TEST(language_features, semantic_tokens_multiline)
 D EQU                                                                 1X3145
 IIIIIIIIIIIIIII1
 )";
+    std::string file_res = utils::path::path_to_uri(path);
 
-    ws_mngr.did_open_file("test", 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + feature::path_to_uri("test") + "\"}}");
+    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
 
     // clang-format off
     json response { { "data",
@@ -191,9 +197,10 @@ TEST(language_features, semantic_tokens_multiline_overlap)
 .X AIF ('&X' EQ '&X').Y
 .Y ANOP
 )";
+    std::string file_res = utils::path::path_to_uri(path);
 
-    ws_mngr.did_open_file("test", 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + feature::path_to_uri("test") + "\"}}");
+    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
 
     // clang-format off
     json response { { "data",

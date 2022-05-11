@@ -75,7 +75,7 @@ void feature_workspace_folders::initialize_feature(const json& initialize_params
     if (root_uri != initialize_params.end() && !root_uri->is_null())
     {
         std::string uri = root_uri->get<std::string>();
-        add_workspace(uri, uri_to_path(uri));
+        add_workspace(uri, uri);
         return;
     }
 
@@ -104,7 +104,7 @@ void feature_workspace_folders::add_workspaces(const json& added)
         const std::string& name = it["name"].get<std::string>();
         std::string uri = it["uri"].get<std::string>();
 
-        add_workspace(name, uri_to_path(uri));
+        add_workspace(name, uri);
     }
 }
 void feature_workspace_folders::remove_workspaces(const json& removed)
@@ -113,7 +113,7 @@ void feature_workspace_folders::remove_workspaces(const json& removed)
     {
         std::string uri = ws["uri"].get<std::string>();
 
-        ws_mngr_.remove_workspace(uri_to_path(uri).c_str());
+        ws_mngr_.remove_workspace(uri.c_str());
     }
 }
 void feature_workspace_folders::add_workspace(const std::string& name, const std::string& path)
@@ -129,7 +129,7 @@ void feature_workspace_folders::did_change_watched_files(const json&, const json
     {
         try
         {
-            paths.push_back(uri_to_path(change["uri"].get<std::string>()));
+            paths.push_back(change["uri"].get<std::string>());
         }
         catch (const std::system_error& e)
         {

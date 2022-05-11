@@ -18,6 +18,7 @@
 #include "diagnosable_impl.h"
 #include "file.h"
 #include "processor.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -29,7 +30,7 @@ namespace hlasm_plugin::parser_library::workspaces {
 class file_impl : public virtual file, public virtual diagnosable_impl
 {
 public:
-    explicit file_impl(file_uri uri);
+    explicit file_impl(utils::path::external_resource uri);
     explicit file_impl(const file_impl&) = default;
     file_impl& operator=(const file_impl&) = default;
 
@@ -62,7 +63,7 @@ protected:
     const std::string& get_text_ref();
 
 private:
-    file_uri file_name_;
+    utils::path::external_resource file_;
     std::string text_;
     // Array of "pointers" to text_ where lines start.
     std::vector<size_t> lines_ind_;

@@ -23,6 +23,7 @@
 #include "empty_configs.h"
 #include "lib_config.h"
 #include "nlohmann/json.hpp"
+#include "utils/external_resource.h"
 #include "workspaces/file_impl.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/workspace.h"
@@ -30,6 +31,7 @@
 using namespace nlohmann;
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 
 std::string one_proc_grps = R"(
 {
@@ -39,15 +41,18 @@ std::string one_proc_grps = R"(
 }
 )";
 
+std::string file_name = "a_file";
+external_resource file_res(file_name, uri_type::RELATIVE_PATH);
+
 TEST(diags_suppress, no_suppress)
 {
     file_manager_impl fm;
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
 
-    std::string file_name = "a_file";
+    external_resource file_name_res("a_file", uri_type::RELATIVE_PATH);
 
-    fm.did_open_file(file_name, 0, R"(
+    fm.did_open_file(file_name_res, 0, R"(
     LR 1,
     LR 1,
     LR 1,
@@ -59,9 +64,9 @@ TEST(diags_suppress, no_suppress)
     lib_config config;
     workspace ws(fm, config);
     ws.open();
-    ws.did_open_file(file_name);
+    ws.did_open_file(file_name_res);
 
-    auto pfile = fm.find(file_name);
+    auto pfile = fm.find(file_name_res.get_url());
     ASSERT_TRUE(pfile);
 
     pfile->collect_diags();
@@ -76,9 +81,7 @@ TEST(diags_suppress, do_suppress)
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
 
-    std::string file_name = "a_file";
-
-    fm.did_open_file(file_name, 0, R"(
+    fm.did_open_file(file_res, 0, R"(
     LR 1,
     LR 1,
     LR 1,
@@ -92,7 +95,7 @@ TEST(diags_suppress, do_suppress)
     workspace ws(fm, config);
     ws.set_message_consumer(&msg_consumer);
     ws.open();
-    ws.did_open_file(file_name);
+    ws.did_open_file(file_res);
 
     auto pfile = fm.find(file_name);
     ASSERT_TRUE(pfile);
@@ -111,9 +114,7 @@ TEST(diags_suppress, pgm_supress_limit_changed)
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
 
-    std::string file_name = "a_file";
-
-    fm.did_open_file(file_name, 0, R"(
+    fm.did_open_file(file_res, 0, R"(
     LR 1,
     LR 1,
     LR 1,
@@ -125,7 +126,7 @@ TEST(diags_suppress, pgm_supress_limit_changed)
     lib_config config;
     workspace ws(fm, config);
     ws.open();
-    ws.did_open_file(file_name);
+    ws.did_open_file(file_res);
 
     auto pfile = fm.find(file_name);
     ASSERT_TRUE(pfile);
@@ -140,7 +141,7 @@ TEST(diags_suppress, pgm_supress_limit_changed)
     fm.did_change_file(pgm_conf_name, 1, &ch, 1);
     ws.did_change_file(pgm_conf_name, &ch, 1);
 
-    ws.did_change_file(file_name, &ch, 1);
+    ws.did_change_file(file_res, &ch, 1);
 
     pfile = fm.find(file_name);
     ASSERT_TRUE(pfile);
@@ -154,9 +155,7 @@ TEST(diags_suppress, cancel_token)
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
 
-    std::string file_name = "a_file";
-
-    fm.did_open_file(file_name, 0, R"(
+    fm.did_open_file(file_res, 0, R"(
     LR 1,
     LR 1,
     LR 1,
@@ -169,7 +168,7 @@ TEST(diags_suppress, cancel_token)
     auto config = lib_config::load_from_json(R"({"diagnosticsSuppressLimit":5})"_json);
     workspace ws(fm, config, &cancel);
     ws.open();
-    ws.did_open_file(file_name);
+    ws.did_open_file(file_res);
 
     auto pfile = fm.find(file_name);
     ASSERT_TRUE(pfile);

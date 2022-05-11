@@ -21,12 +21,14 @@
 #include "analyzer.h"
 #include "file_with_text.h"
 #include "files_parse_lib_provider.h"
+#include "utils/external_resource.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/processor_file_impl.h"
 #include "workspaces/workspace.h"
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 
 namespace {
 
@@ -41,7 +43,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 
     auto& add_macro_or_copy(std::string file_name, std::string text)
     {
-        auto file = std::make_shared<file_with_text>(file_name, text, *this);
+        auto file = std::make_shared<file_with_text>(external_resource(file_name, uri_type::UNKNOWN), text, *this);
 
         auto [it, succ] = files_by_library_.emplace(file_name.substr(lib_prefix_length),
             std::pair<std::shared_ptr<file_with_text>, macro_cache>(
@@ -53,7 +55,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 
     auto add_opencode(std::string file_name, std::string text)
     {
-        auto file = std::make_shared<file_with_text>(file_name, text, *this);
+        auto file = std::make_shared<file_with_text>(external_resource(file_name, uri_type::UNKNOWN), text, *this);
         files_by_fname_.emplace(std::move(file_name), file);
         return file;
     }
@@ -321,6 +323,7 @@ std::optional<diagnostic_s> find_diag_with_filename(
 TEST(macro_cache_test, overwrite_by_inline)
 {
     std::string opencode_file_name = "opencode";
+    external_resource opencode_file_res(opencode_file_name, uri_type::RELATIVE_PATH);
     std::string opencode_text =
         R"(
        MAC
@@ -333,6 +336,7 @@ TEST(macro_cache_test, overwrite_by_inline)
        MAC
 )";
     std::string macro_file_name = "MAC";
+    external_resource macro_file_res(macro_file_name, uri_type::RELATIVE_PATH);
     std::string macro_text =
         R"( MACRO
        MAC
@@ -343,9 +347,9 @@ TEST(macro_cache_test, overwrite_by_inline)
     file_manager_impl file_mngr;
     files_parse_lib_provider lib_provider(file_mngr);
 
-    file_mngr.did_open_file(opencode_file_name, 0, opencode_text);
-    file_mngr.did_open_file(macro_file_name, 0, macro_text);
-    auto opencode = file_mngr.add_processor_file(opencode_file_name);
+    file_mngr.did_open_file(opencode_file_res, 0, opencode_text);
+    file_mngr.did_open_file(macro_file_res, 0, macro_text);
+    auto opencode = file_mngr.add_processor_file(opencode_file_res);
 
     opencode->parse(lib_provider, {}, {}, nullptr);
     opencode->collect_diags();

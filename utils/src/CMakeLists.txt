@@ -12,6 +12,7 @@
 
 target_sources(hlasm_utils PRIVATE
 	platform.cpp
+	external_resource.cpp
 	utf8text.cpp
 )
 

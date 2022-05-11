@@ -22,7 +22,7 @@
 namespace hlasm_plugin::parser_library::workspaces {
 
 processor_file_impl::processor_file_impl(
-    std::string file_name, const file_manager& file_mngr, std::atomic<bool>* cancel)
+    utils::path::external_resource file_name, const file_manager& file_mngr, std::atomic<bool>* cancel)
     : file_impl(std::move(file_name))
     , cancel_(cancel)
     , macro_cache_(file_mngr, *this)

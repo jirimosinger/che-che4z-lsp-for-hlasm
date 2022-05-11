@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "utils/external_resource.h"
 #include "workspace_manager_impl.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/workspace.h"
@@ -59,25 +60,31 @@ void workspace_manager::remove_workspace(const char* uri) { impl_->remove_worksp
 
 void workspace_manager::did_change_watched_files(const char** paths, size_t size)
 {
-    std::vector<std::string> paths_s;
+    std::vector<utils::path::external_resource> paths_s;
     for (size_t i = 0; i < size; ++i)
     {
-        paths_s.push_back(paths[i]);
+        paths_s.push_back(utils::path::external_resource(paths[i], utils::path::uri_type::UNKNOWN));
     }
     impl_->did_change_watched_files(std::move(paths_s));
 }
 
 void workspace_manager::did_open_file(const char* document_uri, version_t version, const char* text, size_t text_size)
 {
-    impl_->did_open_file(document_uri, version, std::string(text, text_size));
+    impl_->did_open_file(utils::path::external_resource(document_uri, utils::path::uri_type::UNKNOWN),
+        version,
+        std::string(text, text_size));
 }
 void workspace_manager::did_change_file(
     const char* document_uri, version_t version, const document_change* changes, size_t ch_size)
 {
-    impl_->did_change_file(document_uri, version, changes, ch_size);
+    impl_->did_change_file(
+        utils::path::external_resource(document_uri, utils::path::uri_type::UNKNOWN), version, changes, ch_size);
 }
 
-void workspace_manager::did_close_file(const char* document_uri) { impl_->did_close_file(document_uri); }
+void workspace_manager::did_close_file(const char* document_uri)
+{
+    impl_->did_close_file(utils::path::external_resource(document_uri, utils::path::uri_type::UNKNOWN));
+}
 
 void workspace_manager::configuration_changed(const lib_config& new_config)
 {

@@ -20,6 +20,7 @@
 #include "../response_provider_mock.h"
 #include "../ws_mngr_mock.h"
 #include "lsp/feature_text_synchronization.h"
+#include "utils/external_resource.h"
 #include "utils/platform.h"
 
 const std::string txt_file_uri =
@@ -120,13 +121,13 @@ TEST(feature, uri_to_path)
 
     if (hlasm_plugin::utils::platform::is_windows())
     {
-        EXPECT_EQ(feature::uri_to_path("file://czprfs50/Public"), "\\\\czprfs50\\Public");
-        EXPECT_EQ(feature::uri_to_path("file:///C%3A/Public"), "c:\\Public");
+        EXPECT_EQ(utils::path::uri_to_path("file://czprfs50/Public"), "\\\\czprfs50\\Public");
+        EXPECT_EQ(utils::path::uri_to_path("file:///C%3A/Public"), "c:\\Public");
     }
     else
     {
-        EXPECT_EQ(feature::uri_to_path("file:///home/user/somefile"), "/home/user/somefile");
-        EXPECT_EQ(feature::uri_to_path("file:///C%3A/Public"), "/C:/Public");
+        EXPECT_EQ(utils::path::uri_to_path("file:///home/user/somefile"), "/home/user/somefile");
+        EXPECT_EQ(utils::path::uri_to_path("file:///C%3A/Public"), "/C:/Public");
     }
 }
 
@@ -136,13 +137,13 @@ TEST(feature, path_to_uri)
 
     if (hlasm_plugin::utils::platform::is_windows())
     {
-        EXPECT_EQ(feature::path_to_uri("\\\\czprfs50\\Public"), "file://czprfs50/Public");
-        EXPECT_EQ(feature::path_to_uri("c:\\Public"), "file:///c%3A/Public");
+        EXPECT_EQ(utils::path::path_to_uri("\\\\czprfs50\\Public"), "file://czprfs50/Public");
+        EXPECT_EQ(utils::path::path_to_uri("c:\\Public"), "file:///c%3A/Public");
     }
     else
     {
-        EXPECT_EQ(feature::path_to_uri("/home/user/somefile"), "file:///home/user/somefile");
-        EXPECT_EQ(feature::path_to_uri("/C:/Public"), "file:///C%3A/Public");
+        EXPECT_EQ(utils::path::path_to_uri("/home/user/somefile"), "file:///home/user/somefile");
+        EXPECT_EQ(utils::path::path_to_uri("/C:/Public"), "file:///C%3A/Public");
     }
 }
 

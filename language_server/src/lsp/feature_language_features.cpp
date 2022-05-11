@@ -332,7 +332,7 @@ void feature_language_features::semantic_tokens(const json& id, const json& para
 {
     auto document_uri = params["textDocument"]["uri"].get<std::string>();
 
-    auto tokens = std::vector<parser_library::token_info>(ws_mngr_.semantic_tokens(uri_to_path(document_uri).c_str()));
+    auto tokens = std::vector<parser_library::token_info>(ws_mngr_.semantic_tokens(document_uri.c_str()));
     json num_array = convert_tokens_to_num_array(tokens);
 
     response_->respond(id, "", { { "data", num_array } });
@@ -412,7 +412,7 @@ void feature_language_features::document_symbol(const json& id, const json& para
     auto document_uri = params["textDocument"]["uri"].get<std::string>();
 
     const auto limit = 5000LL;
-    auto symbol_list = ws_mngr_.document_symbol(uri_to_path(document_uri).c_str(), limit);
+    auto symbol_list = ws_mngr_.document_symbol(document_uri.c_str(), limit);
 
     response_->respond(id, "", document_symbol_list_json(symbol_list));
 }
