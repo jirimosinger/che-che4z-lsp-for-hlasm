@@ -25,6 +25,9 @@ enum class uri_type
     ABSOLUTE_PATH,
     RELATIVE_PATH,
     URL,
+    LOCAL,
+    NETWORK,
+    UNTITLED,
     UNKNOWN
 };
 
@@ -43,6 +46,10 @@ public:
     const std::string& get_absolute_path() const;
 
     const std::string& get_url() const;
+
+    std::string get_content() const;
+
+    uri_type get_type() const;
 
     bool operator==(const external_resource& r) const;
     bool operator!=(const external_resource& r) const;

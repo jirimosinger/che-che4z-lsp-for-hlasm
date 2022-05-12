@@ -16,6 +16,8 @@
 
 #include "../logger.h"
 #include "protocol.h"
+#include "utils/external_resource.h"
+
 namespace hlasm_plugin::language_server::lsp {
 
 feature_text_synchronization::feature_text_synchronization(
@@ -59,7 +61,7 @@ void feature_text_synchronization::on_did_open(const json&, const json& params)
     auto version = text_doc["version"].get<nlohmann::json::number_unsigned_t>();
     std::string text = text_doc["text"].get<std::string>();
 
-    auto path = uri_to_path(doc_uri);
+    auto path = utils::path::uri_to_path(doc_uri);
 
     if (path.empty())
     {
@@ -98,14 +100,14 @@ void feature_text_synchronization::on_did_change(const json&, const json& params
 
         ++i;
     }
-    ws_mngr_.did_change_file(uri_to_path(doc_uri).c_str(), version, &*changes.begin(), changes.size());
+    ws_mngr_.did_change_file(utils::path::uri_to_path(doc_uri).c_str(), version, &*changes.begin(), changes.size());
 }
 
 void feature_text_synchronization::on_did_close(const json&, const json& params)
 {
     std::string uri = params["textDocument"]["uri"].get<std::string>();
 
-    ws_mngr_.did_close_file(uri_to_path(uri).c_str());
+    ws_mngr_.did_close_file(utils::path::uri_to_path(uri).c_str());
 }
 
 } // namespace hlasm_plugin::language_server::lsp

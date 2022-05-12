@@ -16,6 +16,7 @@
 
 #include "utils/path.h"
 #include "utils/platform.h"
+#include "utils/external_resource.h"
 
 namespace {
 using namespace hlasm_plugin::language_server::dap;
@@ -23,7 +24,7 @@ using namespace hlasm_plugin::language_server::dap;
 std::string convert_path(const std::string& path, path_format path_format)
 {
     if (path_format == path_format::URI)
-        return hlasm_plugin::language_server::feature::uri_to_path(path);
+        return hlasm_plugin::utils::path::uri_to_path(path);
 
     // Theia sends us relative path (while not accepting it back) change, to absolute
     std::filesystem::path p = hlasm_plugin::utils::path::absolute(path);

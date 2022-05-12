@@ -115,36 +115,4 @@ TEST(text_synchronization, did_close_file)
         notifs["textDocument/didClose"].handler("", params1);
 }
 
-TEST(feature, uri_to_path)
-{
-    using namespace hlasm_plugin::language_server;
-
-    if (hlasm_plugin::utils::platform::is_windows())
-    {
-        EXPECT_EQ(utils::path::uri_to_path("file://czprfs50/Public"), "\\\\czprfs50\\Public");
-        EXPECT_EQ(utils::path::uri_to_path("file:///C%3A/Public"), "c:\\Public");
-    }
-    else
-    {
-        EXPECT_EQ(utils::path::uri_to_path("file:///home/user/somefile"), "/home/user/somefile");
-        EXPECT_EQ(utils::path::uri_to_path("file:///C%3A/Public"), "/C:/Public");
-    }
-}
-
-TEST(feature, path_to_uri)
-{
-    using namespace hlasm_plugin::language_server;
-
-    if (hlasm_plugin::utils::platform::is_windows())
-    {
-        EXPECT_EQ(utils::path::path_to_uri("\\\\czprfs50\\Public"), "file://czprfs50/Public");
-        EXPECT_EQ(utils::path::path_to_uri("c:\\Public"), "file:///c%3A/Public");
-    }
-    else
-    {
-        EXPECT_EQ(utils::path::path_to_uri("/home/user/somefile"), "file:///home/user/somefile");
-        EXPECT_EQ(utils::path::path_to_uri("/C:/Public"), "file:///C%3A/Public");
-    }
-}
-
 #endif // !HLASMPLUGIN_LANGUAGESERVER_TEST_FEATURE_TEXT_SYNCHRONIZATION_TEST_H
