@@ -2,15 +2,11 @@
 
 ## ****Unreleased****
 
-## [1.3.0](https://github.com/eclipse/che-che4z-lsp-for-hlasm/compare/1.2.0...1.3.0) (2022-05-11)
-
 #### Added
 - Added support for MACHINE assembler option
 
 #### Fixed
 - 
-
-## ****Released****
 
 ## [1.2.0](https://github.com/eclipse/che-che4z-lsp-for-hlasm/compare/1.1.0...1.2.0) (2022-05-11)
 
