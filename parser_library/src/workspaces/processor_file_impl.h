@@ -45,11 +45,11 @@ public:
     // Used by the macro tracer.
     parse_result parse_no_lsp_update(parse_lib_provider&, analyzing_context ctx, library_data) override;
 
-    const std::set<std::string>& dependencies() override;
+    const std::set<utils::path::external_resource, utils::path::external_resource_comp>& dependencies() override;
 
     const semantics::lines_info& get_hl_info() override;
     const lsp::feature_provider& get_lsp_feature_provider() override;
-    const std::set<std::string>& files_to_close() override;
+    const std::set<utils::path::external_resource, utils::path::external_resource_comp>& files_to_close() override;
     const performance_metrics& get_metrics() override;
 
     void erase_cache_of_opencode(const std::string& opencode_file_name) override;
@@ -63,8 +63,8 @@ private:
 
     std::atomic<bool>* cancel_;
 
-    std::set<std::string> dependencies_;
-    std::set<std::string> files_to_close_;
+    std::set<utils::path::external_resource, utils::path::external_resource_comp> dependencies_;
+    std::set<utils::path::external_resource, utils::path::external_resource_comp> files_to_close_;
 
     macro_cache macro_cache_;
 };

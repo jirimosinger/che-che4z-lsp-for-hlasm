@@ -64,13 +64,13 @@ processor_file_ptr file_manager_impl::add_processor_file(const utils::path::exte
         return change_into_processor_file_if_not_already_(ret->second);
 }
 
-processor_file_ptr file_manager_impl::get_processor_file(const file_uri& uri)
+processor_file_ptr file_manager_impl::get_processor_file(const utils::path::external_resource& uri)
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.find(utils::path::external_resource(uri));
+    auto ret = files_.find(uri);
     if (ret == files_.end())
     {
-        return std::make_shared<processor_file_impl>(utils::path::external_resource(uri), *this);
+        return std::make_shared<processor_file_impl>(uri, *this);
     }
     else
         return change_into_processor_file_if_not_already_(ret->second);

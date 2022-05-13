@@ -37,7 +37,7 @@ struct variable_symbol_definition
     // statement number in macro
     size_t def_location = 0;
     // file in opencode
-    std::string file;
+    utils::path::external_resource file;
 
     position def_position;
 
@@ -61,8 +61,11 @@ struct variable_symbol_definition
     {}
 
     // in-opencode SET symbol constructor
-    variable_symbol_definition(
-        context::id_index name, context::SET_t_enum type, bool global, std::string file, position def_position)
+    variable_symbol_definition(context::id_index name,
+        context::SET_t_enum type,
+        bool global,
+        utils::path::external_resource file,
+        position def_position)
         : name(name)
         , macro_param(false)
         , type(type)

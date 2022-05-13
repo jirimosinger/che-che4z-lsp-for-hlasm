@@ -75,12 +75,12 @@ parse_result processor_file_impl::parse(
         dependencies_.clear();
         for (auto& file : last_analyzer_->hlasm_ctx().get_visited_files())
             if (file != get_file_name())
-                dependencies_.insert(file.get_absolute_path()); // todo convert dependencies_ to external resource
+                dependencies_.insert(file);
     }
 
     files_to_close_.clear();
     // files that used to be dependencies but are not anymore should be closed internally
-    for (auto& file : old_dep)
+    for (const auto& file : old_dep)
     {
         if (dependencies_.find(file) == dependencies_.end())
             files_to_close_.insert(file);
@@ -134,7 +134,10 @@ parse_result processor_file_impl::parse_no_lsp_update(
     return true;
 }
 
-const std::set<std::string>& processor_file_impl::dependencies() { return dependencies_; }
+const std::set<utils::path::external_resource, utils::path::external_resource_comp>& processor_file_impl::dependencies()
+{
+    return dependencies_;
+}
 
 const semantics::lines_info& processor_file_impl::get_hl_info()
 {
@@ -179,7 +182,11 @@ const lsp::feature_provider& processor_file_impl::get_lsp_feature_provider()
     return empty_res;
 }
 
-const std::set<std::string>& processor_file_impl::files_to_close() { return files_to_close_; }
+const std::set<utils::path::external_resource, utils::path::external_resource_comp>&
+processor_file_impl::files_to_close()
+{
+    return files_to_close_;
+}
 
 const performance_metrics& processor_file_impl::get_metrics()
 {

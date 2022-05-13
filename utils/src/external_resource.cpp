@@ -247,7 +247,7 @@ std::optional<std::string> get_path(const std::string& uri, uri_type uri_type)
         case uri_type::LOCAL_URI:
             return uri_to_path(uri);
         default:
-            return std::optional<std::string>();
+            return std::nullopt;
     }
 }
 

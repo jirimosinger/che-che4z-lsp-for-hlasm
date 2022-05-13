@@ -303,16 +303,13 @@ void lsp_analyzer::add_var_def(const semantics::variable_symbol* var, context::S
         != opencode_var_defs_.end())
         return;
 
-    opencode_var_defs_.emplace_back(var->access_basic()->name,
-        type,
-        global,
-        hlasm_ctx_.current_statement_location().file.get_absolute_path(), // todo
-        var->symbol_range.start);
+    opencode_var_defs_.emplace_back(
+        var->access_basic()->name, type, global, hlasm_ctx_.current_statement_location().file, var->symbol_range.start);
 }
 
 void lsp_analyzer::add_copy_operand(context::id_index name, const range& operand_range)
 {
-    // find ORD occurence of COPY_OP
+    // find ORD occurrence of COPY_OP
     lsp::symbol_occurence occ(lsp::occurence_kind::ORD, name, operand_range);
     auto ord_sym = std::find(stmt_occurences_.begin(), stmt_occurences_.end(), occ);
 

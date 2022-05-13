@@ -309,8 +309,7 @@ void server::consume_diagnostics(parser_library::diagnostic_list diagnostics)
             diags_array.push_back(std::move(one_json));
         }
 
-        json publish_diags_params { { "uri", file_diags.first },
-            { "diagnostics", diags_array } };
+        json publish_diags_params { { "uri", file_diags.first }, { "diagnostics", diags_array } };
         new_files.insert(file_diags.first);
         last_diagnostics_files_.erase(file_diags.first);
 

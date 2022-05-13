@@ -173,12 +173,14 @@ private:
 
     diagnostic_container config_diags_;
 
-    void filter_and_close_dependencies_(const std::set<std::string>& dependencies, processor_file_ptr file);
+    void filter_and_close_dependencies_(
+        const std::set<utils::path::external_resource, utils::path::external_resource_comp>& dependencies,
+        processor_file_ptr file);
     bool is_dependency_(const std::string& file_uri);
 
     bool program_id_match(const std::string& filename, const program_id& program) const;
 
-    std::vector<processor_file_ptr> find_related_opencodes(const std::string& document_uri) const;
+    std::vector<processor_file_ptr> find_related_opencodes(const utils::path::external_resource& document_uri) const;
     void delete_diags(processor_file_ptr file);
 
     void show_message(const std::string& message);

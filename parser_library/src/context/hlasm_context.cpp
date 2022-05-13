@@ -378,7 +378,9 @@ hlasm_context::hlasm_context(
 {
     add_global_system_vars(scope_stack_.emplace_back());
     visited_files_.insert(file_name);
-    push_statement_processing(processing::processing_kind::ORDINARY, std::move(file_name.get_absolute_path())); // todo is it possible to have push_statement_processing accept external_resource?
+    push_statement_processing(processing::processing_kind::ORDINARY,
+        std::move(file_name.get_absolute_path())); // todo is it possible to have push_statement_processing accept
+                                                   // external_resource?
 }
 
 hlasm_context::~hlasm_context() = default;

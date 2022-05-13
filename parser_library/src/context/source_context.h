@@ -33,7 +33,7 @@ struct source_context
 
     // stack of copy nests
     std::vector<copy_member_invocation> copy_stack;
-    // stack of statement processings
+    // stack of processing statements
     std::vector<processing::processing_kind> proc_stack;
 
     source_context(std::string source_name, processing::processing_kind initial);

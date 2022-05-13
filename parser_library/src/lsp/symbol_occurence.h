@@ -31,7 +31,7 @@ enum class occurence_kind
     COPY_OP
 };
 
-struct symbol_occurence
+struct symbol_occurence // todo typo -> rename to symbol_occurrence
 {
     occurence_kind kind;
     context::id_index name;

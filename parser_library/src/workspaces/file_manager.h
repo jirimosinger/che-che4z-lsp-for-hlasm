@@ -47,7 +47,7 @@ public:
     // If such processor file already exists, it is returned.
     // If such file already exists, it is changed into processor file.
     virtual processor_file_ptr add_processor_file(const utils::path::external_resource&) = 0;
-    virtual processor_file_ptr get_processor_file(const file_uri&) = 0;
+    virtual processor_file_ptr get_processor_file(const utils::path::external_resource&) = 0;
 
     virtual void remove_file(const utils::path::external_resource&) = 0;
 
