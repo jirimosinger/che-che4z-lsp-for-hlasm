@@ -43,7 +43,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 
     auto& add_macro_or_copy(std::string file_name, std::string text)
     {
-        auto file = std::make_shared<file_with_text>(external_resource(file_name, uri_type::UNKNOWN), text, *this);
+        auto file = std::make_shared<file_with_text>(external_resource(file_name), text, *this);
 
         auto [it, succ] = files_by_library_.emplace(file_name.substr(lib_prefix_length),
             std::pair<std::shared_ptr<file_with_text>, macro_cache>(
@@ -55,7 +55,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 
     auto add_opencode(std::string file_name, std::string text)
     {
-        auto file = std::make_shared<file_with_text>(external_resource(file_name, uri_type::UNKNOWN), text, *this);
+        auto file = std::make_shared<file_with_text>(external_resource(file_name), text, *this);
         files_by_fname_.emplace(std::move(file_name), file);
         return file;
     }
@@ -323,7 +323,7 @@ std::optional<diagnostic_s> find_diag_with_filename(
 TEST(macro_cache_test, overwrite_by_inline)
 {
     std::string opencode_file_name = "opencode";
-    external_resource opencode_file_res(opencode_file_name, uri_type::RELATIVE_PATH);
+    external_resource opencode_file_res(opencode_file_name);
     std::string opencode_text =
         R"(
        MAC
@@ -336,7 +336,7 @@ TEST(macro_cache_test, overwrite_by_inline)
        MAC
 )";
     std::string macro_file_name = "MAC";
-    external_resource macro_file_res(macro_file_name, uri_type::RELATIVE_PATH);
+    external_resource macro_file_res(macro_file_name);
     std::string macro_text =
         R"( MACRO
        MAC

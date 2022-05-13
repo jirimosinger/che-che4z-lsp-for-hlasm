@@ -67,11 +67,10 @@ processor_file_ptr file_manager_impl::add_processor_file(const utils::path::exte
 processor_file_ptr file_manager_impl::get_processor_file(const file_uri& uri)
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.find(utils::path::external_resource(uri, utils::path::uri_type::UNKNOWN));
+    auto ret = files_.find(utils::path::external_resource(uri));
     if (ret == files_.end())
     {
-        return std::make_shared<processor_file_impl>(
-            utils::path::external_resource(uri, utils::path::uri_type::UNKNOWN), *this);
+        return std::make_shared<processor_file_impl>(utils::path::external_resource(uri), *this);
     }
     else
         return change_into_processor_file_if_not_already_(ret->second);
@@ -91,7 +90,7 @@ void file_manager_impl::remove_file(const utils::path::external_resource& docume
 file_ptr file_manager_impl::find(const std::string& key) const
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.find(utils::path::external_resource(key, utils::path::uri_type::UNKNOWN));
+    auto ret = files_.find(utils::path::external_resource(key));
     if (ret == files_.end())
         return nullptr;
 

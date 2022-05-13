@@ -34,11 +34,11 @@ enum class uri_type
 class external_resource
 {
 public:
-    // external_resource(std::string uri);
-    external_resource(std::string uri, uri_type type);
+    external_resource(std::string uri);
+    external_resource(const char* uri);
 
-    template<class T>
-    external_resource(T) = delete;
+    // template<class T>
+    // external_resource(T) = delete;
 
     // template<class T>
     // external_resource(T, uri_type) = delete;

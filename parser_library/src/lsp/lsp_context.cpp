@@ -450,10 +450,11 @@ void lsp_context::document_symbol_opencode_var_seq_symbol_aux(document_symbol_li
     }
 }
 
-document_symbol_list_s lsp_context::document_symbol(const std::string& document_uri, long long limit) const
+document_symbol_list_s lsp_context::document_symbol(
+    const utils::path::external_resource& resource, long long limit) const
 {
     document_symbol_list_s result;
-    const auto& file = m_files.find(document_uri);
+    const auto& file = m_files.find(resource.get_absolute_path());
     if (file == m_files.end() || limit <= 0)
         return result;
 
@@ -468,11 +469,12 @@ document_symbol_list_s lsp_context::document_symbol(const std::string& document_
     switch (file->second->type)
     {
         case file_type::MACRO:
-            document_symbol_macro(result, document_uri, std::nullopt, limit, cache);
+            document_symbol_macro(result, resource.get_absolute_path(), std::nullopt, limit, cache);
             break;
 
         case file_type::COPY:
-            document_symbol_copy(result, file->second->get_occurences(), document_uri, std::nullopt, limit);
+            document_symbol_copy(
+                result, file->second->get_occurences(), resource.get_absolute_path(), std::nullopt, limit);
             break;
 
         default:
@@ -483,7 +485,7 @@ document_symbol_list_s lsp_context::document_symbol(const std::string& document_
             {
                 if (limit <= 0)
                     break;
-                if (!belongs_to_copyfile(document_uri, sym.def_position, sym.name))
+                if (!belongs_to_copyfile(resource.get_absolute_path(), sym.def_position, sym.name))
                 {
                     result.emplace_back(*sym.name, document_symbol_kind::VAR, range(sym.def_position));
                     --limit;
@@ -555,16 +557,16 @@ const file_info* lsp_context::get_file_info(const std::string& file_name) const
         return nullptr;
 }
 
-location lsp_context::definition(const std::string& document_uri, const position pos) const
+location lsp_context::definition(const utils::path::external_resource& resource, const position pos) const
 {
-    auto [occ, macro_scope] = find_occurence_with_scope(document_uri, pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(resource.get_absolute_path(), pos);
 
     if (!occ)
-        return { pos, document_uri };
+        return { pos, resource.get_url() };
 
     if (auto def = find_definition_location(*occ, macro_scope))
         return { def->pos, def->file };
-    return { pos, document_uri };
+    return { pos, resource.get_url() };
 }
 
 void collect_references(location_list& refs, const symbol_occurence& occ, const file_occurences_t& file_occs)
@@ -577,11 +579,11 @@ void collect_references(location_list& refs, const symbol_occurence& occ, const 
     }
 }
 
-location_list lsp_context::references(const std::string& document_uri, const position pos) const
+location_list lsp_context::references(const utils::path::external_resource& resource, const position pos) const
 {
     location_list result;
 
-    auto [occ, macro_scope] = find_occurence_with_scope(document_uri, pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(resource.get_absolute_path(), pos);
 
     if (!occ)
         return {};
@@ -603,9 +605,9 @@ location_list lsp_context::references(const std::string& document_uri, const pos
     return result;
 }
 
-hover_result lsp_context::hover(const std::string& document_uri, const position pos) const
+hover_result lsp_context::hover(const utils::path::external_resource& resource, const position pos) const
 {
-    auto [occ, macro_scope] = find_occurence_with_scope(document_uri, pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(resource.get_absolute_path(), pos);
 
     if (!occ)
         return {};
@@ -630,12 +632,12 @@ bool lsp_context::should_complete_instr(const text_data_ref_t& text, const posit
     return !line_before_continued && std::regex_match(line_so_far.begin(), line_so_far.end(), instruction_regex);
 }
 
-completion_list_s lsp_context::completion(const std::string& document_uri,
+completion_list_s lsp_context::completion(const utils::path::external_resource& resource,
     const position pos,
     const char trigger_char,
     completion_trigger_kind trigger_kind) const
 {
-    auto file_it = m_files.find(document_uri);
+    auto file_it = m_files.find(resource.get_absolute_path());
     if (file_it == m_files.end())
         return completion_list_s();
     const text_data_ref_t& text = file_it->second->data;

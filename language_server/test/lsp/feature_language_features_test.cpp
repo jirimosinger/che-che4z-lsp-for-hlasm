@@ -26,53 +26,67 @@
 using hlasm_plugin::utils::platform::is_windows;
 
 const char* path = is_windows() ? "c:\\test" : "/home/test";
+const std::string path_url = is_windows() ? "file:///c%3A/test" : "file:///home/test";
 
 using namespace hlasm_plugin;
 using namespace hlasm_plugin::language_server;
+using namespace ::testing;
 
 TEST(language_features, completion)
 {
-    using namespace ::testing;
     test::ws_mngr_mock ws_mngr;
     NiceMock<response_provider_mock> response_mock;
     lsp::feature_language_features f(ws_mngr, response_mock);
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    json params1 = is_windows()
-        ? R"({"textDocument":{"uri":"file:///c%3A/test"},"position":{"line":0,"character":1},"context":{"triggerKind":1}})"_json
-        : R"({"textDocument":{"uri":"file:///home/test"},"position":{"line":0,"character":1},"context":{"triggerKind":1}})"_json;
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     EXPECT_CALL(ws_mngr,
         completion(
-            StrEq(path), parser_library::position(0, 1), '\0', parser_library::completion_trigger_kind::invoked));
+            StrEq(path_url), parser_library::position(0, 1), '\0', parser_library::completion_trigger_kind::invoked));
     notifs["textDocument/completion"].handler("", params1);
 }
 
 TEST(language_features, hover)
 {
-    using namespace ::testing;
     test::ws_mngr_mock ws_mngr;
     NiceMock<response_provider_mock> response_mock;
     lsp::feature_language_features f(ws_mngr, response_mock);
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    json params1 = is_windows()
-        ? R"({"textDocument":{"uri":"file:///c%3A/test"},"position":{"line":0,"character":1}})"_json
-        : R"({"textDocument":{"uri":"file:///home/test"},"position":{"line":0,"character":1}})"_json;
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     std::string s("test");
-    parser_library::sequence<char> ret(s);
-    EXPECT_CALL(ws_mngr, hover(StrEq(path), parser_library::position(0, 1))).WillOnce(Return(ret));
+    EXPECT_CALL(ws_mngr, hover(StrEq(path_url), parser_library::position(0, 1)));
+    notifs["textDocument/hover"].handler("", params1);
+}
+
+TEST(language_features, hover_integration)
+{
+    parser_library::workspace_manager ws_mngr;
+    NiceMock<response_provider_mock> response_mock;
+    lsp::feature_language_features f(ws_mngr, response_mock);
+    std::map<std::string, method> notifs;
+    f.register_methods(notifs);
+
+    std::string file_text = "&VAR SETA 1";
+    std::string file_res = utils::path::path_to_uri(path);
+    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
+
+    json response { { "contents", { { "kind", "markdown" }, { "value", "SETA variable" } } } };
+    EXPECT_CALL(response_mock, respond(json(""), std::string(""), response));
+
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + file_res
+        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
     notifs["textDocument/hover"].handler("", params1);
 }
 
 TEST(language_features, definition)
 {
-    using namespace ::testing;
-
-
     parser_library::workspace_manager ws_mngr;
 
     NiceMock<response_provider_mock> response_mock;
@@ -80,34 +94,29 @@ TEST(language_features, definition)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    json params1 = is_windows()
-        ? R"({"textDocument":{"uri":"file:///c%3A/test"},"position":{"line":0,"character":1}})"_json
-        : R"({"textDocument":{"uri":"file:///home/test"},"position":{"line":0,"character":1}})"_json;
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
-    EXPECT_CALL(response_mock, respond(json(""), "", ::testing::_));
+    EXPECT_CALL(response_mock, respond(json(""), "", _));
     notifs["textDocument/definition"].handler("", params1);
 }
-
 TEST(language_features, references)
 {
-    using namespace ::testing;
     test::ws_mngr_mock ws_mngr;
     NiceMock<response_provider_mock> response_mock;
     lsp::feature_language_features f(ws_mngr, response_mock);
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    json params1 = is_windows()
-        ? R"({"textDocument":{"uri":"file:///c%3A/test"},"position":{"line":0,"character":1}})"_json
-        : R"({"textDocument":{"uri":"file:///home/test"},"position":{"line":0,"character":1}})"_json;
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
-    EXPECT_CALL(ws_mngr, references(StrEq(path), parser_library::position(0, 1)));
+    EXPECT_CALL(ws_mngr, references(StrEq(path_url), parser_library::position(0, 1)));
     notifs["textDocument/references"].handler("", params1);
 }
 
 TEST(language_features, document_symbol)
 {
-    using namespace ::testing;
     parser_library::workspace_manager ws_mngr;
     response_provider_mock response_mock;
     lsp::feature_language_features f(ws_mngr, response_mock);
@@ -130,7 +139,6 @@ TEST(language_features, document_symbol)
 
 TEST(language_features, semantic_tokens)
 {
-    using namespace ::testing;
     parser_library::workspace_manager ws_mngr;
     response_provider_mock response_mock;
     lsp::feature_language_features f(ws_mngr, response_mock);
@@ -151,7 +159,6 @@ TEST(language_features, semantic_tokens)
 
 TEST(language_features, semantic_tokens_multiline)
 {
-    using namespace ::testing;
     parser_library::workspace_manager ws_mngr;
     response_provider_mock response_mock;
     lsp::feature_language_features f(ws_mngr, response_mock);
@@ -185,7 +192,6 @@ IIIIIIIIIIIIIII1
 
 TEST(language_features, semantic_tokens_multiline_overlap)
 {
-    using namespace ::testing;
     parser_library::workspace_manager ws_mngr;
     response_provider_mock response_mock;
     lsp::feature_language_features f(ws_mngr, response_mock);

@@ -42,7 +42,7 @@ std::string one_proc_grps = R"(
 )";
 
 std::string file_name = "a_file";
-external_resource file_res(file_name, uri_type::RELATIVE_PATH);
+external_resource file_res(file_name);
 
 TEST(diags_suppress, no_suppress)
 {
@@ -50,7 +50,7 @@ TEST(diags_suppress, no_suppress)
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
 
-    external_resource file_name_res("a_file", uri_type::RELATIVE_PATH);
+    external_resource file_name_res("a_file");
 
     fm.did_open_file(file_name_res, 0, R"(
     LR 1,

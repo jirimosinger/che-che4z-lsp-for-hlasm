@@ -106,9 +106,8 @@ void feature_language_features::definition(const json& id, const json& params)
         parser_library::position(params["position"]["line"].get<int>(), params["position"]["character"].get<int>());
 
 
-    auto definition_position_uri = ws_mngr_.definition(utils::path::uri_to_path(document_uri).c_str(), pos);
-    document_uri = definition_position_uri.file().empty() ? document_uri
-                                                          : utils::path::path_to_uri(definition_position_uri.file());
+    auto definition_position_uri = ws_mngr_.definition(document_uri.c_str(), pos);
+    document_uri = definition_position_uri.file().empty() ? document_uri : definition_position_uri.file();
     json to_ret {
         { "uri", document_uri },
         { "range", range_to_json({ definition_position_uri.pos(), definition_position_uri.pos() }) },
@@ -122,12 +121,11 @@ void feature_language_features::references(const json& id, const json& params)
     auto pos =
         parser_library::position(params["position"]["line"].get<int>(), params["position"]["character"].get<int>());
     json to_ret = json::array();
-    auto references = ws_mngr_.references(utils::path::uri_to_path(document_uri).c_str(), pos);
+    auto references = ws_mngr_.references(document_uri.c_str(), pos);
     for (size_t i = 0; i < references.size(); ++i)
     {
         auto ref = references.item(i);
-        to_ret.push_back(json {
-            { "uri", utils::path::path_to_uri(ref.file()) }, { "range", range_to_json({ ref.pos(), ref.pos() }) } });
+        to_ret.push_back(json { { "uri", ref.file() }, { "range", range_to_json({ ref.pos(), ref.pos() }) } });
     }
     response_->respond(id, "", to_ret);
 }
@@ -138,7 +136,7 @@ void feature_language_features::hover(const json& id, const json& params)
         parser_library::position(params["position"]["line"].get<int>(), params["position"]["character"].get<int>());
 
 
-    auto hover_list = std::string_view(ws_mngr_.hover(utils::path::uri_to_path(document_uri).c_str(), pos));
+    auto hover_list = std::string_view(ws_mngr_.hover(document_uri.c_str(), pos));
 
     response_->respond(id, "", json { { "contents", hover_list.empty() ? json() : get_markup_content(hover_list) } });
 }
@@ -205,8 +203,7 @@ void feature_language_features::completion(const json& id, const json& params)
     if (trigger_kind == parser_library::completion_trigger_kind::trigger_character)
         trigger_char = params["context"]["triggerCharacter"].get<std::string>()[0];
 
-    auto completion_list =
-        ws_mngr_.completion(utils::path::uri_to_path(document_uri).c_str(), pos, trigger_char, trigger_kind);
+    auto completion_list = ws_mngr_.completion(document_uri.c_str(), pos, trigger_char, trigger_kind);
     json to_ret = json::value_t::null;
     json completion_item_array = json::array();
     for (size_t i = 0; i < completion_list.size(); ++i)

@@ -44,7 +44,7 @@ TEST(debugger, stopped_on_entry)
     debugger d;
     d.set_event_consumer(&m);
     std::string file_name = "test_workspace\\test";
-    external_resource file_res(file_name, uri_type::RELATIVE_PATH);
+    external_resource file_res(file_name);
 
     file_manager.did_open_file(file_res, 0, "   LR 1,2");
     d.launch(file_name.c_str(), ws, true);
@@ -81,7 +81,7 @@ TEST(debugger, disconnect)
     debugger d;
     d.set_event_consumer(&m);
     std::string file_name = "test_workspace\\test";
-    external_resource file_res(file_name, uri_type::RELATIVE_PATH);
+    external_resource file_res(file_name);
 
     file_manager.did_open_file(file_res, 0, "   LR 1,2");
     d.launch(file_name.c_str(), ws, true);
@@ -321,8 +321,7 @@ public:
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override
     {
-        std::shared_ptr<processor> found =
-            get_file_manager().add_processor_file(external_resource(library, uri_type::UNKNOWN));
+        std::shared_ptr<processor> found = get_file_manager().add_processor_file(external_resource(library));
         if (found)
             return found->parse_no_lsp_update(*this, std::move(ctx), data);
 
@@ -352,13 +351,13 @@ TEST(debugger, test)
         LR 1,1
 )";
     std::string copy1_filename = "COPY1";
-    external_resource copy1_file_res(copy1_filename, uri_type::RELATIVE_PATH);
+    external_resource copy1_file_res(copy1_filename);
     std::string copy1_source = R"(
         COPY COPY2
 )";
 
     std::string copy2_filename = "COPY2";
-    external_resource copy2_file_res(copy2_filename, uri_type::RELATIVE_PATH);
+    external_resource copy2_file_res(copy2_filename);
     std::string copy2_source = R"(
 
         ANOP
@@ -374,7 +373,7 @@ TEST(debugger, test)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+    external_resource file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
@@ -463,7 +462,7 @@ TEST(debugger, sysstmt)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+    external_resource file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
@@ -512,7 +511,7 @@ A  MAC_IN ()
 )";
 
     std::string copy1_filename = "COPY1";
-    external_resource copy1_file_res(copy1_filename, uri_type::RELATIVE_PATH);
+    external_resource copy1_file_res(copy1_filename);
     std::string copy1_source = R"(
            LR 1,1
 )";
@@ -525,7 +524,7 @@ A  MAC_IN ()
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+    external_resource file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
@@ -691,7 +690,7 @@ TEST(debugger, positional_parameters)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+    external_resource file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
 
@@ -812,7 +811,7 @@ TEST(debugger, arrays)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+    external_resource file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
 
@@ -868,7 +867,7 @@ B EQU A
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+    external_resource file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
 
@@ -894,7 +893,7 @@ TEST(debugger, concurrent_next_and_file_change)
     COPY COPY1
 )";
     std::string copy1_filename = "COPY1";
-    external_resource copy1_file_res(copy1_filename, uri_type::RELATIVE_PATH);
+    external_resource copy1_file_res(copy1_filename);
     std::string copy1_source = R"(
         LR 1,1
         LR 1,1
@@ -913,7 +912,7 @@ TEST(debugger, concurrent_next_and_file_change)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename, uri_type::RELATIVE_PATH);
+    external_resource file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);

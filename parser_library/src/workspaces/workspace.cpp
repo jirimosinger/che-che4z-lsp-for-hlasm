@@ -61,7 +61,7 @@ workspace::workspace(const utils::path::external_resource& uri,
 {}
 
 workspace::workspace(file_manager& file_manager, const lib_config& global_config, std::atomic<bool>* cancel)
-    : workspace(utils::path::external_resource("", utils::path::uri_type::UNKNOWN), file_manager, global_config, cancel)
+    : workspace(utils::path::external_resource(""), file_manager, global_config, cancel)
 {
     opened_ = true;
 }
@@ -91,7 +91,7 @@ std::vector<processor_file_ptr> workspace::find_related_opencodes(const std::str
 
     for (const auto& dep : dependants_)
     {
-        auto f = file_manager_.find_processor_file(utils::path::external_resource(dep, utils::path::uri_type::UNKNOWN));
+        auto f = file_manager_.find_processor_file(utils::path::external_resource(dep));
         if (!f)
             continue;
         if (f->dependencies().find(document_uri) != f->dependencies().end())
@@ -101,8 +101,7 @@ std::vector<processor_file_ptr> workspace::find_related_opencodes(const std::str
     if (opencodes.size())
         return opencodes;
 
-    if (auto f = file_manager_.find_processor_file(
-            utils::path::external_resource(document_uri, utils::path::uri_type::UNKNOWN)))
+    if (auto f = file_manager_.find_processor_file(utils::path::external_resource(document_uri)))
         return { f };
     return {};
 }
@@ -113,8 +112,7 @@ void workspace::delete_diags(processor_file_ptr file)
 
     for (const std::string& fname : file->dependencies())
     {
-        auto dep_file =
-            file_manager_.find_processor_file(utils::path::external_resource(fname, utils::path::uri_type::UNKNOWN));
+        auto dep_file = file_manager_.find_processor_file(utils::path::external_resource(fname));
         if (dep_file)
             dep_file->diags().clear();
     }
@@ -191,8 +189,7 @@ workspace_file_info workspace::parse_config_file()
 
         for (const auto& fname : dependants_)
         {
-            auto found = file_manager_.find_processor_file(
-                utils::path::external_resource(fname, utils::path::uri_type::UNKNOWN));
+            auto found = file_manager_.find_processor_file(utils::path::external_resource(fname));
             if (found)
                 filter_and_close_dependencies_(found->files_to_close(), found);
         }
@@ -216,8 +213,7 @@ workspace_file_info workspace::parse_file(const std::string& file_uri)
 
     for (const auto& fname : dependants_)
     {
-        auto f =
-            file_manager_.find_processor_file(utils::path::external_resource(fname, utils::path::uri_type::UNKNOWN));
+        auto f = file_manager_.find_processor_file(utils::path::external_resource(fname));
         if (!f)
             continue;
         for (auto& name : f->dependencies())
@@ -232,8 +228,7 @@ workspace_file_info workspace::parse_file(const std::string& file_uri)
 
     if (files_to_parse.empty())
     {
-        auto f =
-            file_manager_.find_processor_file(utils::path::external_resource(file_uri, utils::path::uri_type::UNKNOWN));
+        auto f = file_manager_.find_processor_file(utils::path::external_resource(file_uri));
         if (f)
             files_to_parse.push_back(f);
     }
@@ -304,8 +299,7 @@ void workspace::did_close_file(const utils::path::external_resource& file_uri)
     auto fname = dependants_.find(file_uri.get_url());
     if (fname != dependants_.end())
     {
-        auto file =
-            file_manager_.find_processor_file(utils::path::external_resource(*fname, utils::path::uri_type::UNKNOWN));
+        auto file = file_manager_.find_processor_file(utils::path::external_resource(*fname));
         // filter the dependencies that should not be closed
         filter_and_close_dependencies_(file->dependencies(), file);
         // Erase macros cached for this opencode from all its dependencies
@@ -335,52 +329,53 @@ void workspace::did_change_watched_files(const utils::path::external_resource& f
     parse_file(file_uri.get_url());
 }
 
-location workspace::definition(const std::string& document_uri, const position pos) const
+location workspace::definition(const utils::path::external_resource& resource, const position pos) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(resource.get_absolute_path());
     if (opencodes.empty())
-        return { pos, document_uri };
+        return { pos, resource.get_url() };
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().definition(document_uri, pos);
+    return opencodes.back()->get_lsp_feature_provider().definition(resource, pos);
 }
 
-location_list workspace::references(const std::string& document_uri, const position pos) const
+location_list workspace::references(const utils::path::external_resource& resource, const position pos) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
-    if (opencodes.empty())
-        return {};
-    // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().references(document_uri, pos);
-}
-
-lsp::hover_result workspace::hover(const std::string& document_uri, const position pos) const
-{
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(resource.get_absolute_path());
     if (opencodes.empty())
         return {};
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().hover(document_uri, pos);
+    return opencodes.back()->get_lsp_feature_provider().references(resource, pos);
 }
 
-lsp::completion_list_s workspace::completion(const std::string& document_uri,
+lsp::hover_result workspace::hover(const utils::path::external_resource& resource, const position pos) const
+{
+    auto opencodes = find_related_opencodes(resource.get_absolute_path());
+    if (opencodes.empty())
+        return {};
+    // for now take last opencode
+    return opencodes.back()->get_lsp_feature_provider().hover(resource, pos);
+}
+
+lsp::completion_list_s workspace::completion(const utils::path::external_resource& resource,
     const position pos,
     const char trigger_char,
     completion_trigger_kind trigger_kind) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(resource.get_absolute_path());
     if (opencodes.empty())
         return {};
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().completion(document_uri, pos, trigger_char, trigger_kind);
+    return opencodes.back()->get_lsp_feature_provider().completion(resource, pos, trigger_char, trigger_kind);
 }
 
-lsp::document_symbol_list_s workspace::document_symbol(const std::string& document_uri, long long limit) const
+lsp::document_symbol_list_s workspace::document_symbol(
+    const utils::path::external_resource& resource, long long limit) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(resource.get_absolute_path());
     if (opencodes.empty())
         return {};
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().document_symbol(document_uri, limit);
+    return opencodes.back()->get_lsp_feature_provider().document_symbol(resource, limit);
 }
 
 void workspace::open() { load_and_process_config(); }
@@ -642,8 +637,8 @@ bool workspace::load_config(
     std::filesystem::path hlasm_base = utils::path::join(uri_.get_absolute_path(), HLASM_PLUGIN_FOLDER);
 
     // proc_grps.json parse
-    proc_grps_file = file_manager_.add_file(utils::path::external_resource(
-        utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string(), utils::path::uri_type::ABSOLUTE_PATH));
+    proc_grps_file = file_manager_.add_file(
+        utils::path::external_resource(utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string()));
 
     if (proc_grps_file->update_and_get_bad())
         return false;
@@ -669,8 +664,8 @@ bool workspace::load_config(
     }
 
     // pgm_conf.json parse
-    pgm_conf_file = file_manager_.add_file(utils::path::external_resource(
-        utils::path::join(hlasm_base, FILENAME_PGM_CONF).string(), utils::path::uri_type::ABSOLUTE_PATH));
+    pgm_conf_file = file_manager_.add_file(
+        utils::path::external_resource(utils::path::join(hlasm_base, FILENAME_PGM_CONF).string()));
 
     if (pgm_conf_file->update_and_get_bad())
         return false;
@@ -706,8 +701,7 @@ void workspace::filter_and_close_dependencies_(const std::set<std::string>& depe
     // filters out externally open files
     for (auto& dependency : dependencies)
     {
-        auto dependency_file = file_manager_.find_processor_file(
-            utils::path::external_resource(dependency, utils::path::uri_type::UNKNOWN));
+        auto dependency_file = file_manager_.find_processor_file(utils::path::external_resource(dependency));
         if (dependency_file && !dependency_file->get_lsp_editing())
             filtered.insert(dependency);
     }
@@ -715,8 +709,7 @@ void workspace::filter_and_close_dependencies_(const std::set<std::string>& depe
     // filters the files that are dependencies of other dependants and externally open files
     for (auto dependant : dependants_)
     {
-        auto fdependant = file_manager_.find_processor_file(
-            utils::path::external_resource(dependant, utils::path::uri_type::UNKNOWN));
+        auto fdependant = file_manager_.find_processor_file(utils::path::external_resource(dependant));
         if (!fdependant)
             continue;
         for (auto& dependency : fdependant->dependencies())
@@ -729,8 +722,8 @@ void workspace::filter_and_close_dependencies_(const std::set<std::string>& depe
     // close all exclusive dependencies of file
     for (auto& dep : filtered)
     {
-        file_manager_.did_close_file(utils::path::external_resource(dep, utils::path::uri_type::UNKNOWN));
-        file_manager_.remove_file(utils::path::external_resource(dep, utils::path::uri_type::UNKNOWN));
+        file_manager_.did_close_file(utils::path::external_resource(dep));
+        file_manager_.remove_file(utils::path::external_resource(dep));
     }
 }
 
@@ -738,8 +731,7 @@ bool workspace::is_dependency_(const std::string& file_uri)
 {
     for (auto dependant : dependants_)
     {
-        auto fdependant = file_manager_.find_processor_file(
-            utils::path::external_resource(dependant, utils::path::uri_type::UNKNOWN));
+        auto fdependant = file_manager_.find_processor_file(utils::path::external_resource(dependant));
         if (!fdependant)
             continue;
         for (auto& dependency : fdependant->dependencies())

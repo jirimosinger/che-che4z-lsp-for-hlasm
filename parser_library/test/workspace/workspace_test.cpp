@@ -72,7 +72,7 @@ TEST_F(workspace_test, parse_lib_provider)
 
     std::string test_wks_path = path::join(path::join("test", "library"), "test_wks").string();
 
-    workspace ws(external_resource(test_wks_path, uri_type::ABSOLUTE_PATH), file_mngr, config);
+    workspace ws(external_resource(test_wks_path), file_mngr, config);
 
     ws.open();
 
@@ -80,19 +80,18 @@ TEST_F(workspace_test, parse_lib_provider)
     collect_diags_from_child(file_mngr);
     EXPECT_EQ(diags().size(), (size_t)0);
 
-    file_mngr.add_processor_file(
-        external_resource(std::string("test\\library\\test_wks\\correct"), uri_type::RELATIVE_PATH));
+    file_mngr.add_processor_file(external_resource("test\\library\\test_wks\\correct"));
 
     auto [ctx_1, ctx_2] = [&ws]() {
         if (platform::is_windows())
         {
-            ws.did_open_file(external_resource("test\\library\\test_wks\\correct", uri_type::RELATIVE_PATH));
+            ws.did_open_file(external_resource("test\\library\\test_wks\\correct"));
             return std::make_pair(std::make_shared<context::hlasm_context>("test\\library\\test_wks\\correct"),
                 std::make_shared<context::hlasm_context>("test\\library\\test_wks\\correct"));
         }
         else
         {
-            ws.did_open_file(external_resource("test/library/test_wks/correct", uri_type::RELATIVE_PATH));
+            ws.did_open_file(external_resource("test/library/test_wks/correct"));
             return std::make_pair(std::make_shared<context::hlasm_context>("test/library/test_wks/correct"),
                 std::make_shared<context::hlasm_context>("test/library/test_wks/correct"));
         }
@@ -282,17 +281,17 @@ const char* faulty_macro_path = is_windows() ? "lib\\ERROR" : "lib/ERROR";
 const char* correct_macro_path = is_windows() ? "lib\\CORRECT" : "lib/CORRECT";
 std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
 
-external_resource empty_res = external_resource(std::string(""), uri_type::RELATIVE_PATH);
+external_resource empty_res = external_resource("");
 
-// external_resource proc_grps_res(std::string("proc_grps.json"), uri_type::RELATIVE_PATH);
-// external_resource pgm_conf_res(std::string("pgm_conf.json"), uri_type::RELATIVE_PATH);
-external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json", uri_type::RELATIVE_PATH);
-external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json", uri_type::RELATIVE_PATH);
-external_resource source1_res("source1", uri_type::RELATIVE_PATH);
-external_resource source2_res("source2", uri_type::RELATIVE_PATH);
-external_resource source3_res("source3", uri_type::RELATIVE_PATH);
-external_resource faulty_macro_res(faulty_macro_path, uri_type::RELATIVE_PATH);
-external_resource correct_macro_res(correct_macro_path, uri_type::RELATIVE_PATH);
+// external_resource proc_grps_res(std::string("proc_grps.json"));
+// external_resource pgm_conf_res(std::string("pgm_conf.json"));
+external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json");
+external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
+external_resource source1_res("source1");
+external_resource source2_res("source2");
+external_resource source3_res("source3");
+external_resource faulty_macro_res(faulty_macro_path);
+external_resource correct_macro_res(correct_macro_path);
 
 class file_manager_extended : public file_manager_impl
 {
@@ -336,7 +335,7 @@ class file_manager_opt : public file_manager_impl
 {
     std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
     {
-        external_resource res(std::string("proc_grps.json"), uri_type::RELATIVE_PATH);
+        external_resource res(std::string("proc_grps.json"));
 
         switch (variant)
         {
@@ -359,7 +358,7 @@ class file_manager_opt : public file_manager_impl
 
     std::unique_ptr<file_with_text> generate_pgm_conf_file(file_manager_opt_variant variant)
     {
-        external_resource res(std::string("pgm_conf.json"), uri_type::RELATIVE_PATH);
+        external_resource res(std::string("pgm_conf.json"));
 
         switch (variant)
         {

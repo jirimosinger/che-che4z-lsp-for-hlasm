@@ -48,14 +48,15 @@ public:
     [[nodiscard]] macro_info_ptr get_macro_info(context::id_index macro_name) const;
     [[nodiscard]] const file_info* get_file_info(const std::string& file_name) const;
 
-    location definition(const std::string& document_uri, position pos) const override;
-    location_list references(const std::string& document_uri, position pos) const override;
-    hover_result hover(const std::string& document_uri, position pos) const override;
-    completion_list_s completion(const std::string& document_uri,
+    location definition(const utils::path::external_resource& resource, position pos) const override;
+    location_list references(const utils::path::external_resource& resource, position pos) const override;
+    hover_result hover(const utils::path::external_resource& document_uri, position pos) const override;
+    completion_list_s completion(const utils::path::external_resource& document_uri,
         position pos,
         char trigger_char,
         completion_trigger_kind trigger_kind) const override;
-    document_symbol_list_s document_symbol(const std::string& document_uri, long long limit) const override;
+    document_symbol_list_s document_symbol(
+        const utils::path::external_resource& document_uri, long long limit) const override;
 
 private:
     void add_file(file_info file_i);

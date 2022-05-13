@@ -35,7 +35,7 @@ class file_proc_grps : public file_impl
 {
 public:
     file_proc_grps()
-        : file_impl(external_resource(std::string("proc_grps.json"), uri_type::RELATIVE_PATH))
+        : file_impl(external_resource("proc_grps.json"))
     {}
 
     file_uri uri = "test_uri";
@@ -107,7 +107,7 @@ class file_pgm_conf : public file_impl
 {
 public:
     file_pgm_conf()
-        : file_impl(external_resource(std::string("proc_grps.json"), uri_type::RELATIVE_PATH))
+        : file_impl(external_resource("proc_grps.json"))
     {}
 
     file_uri uri = "test_uri";
@@ -183,7 +183,7 @@ public:
 
 TEST(workspace, load_config_synthetic)
 {
-    external_resource res(std::string("test_proc_grps_uri"), uri_type::RELATIVE_PATH);
+    external_resource res(std::string("test_proc_grps_uri"));
     file_manager_proc_grps_test file_manager;
     lib_config config;
     workspace ws(res, "test_proc_grps_name", file_manager, config);

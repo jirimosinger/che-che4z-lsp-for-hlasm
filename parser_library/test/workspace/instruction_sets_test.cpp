@@ -103,8 +103,8 @@ std::string sam31_macro = R"( MACRO
 const char* sam31_macro_path = is_windows() ? "lib\\SAM31" : "lib/SAM31";
 std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
 
-external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json", uri_type::RELATIVE_PATH);
-external_resource source_res("source", uri_type::RELATIVE_PATH);
+external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json");
+external_resource source_res("source");
 
 enum class file_manager_opt_variant
 {
@@ -116,7 +116,7 @@ class file_manager_opt : public file_manager_impl
 {
     std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
     {
-        external_resource res(std::string("proc_grps.json"), uri_type::RELATIVE_PATH);
+        external_resource res(std::string("proc_grps.json"));
         switch (variant)
         {
             case file_manager_opt_variant::optable_370:
@@ -130,8 +130,8 @@ class file_manager_opt : public file_manager_impl
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
-        external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json", uri_type::RELATIVE_PATH);
-        external_resource sam31_macro_res(sam31_macro_path, uri_type::RELATIVE_PATH);
+        external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
+        external_resource sam31_macro_res(sam31_macro_path);
 
         files_.emplace(proc_grps_res, generate_proc_grps_file(variant));
         files_.emplace(pgm_conf_res, std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this));
@@ -154,19 +154,14 @@ void change_instruction_set(
     std::vector<document_change> changes;
     changes.push_back(document_change({ change_range }, process_group.c_str(), process_group.size()));
 
-    fm.did_change_file(external_resource(hlasmplugin_folder + "proc_grps.json", uri_type::RELATIVE_PATH),
-        1,
-        changes.data(),
-        changes.size());
-    ws.did_change_file(external_resource(hlasmplugin_folder + "proc_grps.json", uri_type::RELATIVE_PATH),
-        changes.data(),
-        changes.size());
+    fm.did_change_file(external_resource(hlasmplugin_folder + "proc_grps.json"), 1, changes.data(), changes.size());
+    ws.did_change_file(external_resource(hlasmplugin_folder + "proc_grps.json"), changes.data(), changes.size());
 }
 } // namespace
 
 TEST_F(workspace_instruction_sets_test, changed_instr_set_370_Z10)
 {
-    // external_resource res(std::string("workspace_name"), uri_type::RELATIVE_PATH);
+    // external_resource res(std::string("workspace_name"));
     file_manager_opt file_manager(file_manager_opt_variant::optable_370);
     lib_config config;
     workspace ws(file_manager, config);
@@ -184,7 +179,7 @@ TEST_F(workspace_instruction_sets_test, changed_instr_set_370_Z10)
 
 TEST_F(workspace_instruction_sets_test, changed_instr_set_Z10_370)
 {
-    // external_resource res(std::string("workspace_name"), uri_type::RELATIVE_PATH);
+    // external_resource res(std::string("workspace_name"));
     file_manager_opt file_manager(file_manager_opt_variant::optable_Z10);
     lib_config config;
     workspace ws(file_manager, config);

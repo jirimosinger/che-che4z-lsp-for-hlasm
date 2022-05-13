@@ -56,27 +56,27 @@ TEST(external_resource, path_to_uri)
     }
 }
 
-//TEST(external_resource, external_resource_local_relative)
+// TEST(external_resource, external_resource_local_relative)
 //{
-//    std::string uri = is_windows() ? "folder" : "user/somefile";
+//     std::string uri = is_windows() ? "folder" : "user/somefile";
 //
-//    external_resource res(uri, uri_type::UNKNOWN);
-//    EXPECT_EQ(res.get_type(), uri_type::LOCAL);
-//}
+//     external_resource res(uri);
+//     EXPECT_EQ(res.get_type(), uri_type::LOCAL);
+// }
 //
-//TEST(external_resource, external_resource_local_absolute)
+// TEST(external_resource, external_resource_local_absolute)
 //{
-//    std::string uri = is_windows() ? "c:\\Public" : "/home/user/somefile";
+//     std::string uri = is_windows() ? "c:\\Public" : "/home/user/somefile";
 //
-//    external_resource res(uri, uri_type::UNKNOWN);
-//    EXPECT_EQ(res.get_type(), uri_type::LOCAL);
-//}
+//     external_resource res(uri);
+//     EXPECT_EQ(res.get_type(), uri_type::LOCAL);
+// }
 
 TEST(external_resource, external_resource_local_absolute_schema)
 {
     std::string uri = is_windows() ? "file:///C%3A/Public" : "file:///home/user/somefile";
 
-    external_resource res(uri, uri_type::UNKNOWN);
+    external_resource res(uri);
     EXPECT_EQ(res.get_type(), uri_type::LOCAL);
 }
 
@@ -84,7 +84,7 @@ TEST(external_resource, external_resource_network)
 {
     std::string uri = "file://czprfs50/Public";
 
-    external_resource res(uri, uri_type::UNKNOWN);
+    external_resource res(uri);
     EXPECT_EQ(res.get_type(), uri_type::NETWORK);
 }
 
@@ -92,6 +92,6 @@ TEST(external_resource, external_resource_untitled)
 {
     std::string uri = "untitled:Untitled-1";
 
-    external_resource res(uri, uri_type::UNKNOWN);
+    external_resource res(uri);
     EXPECT_EQ(res.get_type(), uri_type::UNTITLED);
 }

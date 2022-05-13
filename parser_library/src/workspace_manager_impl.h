@@ -57,11 +57,7 @@ public:
     void add_workspace(std::string name, std::string uri)
     {
         auto ws = workspaces_.emplace(name,
-            workspaces::workspace(utils::path::external_resource(uri, utils::path::uri_type::UNKNOWN),
-                name,
-                file_manager_,
-                global_config_,
-                cancel_));
+            workspaces::workspace(utils::path::external_resource(uri), name, file_manager_, global_config_, cancel_));
         ws.first->second.set_message_consumer(message_consumer_);
         ws.first->second.open();
 
@@ -160,7 +156,10 @@ public:
             definition_result = { pos, document_uri };
             return position_uri(definition_result);
         }
-        definition_result = ws_path_match(document_uri).definition(document_uri, pos);
+
+        utils::path::external_resource res(document_uri);
+
+        definition_result = ws_path_match(document_uri).definition(res, pos);
 
         return position_uri(definition_result);
     }
@@ -224,9 +223,7 @@ public:
 
         auto file = file_manager_.find(document_uri);
         if (dynamic_cast<workspaces::processor_file*>(file.get()) != nullptr)
-            return file_manager_
-                .find_processor_file(utils::path::external_resource(document_uri, utils::path::uri_type::UNKNOWN))
-                ->get_hl_info();
+            return file_manager_.find_processor_file(utils::path::external_resource(document_uri))->get_hl_info();
 
         return empty_tokens;
     }

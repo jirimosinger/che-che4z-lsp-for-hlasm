@@ -242,12 +242,15 @@ uri_type detect_resource_type(const std::string& uri)
 //     : external_resource(uri, detect_resource_type())
 //{}
 
-external_resource::external_resource(std::string uri, uri_type type)
+external_resource::external_resource(std::string uri)
     : m_uri(std::move(uri))
     , m_type(get_uri_type(m_uri))
     , m_absolute_path(m_type == uri_type::LOCAL ? std::optional<std::string>() : uri_to_path(m_uri))
-{
-}
+{}
+
+external_resource::external_resource(const char* uri)
+    : external_resource(std::string(uri))
+{}
 
 const std::string& external_resource::get_absolute_path() const
 {

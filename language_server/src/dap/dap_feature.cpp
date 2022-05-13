@@ -14,9 +14,9 @@
 
 #include "dap_feature.h"
 
+#include "utils/external_resource.h"
 #include "utils/path.h"
 #include "utils/platform.h"
-#include "utils/external_resource.h"
 
 namespace {
 using namespace hlasm_plugin::language_server::dap;

@@ -101,14 +101,15 @@ public:
         const utils::path::external_resource& document_uri, const document_change* changes, size_t ch_size);
     void did_change_watched_files(const utils::path::external_resource& file_uri);
 
-    location definition(const std::string& document_uri, position pos) const override;
-    location_list references(const std::string& document_uri, position pos) const override;
-    lsp::hover_result hover(const std::string& document_uri, position pos) const override;
-    lsp::completion_list_s completion(const std::string& document_uri,
+    location definition(const utils::path::external_resource& resource, position pos) const override;
+    location_list references(const utils::path::external_resource& resource, position pos) const override;
+    lsp::hover_result hover(const utils::path::external_resource& resource, position pos) const override;
+    lsp::completion_list_s completion(const utils::path::external_resource& resource,
         position pos,
         char trigger_char,
         completion_trigger_kind trigger_kind) const override;
-    lsp::document_symbol_list_s document_symbol(const std::string& document_uri, long long limit) const override;
+    lsp::document_symbol_list_s document_symbol(
+        const utils::path::external_resource& resource, long long limit) const override;
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override;
     bool has_library(const std::string& library, const std::string& program) const override;

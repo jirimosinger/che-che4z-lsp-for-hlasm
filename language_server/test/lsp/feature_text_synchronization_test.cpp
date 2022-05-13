@@ -25,8 +25,6 @@
 
 const std::string txt_file_uri =
     hlasm_plugin::utils::platform::is_windows() ? R"(file:///c%3A/test/one/blah.txt)" : R"(file:///home/user/somefile)";
-const std::string txt_file_path =
-    hlasm_plugin::utils::platform::is_windows() ? R"(c:\test\one\blah.txt)" : R"(/home/user/somefile)";
 
 using namespace hlasm_plugin;
 using namespace hlasm_plugin::language_server;
@@ -44,7 +42,7 @@ TEST(text_synchronization, did_open_file)
     json params1 = json::parse(
         R"({"textDocument":{"uri":")" + txt_file_uri + R"(","languageId":"plaintext","version":4,"text":"sad"}})");
 
-    EXPECT_CALL(ws_mngr, did_open_file(StrEq(txt_file_path), 4, StrEq("sad"), 3));
+    EXPECT_CALL(ws_mngr, did_open_file(StrEq(txt_file_uri), 4, StrEq("sad"), 3));
 
     notifs["textDocument/didOpen"].handler("", params1);
 }
@@ -78,7 +76,7 @@ TEST(text_synchronization, did_change_file)
     parser_library::document_change expected1[2] { { { { 0, 0 }, { 0, 8 } }, "sad", 3 },
         { { { 1, 12 }, { 1, 14 } }, "", 0 } };
 
-    EXPECT_CALL(ws_mngr, did_change_file(StrEq(txt_file_path), 7, _, 2))
+    EXPECT_CALL(ws_mngr, did_change_file(StrEq(txt_file_uri), 7, _, 2))
         .With(Args<2, 3>(PointerAndSizeEqArray(expected1, std::size(expected1))));
     notifs["textDocument/didChange"].handler("", params1);
 
@@ -87,7 +85,7 @@ TEST(text_synchronization, did_change_file)
     parser_library::document_change expected2[1] { { "sad", 3 } };
     json params2 = json::parse(
         R"({"textDocument":{"uri":")" + txt_file_uri + R"(","version":7},"contentChanges":[{"text":"sad"}]})");
-    EXPECT_CALL(ws_mngr, did_change_file(StrEq(txt_file_path), 7, _, 1))
+    EXPECT_CALL(ws_mngr, did_change_file(StrEq(txt_file_uri), 7, _, 1))
         .With(Args<2, 3>(PointerAndSizeEqArray(expected2, std::size(expected2))));
 
     notifs["textDocument/didChange"].handler("", params2);
@@ -110,7 +108,7 @@ TEST(text_synchronization, did_close_file)
     f.register_methods(notifs);
 
     json params1 = json::parse(R"({"textDocument":{"uri":")" + txt_file_uri + R"("}})");
-    EXPECT_CALL(ws_mngr, did_close_file(StrEq(txt_file_path))),
+    EXPECT_CALL(ws_mngr, did_close_file(StrEq(txt_file_uri))),
 
         notifs["textDocument/didClose"].handler("", params1);
 }
