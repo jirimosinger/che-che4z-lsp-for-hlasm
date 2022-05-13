@@ -92,8 +92,11 @@ struct macro_slice_t
     {}
 };
 
-using file_scopes_t = std::unordered_map<std::string, std::vector<lsp::macro_slice_t>>;
-using file_occurences_t = std::unordered_map<std::string, occurence_storage>;
+using file_scopes_t = std::unordered_map<utils::path::external_resource,
+    std::vector<lsp::macro_slice_t>,
+    utils::path::external_resource_hasher>;
+using file_occurences_t =
+    std::unordered_map<utils::path::external_resource, occurence_storage, utils::path::external_resource_hasher>;
 
 class lsp_context;
 

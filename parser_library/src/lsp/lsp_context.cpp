@@ -102,7 +102,8 @@ std::string lsp_context::find_macro_copy_id(const context::processing_stack_t& s
 {
     assert(i != 0);
     assert(i < stack.size());
-    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.file : *stack[i].member_name;
+    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.file.get_absolute_path()
+                                                                 : *stack[i].member_name;
 }
 
 void lsp_context::document_symbol_macro(document_symbol_list_s& result,
@@ -460,9 +461,9 @@ document_symbol_list_s lsp_context::document_symbol(
 
     std::unordered_map<std::string_view, std::string_view> name_to_uri;
     for (const auto& [def, info] : m_macros)
-        name_to_uri.insert_or_assign(*def->id, info->definition_location.file);
+        name_to_uri.insert_or_assign(*def->id, info->definition_location.file.get_absolute_path()); // todo
     for (const auto& [def, info] : m_hlasm_ctx->copy_members())
-        name_to_uri.insert_or_assign(*info->name, info->definition_location.file);
+        name_to_uri.insert_or_assign(*info->name, info->definition_location.file.get_absolute_path()); // todo
 
     document_symbol_cache cache;
 
@@ -503,8 +504,9 @@ document_symbol_list_s lsp_context::document_symbol(
 
 void lsp_context::add_file(file_info file_i)
 {
-    std::string name = file_i.name;
-    m_files.try_emplace(std::move(name), std::make_unique<file_info>(std::move(file_i)));
+    std::string name = file_i.name.get_absolute_path();
+    m_files.try_emplace(std::move(name),
+        std::make_unique<file_info>(std::move(file_i))); // todo is it possible to have m_files take external_resource?
 }
 
 lsp_context::lsp_context(std::shared_ptr<context::hlasm_context> h_ctx)
@@ -726,7 +728,8 @@ bool is_comment(std::string_view line) { return line.substr(0, 1) == "*" || line
 std::string lsp_context::get_macro_documentation(const macro_info& m) const
 {
     // Get file, where the macro is defined
-    auto it = m_files.find(m.definition_location.file);
+    auto it = m_files.find(
+        m.definition_location.file.get_absolute_path()); // todo check if m_files can be converted to external_resource
     if (it == m_files.end())
         return "";
     const text_data_ref_t& text = it->second->data;
@@ -806,12 +809,23 @@ bool files_present(
     return present;
 }
 
+template<typename T, typename H>
+bool files_present(const std::unordered_map<std::string, file_info_ptr>& files,
+    const std::unordered_map<utils::path::external_resource, T, H>& scopes) // todo unit this with previous
+{
+    bool present = true;
+    for (const auto& [file, _] : scopes)
+        present &= files.find(file.get_absolute_path())
+            != files.end(); // todo erase get_abs... after m_files is changed to external_resource
+    return present;
+}
+
 void lsp_context::distribute_macro_i(macro_info_ptr macro_i)
 {
     assert(files_present(m_files, macro_i->file_scopes_));
 
     for (const auto& [file, slices] : macro_i->file_scopes_)
-        m_files[file]->update_slices(file_slice_t::transform_slices(slices, macro_i));
+        m_files[file.get_absolute_path()]->update_slices(file_slice_t::transform_slices(slices, macro_i)); // todo
 
     distribute_file_occurences(macro_i->file_occurences_);
 }
@@ -821,7 +835,7 @@ void lsp_context::distribute_file_occurences(const file_occurences_t& occurences
     assert(files_present(m_files, occurences));
 
     for (const auto& [file, occs] : occurences)
-        m_files[file]->update_occurences(occs);
+        m_files[file.get_absolute_path()]->update_occurences(occs); // todo change m_files to external_resource
 }
 
 occurence_scope_t lsp_context::find_occurence_with_scope(const std::string& document_uri, const position pos) const

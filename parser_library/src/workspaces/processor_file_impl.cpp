@@ -75,7 +75,7 @@ parse_result processor_file_impl::parse(
         dependencies_.clear();
         for (auto& file : last_analyzer_->hlasm_ctx().get_visited_files())
             if (file != get_file_name())
-                dependencies_.insert(file);
+                dependencies_.insert(file.get_absolute_path()); // todo convert dependencies_ to external resource
     }
 
     files_to_close_.clear();

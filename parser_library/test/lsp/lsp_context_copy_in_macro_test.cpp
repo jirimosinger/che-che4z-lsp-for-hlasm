@@ -23,6 +23,7 @@ using namespace hlasm_plugin::parser_library::lsp;
 struct lsp_context_copy_in_macro : public ::testing::Test
 {
     const static inline std::string opencode_file_name = "source";
+    const static inline hlasm_plugin::utils::path::external_resource opencode_file_res = opencode_file_name;
     const static inline std::string opencode =
         R"(
        MAC 1
@@ -34,6 +35,7 @@ struct lsp_context_copy_in_macro : public ::testing::Test
        COPY NOTEXIST
 )";
     const static inline std::string macro_file_name = "MAC";
+    const static inline hlasm_plugin::utils::path::external_resource macro_file_res = macro_file_name;
     const static inline std::string macro =
         R"( MACRO
        MAC &PARAM
@@ -45,6 +47,7 @@ SYM    LR &VAR,1
        MEND
 )";
     const static inline std::string copyfile_file_name = "COPYFILE";
+    const static inline hlasm_plugin::utils::path::external_resource copyfile_file_res = copyfile_file_name;
     const static inline std::string copyfile =
         R"(
        
@@ -68,49 +71,49 @@ SYM    LR &VAR,1
 
 TEST_F(lsp_context_copy_in_macro, definition_macro)
 {
-    location res = a->context().lsp_ctx->definition(opencode_file_name, { 1, 8 });
-    EXPECT_EQ(res.file, macro_file_name);
+    location res = a->context().lsp_ctx->definition(opencode_file_res, { 1, 8 });
+    EXPECT_EQ(res.file, macro_file_res);
     EXPECT_EQ(res.pos, position(1, 7));
 }
 
 TEST_F(lsp_context_copy_in_macro, definition_copyfile_from_opencode)
 {
-    location res = a->context().lsp_ctx->definition(opencode_file_name, { 3, 13 });
-    EXPECT_EQ(res.file, copyfile_file_name);
+    location res = a->context().lsp_ctx->definition(opencode_file_res, { 3, 13 });
+    EXPECT_EQ(res.file, copyfile_file_res);
     EXPECT_EQ(res.pos, position(0, 0));
 }
 
 TEST_F(lsp_context_copy_in_macro, definition_copyfile_from_macro)
 {
-    location res = a->context().lsp_ctx->definition(macro_file_name, { 3, 13 });
-    EXPECT_EQ(res.file, copyfile_file_name);
+    location res = a->context().lsp_ctx->definition(macro_file_res, { 3, 13 });
+    EXPECT_EQ(res.file, copyfile_file_res);
     EXPECT_EQ(res.pos, position(0, 0));
 }
 
 TEST_F(lsp_context_copy_in_macro, definition_macro_param_from_copyfile)
 {
-    location res = a->context().lsp_ctx->definition(copyfile_file_name, { 2, 11 });
-    EXPECT_EQ(res.file, macro_file_name);
+    location res = a->context().lsp_ctx->definition(copyfile_file_res, { 2, 11 });
+    EXPECT_EQ(res.file, macro_file_res);
     EXPECT_EQ(res.pos, position(1, 11));
 }
 
 TEST_F(lsp_context_copy_in_macro, definition_var_from_macro)
 {
-    location res = a->context().lsp_ctx->definition(macro_file_name, { 5, 11 });
-    EXPECT_EQ(res.file, copyfile_file_name);
+    location res = a->context().lsp_ctx->definition(macro_file_res, { 5, 11 });
+    EXPECT_EQ(res.file, copyfile_file_res);
     EXPECT_EQ(res.pos, position(3, 0));
 }
 
 TEST_F(lsp_context_copy_in_macro, definition_var_from_opencode)
 {
-    location res = a->context().lsp_ctx->definition(opencode_file_name, { 4, 11 });
-    EXPECT_EQ(res.file, copyfile_file_name);
+    location res = a->context().lsp_ctx->definition(opencode_file_res, { 4, 11 });
+    EXPECT_EQ(res.file, copyfile_file_res);
     EXPECT_EQ(res.pos, position(3, 0));
 }
 
 TEST_F(lsp_context_copy_in_macro, definition_no_exist_copyfile)
 {
-    location res = a->context().lsp_ctx->definition(opencode_file_name, { 7, 15 });
-    EXPECT_EQ(res.file, opencode_file_name);
+    location res = a->context().lsp_ctx->definition(opencode_file_res, { 7, 15 });
+    EXPECT_EQ(res.file, opencode_file_res);
     EXPECT_EQ(res.pos, position(7, 15));
 }

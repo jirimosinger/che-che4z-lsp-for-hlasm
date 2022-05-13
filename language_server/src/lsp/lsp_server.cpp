@@ -244,7 +244,7 @@ json diagnostic_related_info_to_json(parser_library::diagnostic& diag)
     {
         related.push_back(
             json { { "location",
-                       json { { "uri", utils::path::path_to_uri(diag.related_info(i).location().uri()) },
+                       json { { "uri", diag.related_info(i).location().uri() },
                            { "range", feature::range_to_json(diag.related_info(i).location().get_range()) } } },
                 { "message", diag.related_info(i).message() } });
     }
@@ -309,7 +309,7 @@ void server::consume_diagnostics(parser_library::diagnostic_list diagnostics)
             diags_array.push_back(std::move(one_json));
         }
 
-        json publish_diags_params { { "uri", utils::path::path_to_uri(file_diags.first) },
+        json publish_diags_params { { "uri", file_diags.first },
             { "diagnostics", diags_array } };
         new_files.insert(file_diags.first);
         last_diagnostics_files_.erase(file_diags.first);
@@ -322,7 +322,7 @@ void server::consume_diagnostics(parser_library::diagnostic_list diagnostics)
     // remove the diags from UI
     for (auto& it : last_diagnostics_files_)
     {
-        json publish_diags_params { { "uri", utils::path::path_to_uri(it) }, { "diagnostics", json::array() } };
+        json publish_diags_params { { "uri", it }, { "diagnostics", json::array() } };
         notify("textDocument/publishDiagnostics", publish_diags_params);
     }
 

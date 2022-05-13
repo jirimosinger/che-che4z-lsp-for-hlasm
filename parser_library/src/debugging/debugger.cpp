@@ -192,7 +192,7 @@ public:
         auto stack = ctx_->processing_stack();
         const auto stack_depth = stack.size();
 
-        for (const auto& bp : breakpoints(stack.back().proc_location.file))
+        for (const auto& bp : breakpoints(stack.back().proc_location.file.get_absolute_path()))
         {
             if (bp.line >= stmt_range.start.line && bp.line <= stmt_range.end.line)
                 breakpoint_hit = true;
@@ -279,7 +279,7 @@ public:
             return stack_frames_;
         for (size_t i = proc_stack_.size() - 1; i != (size_t)-1; --i)
         {
-            source source(proc_stack_[i].proc_location.file);
+            source source(proc_stack_[i].proc_location.file.get_absolute_path());
             std::string name;
             switch (proc_stack_[i].proc_type)
             {

@@ -745,7 +745,7 @@ bool workspace::is_dependency_(const std::string& file_uri)
 
 parse_result workspace::parse_library(const std::string& library, analyzing_context ctx, library_data data)
 {
-    auto& proc_grp = get_proc_grp_by_program(ctx.hlasm_ctx->opencode_file_name());
+    auto& proc_grp = get_proc_grp_by_program(ctx.hlasm_ctx->opencode_file_name().get_absolute_path());
     for (auto&& lib : proc_grp.libraries())
     {
         std::shared_ptr<processor> found = lib->find_file(library);

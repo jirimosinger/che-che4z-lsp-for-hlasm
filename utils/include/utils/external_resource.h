@@ -26,6 +26,9 @@ enum class uri_type
     RELATIVE_PATH,
     URL,
     LOCAL,
+    LOCAL_URI,
+    LOCAL_ABSOLUTE,
+    LOCAL_RELATIVE,
     NETWORK,
     UNTITLED,
     UNKNOWN
@@ -34,8 +37,16 @@ enum class uri_type
 class external_resource
 {
 public:
+    external_resource() = default;
     external_resource(std::string uri);
     external_resource(const char* uri);
+
+    external_resource(external_resource&) = default;
+    external_resource& operator=(external_resource&) = default;
+    external_resource(const external_resource&) = default;
+    external_resource& operator=(const external_resource&) = default;
+    external_resource(external_resource&&) = default;
+    external_resource& operator=(external_resource&&) = default;
 
     // template<class T>
     // external_resource(T) = delete;
@@ -53,6 +64,7 @@ public:
 
     bool operator==(const external_resource& r) const;
     bool operator!=(const external_resource& r) const;
+    bool operator<(const external_resource& r) const;
 
 private:
     std::string m_uri;

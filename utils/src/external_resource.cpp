@@ -193,7 +193,7 @@ uri_type transform_uri_by_resource_type(std::string& uri)
                 auth_path[0] = (char)tolower((unsigned char)auth_path[0]);
             }
 
-            ret_val = uri_type::LOCAL;
+            ret_val = uri_type::LOCAL_URI;
         }
 
         uri = utils::path::lexically_normal(network::detail::decode(auth_path)).string();
@@ -205,11 +205,11 @@ uri_type transform_uri_by_resource_type(std::string& uri)
 
         if (is_absolute(path))
             // return uri_type::ABSOLUTE_PATH;
-            return uri_type::LOCAL;
+            return uri_type::LOCAL_ABSOLUTE;
 
         // path = utils::path::absolute(path);
         // return uri_type::RELATIVE_PATH;
-        return uri_type::LOCAL;
+        return uri_type::LOCAL_RELATIVE;
     }
 }
 
@@ -236,6 +236,21 @@ uri_type detect_resource_type(const std::string& uri)
     return uri_type::UNKNOWN;
 }
 
+std::optional<std::string> get_path(const std::string& uri, uri_type uri_type)
+{
+    switch (uri_type)
+    {
+        case uri_type::LOCAL_ABSOLUTE:
+            return uri;
+        case uri_type::LOCAL_RELATIVE:
+            return uri; // todo
+        case uri_type::LOCAL_URI:
+            return uri_to_path(uri);
+        default:
+            return std::optional<std::string>();
+    }
+}
+
 //} // namespace
 
 // external_resource::external_resource(std::string uri)
@@ -245,7 +260,7 @@ uri_type detect_resource_type(const std::string& uri)
 external_resource::external_resource(std::string uri)
     : m_uri(std::move(uri))
     , m_type(get_uri_type(m_uri))
-    , m_absolute_path(m_type == uri_type::LOCAL ? std::optional<std::string>() : uri_to_path(m_uri))
+    , m_absolute_path(get_path(m_uri, m_type))
 {}
 
 external_resource::external_resource(const char* uri)
@@ -270,7 +285,6 @@ const std::string& external_resource::get_url() const { return m_uri; }
 // }
 bool external_resource::operator==(const external_resource& r) const { return m_uri == r.m_uri; }
 bool external_resource::operator!=(const external_resource& r) const { return !operator==(r); }
-
-
+bool external_resource::operator<(const external_resource& r) const { return m_uri < r.m_uri; }
 
 } // namespace hlasm_plugin::utils::path

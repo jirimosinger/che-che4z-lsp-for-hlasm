@@ -34,7 +34,7 @@ public:
     workspaces::parse_result parse_library(
         const std::string& library, analyzing_context ctx, workspaces::library_data data) override
     {
-        auto& proc_grp = ws_.get_proc_grp_by_program(ctx.hlasm_ctx->opencode_file_name());
+        auto& proc_grp = ws_.get_proc_grp_by_program(ctx.hlasm_ctx->opencode_file_name().get_absolute_path());
         for (auto&& lib : proc_grp.libraries())
         {
             std::shared_ptr<workspaces::processor> found = lib->find_file(library);

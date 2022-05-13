@@ -365,7 +365,8 @@ bool hlasm_context::is_opcode(id_index symbol) const
     return macros_.contains(symbol) || m_instruction_map.contains(symbol);
 }
 
-hlasm_context::hlasm_context(std::string file_name, asm_option asm_options, std::shared_ptr<id_storage> init_ids)
+hlasm_context::hlasm_context(
+    utils::path::external_resource file_name, asm_option asm_options, std::shared_ptr<id_storage> init_ids)
     : ids_(std::move(init_ids))
     , opencode_file_name_(file_name)
     , asm_options_(std::move(asm_options))
@@ -377,7 +378,7 @@ hlasm_context::hlasm_context(std::string file_name, asm_option asm_options, std:
 {
     add_global_system_vars(scope_stack_.emplace_back());
     visited_files_.insert(file_name);
-    push_statement_processing(processing::processing_kind::ORDINARY, std::move(file_name));
+    push_statement_processing(processing::processing_kind::ORDINARY, std::move(file_name.get_absolute_path())); // todo is it possible to have push_statement_processing accept external_resource?
 }
 
 hlasm_context::~hlasm_context() = default;
@@ -881,9 +882,9 @@ macro_invo_ptr hlasm_context::this_macro() const
     return macro_invo_ptr();
 }
 
-const std::string& hlasm_context::opencode_file_name() const { return opencode_file_name_; }
+const utils::path::external_resource& hlasm_context::opencode_file_name() const { return opencode_file_name_; }
 
-const std::set<std::string>& hlasm_context::get_visited_files() { return visited_files_; }
+const std::set<utils::path::external_resource>& hlasm_context::get_visited_files() { return visited_files_; }
 
 copy_member_ptr hlasm_context::add_copy_member(
     id_index member, statement_block definition, location definition_location)
