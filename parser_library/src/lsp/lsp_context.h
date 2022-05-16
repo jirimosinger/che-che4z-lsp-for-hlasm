@@ -27,14 +27,16 @@ namespace hlasm_plugin::parser_library::lsp {
 class lsp_context final : public feature_provider
 {
     opencode_info_ptr m_opencode;
-    std::unordered_map<std::string, file_info_ptr> m_files;
+    std::unordered_map<utils::path::external_resource, file_info_ptr, utils::path::external_resource_hasher> m_files;
     std::unordered_map<context::macro_def_ptr, macro_info_ptr> m_macros;
 
     std::shared_ptr<context::hlasm_context> m_hlasm_ctx;
 
     struct document_symbol_cache
     {
-        std::unordered_map<std::string, std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>>>
+        std::unordered_map<utils::path::external_resource,
+            std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>>,
+            utils::path::external_resource_hasher>
             occurences;
     };
 
@@ -46,7 +48,7 @@ public:
     void add_opencode(opencode_info_ptr opencode_i, text_data_ref_t text_data);
 
     [[nodiscard]] macro_info_ptr get_macro_info(context::id_index macro_name) const;
-    [[nodiscard]] const file_info* get_file_info(const std::string& file_name) const;
+    [[nodiscard]] const file_info* get_file_info(const utils::path::external_resource& file_name) const;
 
     location definition(const utils::path::external_resource& resource, position pos) const override;
     location_list references(const utils::path::external_resource& resource, position pos) const override;
@@ -63,7 +65,8 @@ private:
     void distribute_macro_i(macro_info_ptr macro_i);
     void distribute_file_occurences(const file_occurences_t& occurences);
 
-    occurence_scope_t find_occurence_with_scope(const std::string& document_uri, const position pos) const;
+    occurence_scope_t find_occurence_with_scope(
+        const utils::path::external_resource& document_uri, const position pos) const;
 
     std::optional<location> find_definition_location(const symbol_occurence& occ, macro_info_ptr macro_i) const;
     hover_result find_hover(const symbol_occurence& occ, macro_info_ptr macro_i) const;
@@ -77,17 +80,19 @@ private:
     std::string get_macro_documentation(const macro_info& m) const;
 
     void document_symbol_macro(document_symbol_list_s& result,
-        const std::string& document_uri,
+        const utils::path::external_resource& document_uri,
         std::optional<range> r,
         long long& limit,
         document_symbol_cache& cache) const;
     void document_symbol_copy(document_symbol_list_s& result,
         const std::vector<symbol_occurence>& occurence_list,
-        const std::string& document_uri,
+        const utils::path::external_resource& document_uri,
         std::optional<range> r,
         long long& limit) const;
-    const std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>>& copy_occurences(
-        const std::string& document_uri, document_symbol_cache& cache) const;
+    const std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>>&
+    copy_occurences( // todo rename to copy_occurrences
+        const utils::path::external_resource& document_uri,
+        document_symbol_cache& cache) const;
     void modify_with_copy(document_symbol_list_s& modified,
         context::id_index sym_name,
         const std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>>& copy_occs,
@@ -106,7 +111,8 @@ private:
         const std::unordered_map<std::string_view, std::string_view>& name_to_uri_cache,
         long long& limit,
         document_symbol_cache& cache) const;
-    bool belongs_to_copyfile(const std::string& document_uri, position pos, context::id_index id) const;
+    bool belongs_to_copyfile(
+        const utils::path::external_resource& document_uri, position pos, context::id_index id) const;
 };
 
 } // namespace hlasm_plugin::parser_library::lsp

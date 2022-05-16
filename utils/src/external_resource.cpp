@@ -130,7 +130,7 @@ uri_type get_uri_type(const std::string& uri)
         }
         else
         {
-            return uri_type::LOCAL;
+            return uri_type::LOCAL_URI;
         }
     }
     catch (const std::exception&)
@@ -139,11 +139,11 @@ uri_type get_uri_type(const std::string& uri)
 
         if (is_absolute(path))
             // return uri_type::ABSOLUTE_PATH;
-            return uri_type::LOCAL;
+            return uri_type::LOCAL_ABSOLUTE;
 
         // path = utils::path::absolute(path);
         // return uri_type::RELATIVE_PATH;
-        return uri_type::LOCAL;
+        return uri_type::LOCAL_RELATIVE;
     }
 }
 
@@ -265,6 +265,12 @@ external_resource::external_resource(std::string uri)
 
 external_resource::external_resource(const char* uri)
     : external_resource(std::string(uri))
+{}
+
+external_resource::external_resource(const external_resource& r)
+    : m_uri(r.m_uri)
+    , m_type(r.m_type)
+    , m_absolute_path(r.m_absolute_path)
 {}
 
 const std::string& external_resource::get_absolute_path() const

@@ -220,7 +220,7 @@ void processing_manager::finish_lookahead(lookahead_processing_result result)
 
 void processing_manager::start_copy_member(copy_start_data start)
 {
-    hlasm_ctx_.push_statement_processing(processing_kind::COPY, std::move(start.member_file));
+    hlasm_ctx_.push_statement_processing(processing_kind::COPY, std::move(start.member_file)); // todo
     procs_.emplace_back(std::make_unique<copy_processor>(ctx_, *this, std::move(start)));
 }
 
@@ -238,7 +238,7 @@ void processing_manager::finish_opencode() { lsp_analyzer_.opencode_finished(); 
 void processing_manager::start_macro_definition(macrodef_start_data start, std::optional<std::string> file)
 {
     if (file)
-        hlasm_ctx_.push_statement_processing(processing_kind::MACRO, std::move(*file));
+        hlasm_ctx_.push_statement_processing(processing_kind::MACRO, std::move(*file)); // todo
     else
         hlasm_ctx_.push_statement_processing(processing_kind::MACRO);
 

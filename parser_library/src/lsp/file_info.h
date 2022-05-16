@@ -76,7 +76,7 @@ public:
     // first variant is monostate as there is no storing of opencode statements in the code yet
     using owner_t = std::variant<std::monostate, context::macro_def_ptr, context::copy_member_ptr>;
 
-    utils::path::external_resource name;
+    utils::path::external_resource name; // todo rename to resource
     file_type type;
     owner_t owner;
     text_data_ref_t data;

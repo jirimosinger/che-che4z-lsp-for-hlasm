@@ -107,7 +107,7 @@ std::string lsp_context::find_macro_copy_id(const context::processing_stack_t& s
 }
 
 void lsp_context::document_symbol_macro(document_symbol_list_s& result,
-    const std::string& document_uri,
+    const utils::path::external_resource& document_uri,
     std::optional<range> r,
     long long& limit,
     document_symbol_cache& cache) const
@@ -148,7 +148,8 @@ void lsp_context::document_symbol_macro(document_symbol_list_s& result,
     }
 }
 
-bool lsp_context::belongs_to_copyfile(const std::string& document_uri, position pos, context::id_index id) const
+bool lsp_context::belongs_to_copyfile(
+    const utils::path::external_resource& document_uri, position pos, context::id_index id) const
 {
     const auto* aux = find_occurence_with_scope(document_uri, pos).first;
     return aux == nullptr || *aux->name != *id;
@@ -156,7 +157,7 @@ bool lsp_context::belongs_to_copyfile(const std::string& document_uri, position 
 
 void lsp_context::document_symbol_copy(document_symbol_list_s& result,
     const std::vector<symbol_occurence>& occurence_list,
-    const std::string& document_uri,
+    const utils::path::external_resource& document_uri,
     std::optional<range> r,
     long long& limit) const
 {
@@ -183,14 +184,14 @@ void lsp_context::document_symbol_copy(document_symbol_list_s& result,
 }
 
 const std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>>& lsp_context::copy_occurences(
-    const std::string& document_uri, document_symbol_cache& cache) const
+    const utils::path::external_resource& document_uri, document_symbol_cache& cache) const
 {
     if (auto it = cache.occurences.find(document_uri); it != cache.occurences.end())
         return it->second;
 
     const auto& file = m_files.find(document_uri);
     std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>> copy_occurences;
-    for (const auto& [uri, info] : m_files)
+    for (const auto& [_, info] : m_files)
     {
         if (info->type != file_type::COPY)
             continue;
@@ -435,7 +436,7 @@ void lsp_context::document_symbol_opencode_var_seq_symbol_aux(document_symbol_li
         if (item.kind != document_symbol_kind::MACRO)
             continue;
 
-        auto uri = name_to_uri_cache.find(item.name);
+        auto uri = name_to_uri_cache.find(item.name); // todo name_to_uri_cache -> external_resource?
         if (uri == name_to_uri_cache.end() || uri->second.empty())
             return;
 
@@ -455,7 +456,7 @@ document_symbol_list_s lsp_context::document_symbol(
     const utils::path::external_resource& resource, long long limit) const
 {
     document_symbol_list_s result;
-    const auto& file = m_files.find(resource.get_absolute_path());
+    const auto& file = m_files.find(resource);
     if (file == m_files.end() || limit <= 0)
         return result;
 
@@ -470,12 +471,12 @@ document_symbol_list_s lsp_context::document_symbol(
     switch (file->second->type)
     {
         case file_type::MACRO:
-            document_symbol_macro(result, resource.get_absolute_path(), std::nullopt, limit, cache);
+            document_symbol_macro(result, resource, std::nullopt, limit, cache);
             break;
 
         case file_type::COPY:
             document_symbol_copy(
-                result, file->second->get_occurences(), resource.get_absolute_path(), std::nullopt, limit);
+                result, file->second->get_occurences(), resource, std::nullopt, limit);
             break;
 
         default:
@@ -486,7 +487,7 @@ document_symbol_list_s lsp_context::document_symbol(
             {
                 if (limit <= 0)
                     break;
-                if (!belongs_to_copyfile(resource.get_absolute_path(), sym.def_position, sym.name))
+                if (!belongs_to_copyfile(resource, sym.def_position, sym.name))
                 {
                     result.emplace_back(*sym.name, document_symbol_kind::VAR, range(sym.def_position));
                     --limit;
@@ -504,9 +505,7 @@ document_symbol_list_s lsp_context::document_symbol(
 
 void lsp_context::add_file(file_info file_i)
 {
-    std::string name = file_i.name.get_absolute_path();
-    m_files.try_emplace(std::move(name),
-        std::make_unique<file_info>(std::move(file_i))); // todo is it possible to have m_files take external_resource?
+    m_files.try_emplace(file_i.name, std::make_unique<file_info>(file_i));
 }
 
 lsp_context::lsp_context(std::shared_ptr<context::hlasm_context> h_ctx)
@@ -537,7 +536,7 @@ void lsp_context::add_opencode(opencode_info_ptr opencode_i, text_data_ref_t tex
 
     distribute_file_occurences(m_opencode->file_occurences);
 
-    for (const auto& [name, file] : m_files)
+    for (const auto& [_, file] : m_files)
         file->process_occurrences();
 }
 
@@ -551,7 +550,7 @@ macro_info_ptr lsp_context::get_macro_info(context::id_index macro_name) const
         return m_macros.at(it->second);
 }
 
-const file_info* lsp_context::get_file_info(const std::string& file_name) const
+const file_info* lsp_context::get_file_info(const utils::path::external_resource& file_name) const
 {
     if (auto it = m_files.find(file_name); it != m_files.end())
         return it->second.get();
@@ -561,7 +560,7 @@ const file_info* lsp_context::get_file_info(const std::string& file_name) const
 
 location lsp_context::definition(const utils::path::external_resource& resource, const position pos) const
 {
-    auto [occ, macro_scope] = find_occurence_with_scope(resource.get_absolute_path(), pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(resource, pos);
 
     if (!occ)
         return { pos, resource.get_url() };
@@ -585,7 +584,7 @@ location_list lsp_context::references(const utils::path::external_resource& reso
 {
     location_list result;
 
-    auto [occ, macro_scope] = find_occurence_with_scope(resource.get_absolute_path(), pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(resource, pos);
 
     if (!occ)
         return {};
@@ -609,7 +608,7 @@ location_list lsp_context::references(const utils::path::external_resource& reso
 
 hover_result lsp_context::hover(const utils::path::external_resource& resource, const position pos) const
 {
-    auto [occ, macro_scope] = find_occurence_with_scope(resource.get_absolute_path(), pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(resource, pos);
 
     if (!occ)
         return {};
@@ -639,7 +638,7 @@ completion_list_s lsp_context::completion(const utils::path::external_resource& 
     const char trigger_char,
     completion_trigger_kind trigger_kind) const
 {
-    auto file_it = m_files.find(resource.get_absolute_path());
+    auto file_it = m_files.find(resource);
     if (file_it == m_files.end())
         return completion_list_s();
     const text_data_ref_t& text = file_it->second->data;
@@ -728,8 +727,7 @@ bool is_comment(std::string_view line) { return line.substr(0, 1) == "*" || line
 std::string lsp_context::get_macro_documentation(const macro_info& m) const
 {
     // Get file, where the macro is defined
-    auto it = m_files.find(
-        m.definition_location.file.get_absolute_path()); // todo check if m_files can be converted to external_resource
+    auto it = m_files.find(m.definition_location.file);
     if (it == m_files.end())
         return "";
     const text_data_ref_t& text = it->second->data;
@@ -798,25 +796,13 @@ completion_list_s lsp_context::complete_instr(const file_info&, position) const
     return result;
 }
 
-
-template<typename T>
-bool files_present(
-    const std::unordered_map<std::string, file_info_ptr>& files, const std::unordered_map<std::string, T>& scopes)
+template<typename T, typename H>
+bool files_present(const std::unordered_map<utils::path::external_resource, file_info_ptr, H>& files,
+    const std::unordered_map<utils::path::external_resource, T, H>& scopes) // todo unite this with previous
 {
     bool present = true;
     for (const auto& [file, _] : scopes)
         present &= files.find(file) != files.end();
-    return present;
-}
-
-template<typename T, typename H>
-bool files_present(const std::unordered_map<std::string, file_info_ptr>& files,
-    const std::unordered_map<utils::path::external_resource, T, H>& scopes) // todo unit this with previous
-{
-    bool present = true;
-    for (const auto& [file, _] : scopes)
-        present &= files.find(file.get_absolute_path())
-            != files.end(); // todo erase get_abs... after m_files is changed to external_resource
     return present;
 }
 
@@ -825,7 +811,7 @@ void lsp_context::distribute_macro_i(macro_info_ptr macro_i)
     assert(files_present(m_files, macro_i->file_scopes_));
 
     for (const auto& [file, slices] : macro_i->file_scopes_)
-        m_files[file.get_absolute_path()]->update_slices(file_slice_t::transform_slices(slices, macro_i)); // todo
+        m_files[file]->update_slices(file_slice_t::transform_slices(slices, macro_i));
 
     distribute_file_occurences(macro_i->file_occurences_);
 }
@@ -835,10 +821,11 @@ void lsp_context::distribute_file_occurences(const file_occurences_t& occurences
     assert(files_present(m_files, occurences));
 
     for (const auto& [file, occs] : occurences)
-        m_files[file.get_absolute_path()]->update_occurences(occs); // todo change m_files to external_resource
+        m_files[file]->update_occurences(occs);
 }
 
-occurence_scope_t lsp_context::find_occurence_with_scope(const std::string& document_uri, const position pos) const
+occurence_scope_t lsp_context::find_occurence_with_scope(
+    const utils::path::external_resource& document_uri, const position pos) const
 {
     if (auto file = m_files.find(document_uri); file != m_files.end())
         return file->second->find_occurence_with_scope(pos);

@@ -128,7 +128,7 @@ public:
     // pushes new kind of statement processing
     void push_statement_processing(const processing::processing_kind kind);
     // pushes new kind of statement processing as well as new source
-    void push_statement_processing(const processing::processing_kind kind, std::string file_name);
+    void push_statement_processing(const processing::processing_kind kind, utils::path::external_resource resource);
     // pops statement processing
     void pop_statement_processing();
 

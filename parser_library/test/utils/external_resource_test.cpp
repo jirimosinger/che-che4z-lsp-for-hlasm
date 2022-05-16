@@ -56,20 +56,20 @@ TEST(external_resource, path_to_uri)
     }
 }
 
-// TEST(external_resource, external_resource_local_relative)
-//{
-//     std::string uri = is_windows() ? "folder" : "user/somefile";
-//
-//     external_resource res(uri);
-//     EXPECT_EQ(res.get_type(), uri_type::LOCAL);
-// }
-//
+ TEST(external_resource, external_resource_local_relative)
+{
+     std::string uri = is_windows() ? "folder" : "user/somefile";
+
+     external_resource res(uri);
+     EXPECT_EQ(res.get_type(), uri_type::LOCAL_RELATIVE);
+ }
+
 // TEST(external_resource, external_resource_local_absolute)
 //{
 //     std::string uri = is_windows() ? "c:\\Public" : "/home/user/somefile";
 //
 //     external_resource res(uri);
-//     EXPECT_EQ(res.get_type(), uri_type::LOCAL);
+//     EXPECT_EQ(res.get_type(), uri_type::LOCAL_ABSOLUTE);
 // }
 
 TEST(external_resource, external_resource_local_absolute_schema)
@@ -77,7 +77,7 @@ TEST(external_resource, external_resource_local_absolute_schema)
     std::string uri = is_windows() ? "file:///C%3A/Public" : "file:///home/user/somefile";
 
     external_resource res(uri);
-    EXPECT_EQ(res.get_type(), uri_type::LOCAL);
+    EXPECT_EQ(res.get_type(), uri_type::LOCAL_URI);
 }
 
 TEST(external_resource, external_resource_network)
