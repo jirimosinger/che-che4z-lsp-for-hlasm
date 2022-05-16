@@ -77,9 +77,9 @@ class hlasm_context
     asm_option asm_options_;
     static constexpr alignment sectalgn = doubleword;
 
-    // map of all instruction in HLASM
-    const instruction_storage instruction_map_;
-    static instruction_storage init_instruction_map(id_storage& ids);
+    // map of active instructions in HLASM
+    const instruction_storage m_instruction_map;
+    static instruction_storage init_instruction_map(id_storage& ids, instruction_set_version active_instr_set);
 
     // value of system variable SYSNDX
     unsigned long SYSNDX_ = 1;
@@ -99,6 +99,8 @@ class hlasm_context
 
     std::unique_ptr<using_collection> m_usings;
     std::vector<index_t<using_collection>> m_active_usings;
+
+    long long m_statements_remaining;
 
 public:
     hlasm_context(std::string file_name = "",
@@ -152,9 +154,10 @@ public:
 
     // index storage
     id_storage& ids();
+    const id_storage& ids() const;
     std::shared_ptr<id_storage> ids_ptr();
 
-    // map of instructions
+    // map of active instructions
     const instruction_storage& instruction_map() const;
 
     // field that accessed ordinary assembly context
@@ -180,7 +183,7 @@ public:
     // returns nullptr if there is none
     const sequence_symbol* get_opencode_sequence_symbol(id_index name) const;
 
-    void set_branch_counter(A_t value);
+    size_t set_branch_counter(A_t value);
     A_t get_branch_counter() const;
     void decrement_branch_counter();
 
@@ -190,7 +193,7 @@ public:
     void remove_mnemonic(id_index mnemo);
     const opcode_map& opcode_mnemo_storage() const;
 
-    // checks wheter the symbol is an operation code (is a valid instruction or a mnemonic)
+    // checks whether the symbol is an operation code (is a valid instruction or a mnemonic)
     opcode_t get_operation_code(id_index symbol) const;
 
     // get data attribute value of variable symbol
@@ -310,8 +313,12 @@ public:
     void using_resolve(diagnostic_s_consumer&);
     index_t<using_collection> using_current() const;
 
+    const using_collection& usings() const { return *m_usings; }
+
     using name_result = std::pair<bool, context::id_index>;
     name_result try_get_symbol_name(const std::string& symbol);
+
+    bool next_statement() { return --m_statements_remaining >= 0; }
 };
 
 bool test_symbol_for_read(

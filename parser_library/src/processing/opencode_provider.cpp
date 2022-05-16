@@ -25,6 +25,14 @@
 
 namespace hlasm_plugin::parser_library::processing {
 
+namespace {
+struct dummy_vfm final : public virtual_file_monitor
+{
+    virtual_file_handle file_generated(std::string_view content) override { return virtual_file_handle(); }
+};
+dummy_vfm fallback_vfm;
+} // namespace
+
 opencode_provider::opencode_provider(std::string_view text,
     analyzing_context& ctx,
     workspaces::parse_lib_provider& lib_provider,
@@ -32,7 +40,8 @@ opencode_provider::opencode_provider(std::string_view text,
     semantics::source_info_processor& src_proc,
     diagnosable_ctx& diag_consumer,
     std::unique_ptr<preprocessor> preprocessor,
-    opencode_provider_options opts)
+    opencode_provider_options opts,
+    virtual_file_monitor* virtual_file_monitor)
     : statement_provider(statement_provider_kind::OPEN)
     , m_original_text(text)
     , m_next_line_text(text)
@@ -46,6 +55,7 @@ opencode_provider::opencode_provider(std::string_view text,
     , m_diagnoser(&diag_consumer)
     , m_opts(opts)
     , m_preprocessor(std::move(preprocessor))
+    , m_virtual_file_monitor(virtual_file_monitor ? virtual_file_monitor : &fallback_vfm)
 {}
 
 void opencode_provider::rewind_input(context::source_position pos)
@@ -273,7 +283,11 @@ std::shared_ptr<const context::hlasm_statement> opencode_provider::process_ordin
                     auto line = std::move(rule->line);
                     auto line_range = rule->line_range;
 
-                    if (line.operands.size())
+                    if (h.error_handler->error_reported())
+                    {
+                        line.operands.clear();
+                    }
+                    else if (line.operands.size())
                     {
                         auto [to_parse, ranges, r] = join_operands(line.operands);
 
@@ -329,6 +343,20 @@ std::shared_ptr<const context::hlasm_statement> opencode_provider::process_ordin
     return result;
 }
 
+std::string generate_virtual_file_name(virtual_file_id id, std::string_view name)
+{
+    std::string result;
+    if (id)
+    {
+        result += "hlasm://";
+        result += std::to_string(id.value());
+        result += "/";
+    }
+    result += name;
+    result += ".hlasm";
+    return result;
+}
+
 bool opencode_provider::try_running_preprocessor()
 {
     const auto current_line = m_current_line;
@@ -336,9 +364,9 @@ bool opencode_provider::try_running_preprocessor()
     if (!result.has_value() || result.value().empty())
         return false;
 
-    auto virtual_copy_name = m_ctx->hlasm_ctx->ids().add("preprocessor:" + std::to_string(current_line));
+    auto virtual_file_name = m_ctx->hlasm_ctx->ids().add("preprocessor:" + std::to_string(current_line));
 
-    auto [new_file, inserted] = m_virtual_files.try_emplace(virtual_copy_name, std::move(result.value()));
+    auto [new_file, inserted] = m_virtual_files.try_emplace(virtual_file_name, std::move(result.value()));
 
     // set up "call site"
     const auto current_offset =
@@ -351,10 +379,12 @@ bool opencode_provider::try_running_preprocessor()
     {
         analyzer a(new_file->second,
             analyzer_options {
-                *virtual_copy_name,
+                generate_virtual_file_name(
+                    m_vf_handles.emplace_back(m_virtual_file_monitor->file_generated(new_file->second)).file_id(),
+                    *virtual_file_name),
                 m_lib_provider,
                 *m_ctx,
-                workspaces::library_data { processing_kind::COPY, virtual_copy_name },
+                workspaces::library_data { processing_kind::COPY, virtual_file_name },
             });
         a.analyze();
         m_diagnoser->collect_diags_from_child(a);
@@ -364,7 +394,7 @@ bool opencode_provider::try_running_preprocessor()
         assert(result.value() == new_file->second);
     }
 
-    m_ctx->hlasm_ctx->enter_copy_member(virtual_copy_name);
+    m_ctx->hlasm_ctx->enter_copy_member(virtual_file_name);
 
     return true;
 }
@@ -423,7 +453,9 @@ void opencode_provider::convert_ainsert_buffer_to_copybook()
 
     analyzer a(new_file->second,
         analyzer_options {
-            *virtual_copy_name,
+            generate_virtual_file_name(
+                m_vf_handles.emplace_back(m_virtual_file_monitor->file_generated(new_file->second)).file_id(),
+                *virtual_copy_name),
             m_lib_provider,
             *m_ctx,
             workspaces::library_data { processing_kind::COPY, virtual_copy_name },
@@ -480,6 +512,7 @@ context::shared_stmt_ptr opencode_provider::get_next(const statement_processor& 
             return std::tie(lab_instr->op_text, lab_instr->op_range);
         }
     }();
+    ph.parser->get_collector().resolve_first_part();
 
     if (!collector.has_instruction())
     {
@@ -722,7 +755,6 @@ const parsing::parser_holder& opencode_provider::prepare_operand_parser(const st
     h.lex->set_unlimited_line(unlimited_line);
 
     h.stream->reset();
-
 
     h.parser->reinitialize(&hlasm_ctx, std::move(range_prov), proc_status, diags);
 

@@ -20,6 +20,7 @@
 #include <variant>
 #include <vector>
 
+#include "assembler_options.h"
 #include "nlohmann/json_fwd.hpp"
 
 namespace hlasm_plugin::parser_library::config {
@@ -33,21 +34,14 @@ struct library
 void to_json(nlohmann::json& j, const library& p);
 void from_json(const nlohmann::json& j, library& p);
 
-struct assembler_options
-{
-    std::string sysparm;
-    std::string profile;
-    std::string system_id;
-
-    bool valid() const noexcept { return sysparm.size() < 256; }
-};
-void to_json(nlohmann::json& j, const assembler_options& p);
-void from_json(const nlohmann::json& j, assembler_options& p);
-
 struct db2_preprocessor
-{};
-inline bool operator==(const db2_preprocessor&, const db2_preprocessor&) { return true; }
-inline bool operator!=(const db2_preprocessor& l, const db2_preprocessor& r) { return !(l == r); }
+{
+    std::string version;
+
+    bool valid() const noexcept { return version.size() <= 64; }
+
+    friend bool operator==(const db2_preprocessor&, const db2_preprocessor&) = default;
+};
 
 void to_json(nlohmann::json& j, const db2_preprocessor& p);
 void from_json(const nlohmann::json& j, db2_preprocessor& p);
@@ -57,12 +51,11 @@ struct cics_preprocessor
     bool prolog = true;
     bool epilog = true;
     bool leasm = false;
+
+    bool valid() const noexcept { return true; }
+
+    friend bool operator==(const cics_preprocessor&, const cics_preprocessor&) = default;
 };
-inline bool operator==(const cics_preprocessor& l, const cics_preprocessor& r)
-{
-    return l.prolog == r.prolog && l.epilog == r.epilog && l.leasm == r.leasm;
-}
-inline bool operator!=(const cics_preprocessor& l, const cics_preprocessor& r) { return !(l == r); }
 
 void to_json(nlohmann::json& j, const cics_preprocessor& p);
 void from_json(const nlohmann::json& j, cics_preprocessor& p);
@@ -70,9 +63,11 @@ void from_json(const nlohmann::json& j, cics_preprocessor& p);
 struct preprocessor_options
 {
     std::variant<std::monostate, db2_preprocessor, cics_preprocessor> options;
+
+    bool valid() const noexcept;
+
+    friend bool operator==(const preprocessor_options&, const preprocessor_options&) = default;
 };
-inline bool operator==(const preprocessor_options& l, const preprocessor_options& r) { return l.options == r.options; }
-inline bool operator!=(const preprocessor_options& l, const preprocessor_options& r) { return !(l == r); }
 
 struct processor_group
 {

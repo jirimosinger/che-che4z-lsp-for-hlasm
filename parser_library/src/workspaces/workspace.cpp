@@ -21,6 +21,7 @@
 #include <regex>
 #include <string>
 
+#include "file_manager_vfm.h"
 #include "lib_config.h"
 #include "library_local.h"
 #include "nlohmann/json.hpp"
@@ -42,6 +43,7 @@ workspace::workspace(const ws_uri& uri,
     , name_(name)
     , uri_(uri)
     , file_manager_(file_manager)
+    , fm_vfm_(file_manager_)
     , implicit_proc_grp("pg_implicit", {}, {})
     , ws_path_(uri)
     , global_config_(global_config)
@@ -129,6 +131,18 @@ lib_config workspace::get_config() { return local_config_.fill_missing_settings(
 
 const processor_group& workspace::get_proc_grp_by_program(const std::string& filename) const
 {
+    const auto* pgm = get_program(filename);
+    if (pgm)
+        return proc_grps_.at(pgm->pgroup);
+    return implicit_proc_grp;
+}
+const processor_group& workspace::get_proc_grp_by_program(const program& pgm) const
+{
+    return proc_grps_.at(pgm.pgroup);
+}
+
+const program* workspace::get_program(const std::string& filename) const
+{
     assert(opened_);
 
     std::string file = utils::path::lexically_normal(utils::path::lexically_relative(filename, uri_)).string();
@@ -136,49 +150,64 @@ const processor_group& workspace::get_proc_grp_by_program(const std::string& fil
     // direct match
     auto program = exact_pgm_conf_.find(file);
     if (program != exact_pgm_conf_.cend())
-        return proc_grps_.at(program->second.pgroup);
+        return &program->second;
 
     for (const auto& pgm : regex_pgm_conf_)
     {
         if (std::regex_match(file, pgm.second))
-            return proc_grps_.at(pgm.first.pgroup);
+            return &pgm.first;
     }
-    return implicit_proc_grp;
+    return nullptr;
 }
 
 const ws_uri& workspace::uri() { return uri_; }
+
+bool workspace::is_config_file(const std::string& file_uri) const
+{
+    std::filesystem::path file_path(file_uri);
+
+    return utils::path::equal(file_path, proc_grps_path_) || utils::path::equal(file_path, pgm_conf_path_);
+}
+
+workspace_file_info workspace::parse_config_file()
+{
+    workspace_file_info ws_file_info;
+
+    if (load_and_process_config())
+    {
+        // Reparse every opened file when configuration is changed
+        for (const auto& fname : opened_files_)
+        {
+            auto found = file_manager_.find_processor_file(fname);
+            if (found)
+                found->parse(*this, get_asm_options(fname), get_preprocessor_options(fname), &fm_vfm_);
+        }
+
+        for (const auto& fname : dependants_)
+        {
+            auto found = file_manager_.find_processor_file(fname);
+            if (found)
+                filter_and_close_dependencies_(found->files_to_close(), found);
+        }
+    }
+    ws_file_info.config_parsing = true;
+    return ws_file_info;
+}
 
 workspace_file_info workspace::parse_file(const std::string& file_uri)
 {
     workspace_file_info ws_file_info;
 
-    std::filesystem::path file_path(file_uri);
-    // add support for hlasm to vscode (auto detection??) and do the decision based on languageid
-    if (utils::path::equal(file_path, proc_grps_path_) || utils::path::equal(file_path, pgm_conf_path_))
+    // TODO: add support for hlasm to vscode (auto detection??) and do the decision based on languageid
+    if (is_config_file(file_uri))
     {
-        if (load_and_process_config())
-        {
-            for (auto fname : dependants_)
-            {
-                auto found = file_manager_.find_processor_file(fname);
-                if (found)
-                    found->parse(*this, get_asm_options(fname), get_preprocessor_options(fname));
-            }
-
-            for (auto fname : dependants_)
-            {
-                auto found = file_manager_.find_processor_file(fname);
-                if (found)
-                    filter_and_close_dependencies_(found->files_to_close(), found);
-            }
-        }
-        ws_file_info.config_parsing = true;
-        return ws_file_info;
+        return parse_config_file();
     }
-    // what about removing files??? what if depentands_ points to not existing file?
+
+    // TODO: what about removing files??? what if depentands_ points to not existing file?
     std::vector<processor_file_ptr> files_to_parse;
 
-    for (auto fname : dependants_)
+    for (const auto& fname : dependants_)
     {
         auto f = file_manager_.find_processor_file(fname);
         if (!f)
@@ -200,12 +229,11 @@ workspace_file_info workspace::parse_file(const std::string& file_uri)
             files_to_parse.push_back(f);
     }
 
-    for (auto f : files_to_parse)
+    for (const auto& f : files_to_parse)
     {
-        f->parse(*this, get_asm_options(f->get_file_name()), get_preprocessor_options(f->get_file_name()));
+        f->parse(*this, get_asm_options(f->get_file_name()), get_preprocessor_options(f->get_file_name()), &fm_vfm_);
         if (!f->dependencies().empty())
             dependants_.insert(f->get_file_name());
-
 
         // if there is no processor group assigned to the program, delete diagnostics that may have been created
         if (cancel_ && cancel_->load()) // skip, if parsing was cancelled using the cancellation token
@@ -224,7 +252,7 @@ workspace_file_info workspace::parse_file(const std::string& file_uri)
     }
 
     // second check after all dependants are there to close all files that used to be dependencies
-    for (auto f : files_to_parse)
+    for (const auto& f : files_to_parse)
         filter_and_close_dependencies_(f->files_to_close(), f);
 
     return ws_file_info;
@@ -241,11 +269,20 @@ void workspace::refresh_libraries()
     }
 }
 
-workspace_file_info workspace::did_open_file(const std::string& file_uri) { return parse_file(file_uri); }
+workspace_file_info workspace::did_open_file(const std::string& file_uri)
+{
+    if (!is_config_file(file_uri))
+        opened_files_.emplace(file_uri);
+
+    return parse_file(file_uri);
+}
 
 void workspace::did_close_file(const std::string& file_uri)
 {
     diag_suppress_notified_[file_uri] = false;
+
+    opened_files_.erase(file_uri);
+
     // first check whether the file is a dependency
     // if so, simply close it, no other action is needed
     if (is_dependency_(file_uri))
@@ -277,7 +314,7 @@ void workspace::did_close_file(const std::string& file_uri)
     file_manager_.remove_file(file_uri);
 }
 
-void workspace::did_change_file(const std::string file_uri, const document_change*, size_t) { parse_file(file_uri); }
+void workspace::did_change_file(const std::string& file_uri, const document_change*, size_t) { parse_file(file_uri); }
 
 void workspace::did_change_watched_files(const std::string& file_uri)
 {
@@ -500,9 +537,10 @@ bool workspace::load_and_process_config()
 
     config::pgm_conf pgm_config;
     config::proc_grps proc_groups;
+    file_ptr proc_grps_file;
     file_ptr pgm_conf_file;
 
-    bool load_ok = load_config(proc_groups, pgm_config, pgm_conf_file);
+    bool load_ok = load_config(proc_groups, pgm_config, proc_grps_file, pgm_conf_file);
     if (!load_ok)
         return false;
 
@@ -573,24 +611,25 @@ bool workspace::load_and_process_config()
                 std::replace(pgm_name.begin(), pgm_name.end(), '/', '\\');
 
             if (!is_wildcard(pgm_name))
-                exact_pgm_conf_.emplace(pgm_name, program { pgm_name, pgm.pgroup });
+                exact_pgm_conf_.emplace(pgm_name, program { pgm_name, pgm.pgroup, pgm.opts });
             else
-                regex_pgm_conf_.push_back({ program { pgm_name, pgm.pgroup }, wildcard2regex(pgm_name) });
+                regex_pgm_conf_.push_back({ program { pgm_name, pgm.pgroup, pgm.opts }, wildcard2regex(pgm_name) });
         }
         else
         {
-            config_diags_.push_back(diagnostic_s::error_W004(pgm_conf_file->get_file_name(), name_));
+            config_diags_.push_back(diagnostic_s::error_W0004(pgm_conf_file->get_file_name(), name_));
         }
     }
 
     return true;
 }
-bool workspace::load_config(config::proc_grps& proc_groups, config::pgm_conf& pgm_config, file_ptr& pgm_conf_file)
+bool workspace::load_config(
+    config::proc_grps& proc_groups, config::pgm_conf& pgm_config, file_ptr& proc_grps_file, file_ptr& pgm_conf_file)
 {
     std::filesystem::path hlasm_base = utils::path::join(uri_, HLASM_PLUGIN_FOLDER);
 
     // proc_grps.json parse
-    file_ptr proc_grps_file = file_manager_.add_file(utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string());
+    proc_grps_file = file_manager_.add_file(utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string());
 
     if (proc_grps_file->update_and_get_bad())
         return false;
@@ -600,13 +639,18 @@ bool workspace::load_config(config::proc_grps& proc_groups, config::pgm_conf& pg
         nlohmann::json::parse(proc_grps_file->get_text()).get_to(proc_groups);
         proc_grps_.clear();
         for (const auto& pg : proc_groups.pgroups)
+        {
             if (!pg.asm_options.valid())
-                config_diags_.push_back(diagnostic_s::error_W005(proc_grps_file->get_file_name(), pg.name));
+                config_diags_.push_back(
+                    diagnostic_s::error_W0005(proc_grps_file->get_file_name(), pg.name, "processor group"));
+            if (!pg.preprocessor.valid())
+                config_diags_.push_back(diagnostic_s::error_W0006(proc_grps_file->get_file_name(), pg.name));
+        }
     }
     catch (const nlohmann::json::exception&)
     {
         // could not load proc_grps
-        config_diags_.push_back(diagnostic_s::error_W002(proc_grps_file->get_file_name(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_file_name(), name_));
         return false;
     }
 
@@ -619,12 +663,18 @@ bool workspace::load_config(config::proc_grps& proc_groups, config::pgm_conf& pg
     try
     {
         nlohmann::json::parse(pgm_conf_file->get_text()).get_to(pgm_config);
+        for (const auto& pgm : pgm_config.pgms)
+        {
+            if (!pgm.opts.valid())
+                config_diags_.push_back(
+                    diagnostic_s::error_W0005(pgm_conf_file->get_file_name(), pgm.program, "program"));
+        }
         exact_pgm_conf_.clear();
         regex_pgm_conf_.clear();
     }
     catch (const nlohmann::json::exception&)
     {
-        config_diags_.push_back(diagnostic_s::error_W003(pgm_conf_file->get_file_name(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_file_name(), name_));
         return false;
     }
 
@@ -733,9 +783,20 @@ std::optional<std::string> workspace::get_library(
 
 asm_option workspace::get_asm_options(const std::string& file_name) const
 {
-    auto& proc_grp = get_proc_grp_by_program(file_name);
+    asm_option result;
 
-    return proc_grp.asm_options();
+    auto pgm = get_program(file_name);
+    if (pgm)
+    {
+        get_proc_grp_by_program(*pgm).update_asm_options(result);
+        pgm->asm_opts.apply(result);
+    }
+    else
+    {
+        implicit_proc_grp.update_asm_options(result);
+    }
+
+    return result;
 }
 
 preprocessor_options workspace::get_preprocessor_options(const std::string& file_name) const

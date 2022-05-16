@@ -1006,3 +1006,53 @@ B EQU *-A
     a.collect_diags();
     ASSERT_EQ(a.diags().size(), (size_t)0);
 }
+
+TEST(org, correct_alignment_computation_with_locators)
+{
+    std::string input(R"(
+S   CSECT
+    DS    XL1000
+B   LOCTR
+Y   DS    A
+    ORG   B
+    ORG   ,
+Z   DS    A
+)");
+    analyzer a(input);
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty());
+
+    auto z = get_symbol_reloc(a.hlasm_ctx(), "Z");
+    auto s = get_section(a.hlasm_ctx(), "S");
+    ASSERT_TRUE(z);
+    ASSERT_TRUE(s);
+
+    std::vector<address::base_entry> expected_bases { { { s, nullptr }, 1 } };
+    EXPECT_EQ(z->bases(), expected_bases);
+
+    EXPECT_EQ(z->offset(), 1004);
+}
+
+TEST(org, correct_relative_address_after_org)
+{
+    std::string input(R"(
+        DS      512XL1024
+LOC     LOCTR
+LABEL   DS      XL(LEN)
+        ORG     *-LEN
+        DS      CL8
+        ORG     ,
+TEST    EQU     *-LABEL
+LEN     EQU     144
+
+)");
+    analyzer a(input);
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty());
+
+    EXPECT_EQ(get_symbol_abs(a.hlasm_ctx(), "TEST"), 144);
+}

@@ -14,46 +14,40 @@
 
 #include "processor_group.h"
 
-#include "config/proc_grps.h"
-
 namespace hlasm_plugin::parser_library::workspaces {
 
 namespace {
 struct translate_pp_options
 {
     preprocessor_options operator()(const std::monostate&) const { return std::monostate {}; }
-    preprocessor_options operator()(const config::db2_preprocessor&) const { return db2_preprocessor_options {}; }
+    preprocessor_options operator()(const config::db2_preprocessor& opt) const
+    {
+        return db2_preprocessor_options(opt.version);
+    }
     preprocessor_options operator()(const config::cics_preprocessor& opt) const
     {
         return cics_preprocessor_options(opt.prolog, opt.epilog, opt.leasm);
     }
 };
-
-asm_option translate_assembler_options(const config::assembler_options& asm_options)
-{
-    return asm_option {
-        asm_options.sysparm,
-        asm_options.profile,
-        asm_options.system_id.empty() ? asm_option::system_id_default : asm_options.system_id,
-    };
-}
 } // namespace
 
 processor_group::processor_group(
-    const std::string& name, const config::assembler_options& asm_options, const config::preprocessor_options& pp)
-    : name_(name)
-    , asm_optns(translate_assembler_options(asm_options))
-    , prep_opts(std::visit(translate_pp_options {}, pp.options))
+    const std::string& pg_name, const config::assembler_options& asm_options, const config::preprocessor_options& pp)
+    : m_pg_name(pg_name)
+    , m_asm_opts(asm_options)
+    , m_prep_opts(std::visit(translate_pp_options {}, pp.options))
 {}
+
+void processor_group::update_asm_options(asm_option& opts) const { m_asm_opts.apply(opts); }
 
 void processor_group::collect_diags() const
 {
-    for (auto&& lib : libs_)
+    for (auto&& lib : m_libs)
     {
         collect_diags_from_child(*lib);
     }
 }
 
-void processor_group::add_library(std::unique_ptr<library> library) { libs_.push_back(std::move(library)); }
+void processor_group::add_library(std::unique_ptr<library> library) { m_libs.push_back(std::move(library)); }
 
 } // namespace hlasm_plugin::parser_library::workspaces

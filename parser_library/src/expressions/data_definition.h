@@ -25,7 +25,8 @@
 
 namespace hlasm_plugin::parser_library::checking {
 class data_def_type;
-}
+enum class data_instr_type;
+} // namespace hlasm_plugin::parser_library::checking
 
 namespace hlasm_plugin::parser_library::semantics {
 class collector;
@@ -97,6 +98,11 @@ struct data_definition final : public context::dependable
     // data_def_expr::ignored or data_def_address::ignored set to false
     checking::nominal_value_t evaluate_nominal_value(
         context::dependency_solver& info, diagnostic_op_consumer& diags) const;
+    checking::reduced_nominal_value_t evaluate_reduced_nominal_value() const;
+
+    long long evaluate_total_length(context::dependency_solver& info,
+        checking::data_instr_type checking_rules,
+        diagnostic_op_consumer& diags) const;
 
     void apply(mach_expr_visitor& visitor) const;
 

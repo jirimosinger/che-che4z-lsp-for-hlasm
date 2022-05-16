@@ -29,11 +29,13 @@ target_sources(parser_library PRIVATE
 	ebcdic_encoding.cpp
 	ebcdic_encoding.h
 	error_messages.h
+	instruction_set_version.h
 	lib_config.cpp
 	location.h
 	preprocessor_options.h
 	protocol.cpp
 	tagged_index.h
+	virtual_file_monitor.h
 	workspace_manager.cpp
 	workspace_manager_impl.h
 )

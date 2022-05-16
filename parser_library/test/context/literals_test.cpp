@@ -240,7 +240,8 @@ TEST(literals, similar)
 TEST(literals, in_machine_instructions)
 {
     std::string input = R"(
-    MVC =A(0),=A(0)
+    USING *,10
+    MVC   =A(0),=A(0)
 )";
     analyzer a(input);
     a.analyze();
@@ -257,6 +258,7 @@ TEST(literals, strange_literals)
 {
     std::string input = R"(
 &ENDL    SETC  X2C('0D25')
+         USING *,10
          MVC   0,=C'&ENDL'
 )";
     analyzer a(input);
@@ -325,9 +327,10 @@ TEST(literals, halfward_alignment_expression)
 TEST(literals, halfward_alignment_delayed)
 {
     std::string input = R"(
-         LARL 0,=C'0'
-         LA   0,=C'1'
-         LARL 0,=C'1'
+         USING *,12
+         LARL  0,=C'0'
+         LA    0,=C'1'
+         LARL  0,=C'1'
 )";
     analyzer a(input);
     a.analyze();
@@ -376,7 +379,7 @@ B        CSECT
     a.analyze();
     a.collect_diags();
 
-    EXPECT_TRUE(matches_message_codes(a.diags(), { "M113" }));
+    EXPECT_TRUE(matches_message_codes(a.diags(), { "M136" }));
 }
 
 TEST(literals, no_csect_available)
@@ -389,7 +392,7 @@ TEST(literals, no_csect_available)
     a.analyze();
     a.collect_diags();
 
-    EXPECT_TRUE(matches_message_codes(a.diags(), { "M113" }));
+    EXPECT_TRUE(matches_message_codes(a.diags(), { "M136" }));
 }
 
 TEST(literals, ltorg_in_dsect)

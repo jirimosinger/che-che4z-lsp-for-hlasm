@@ -105,13 +105,20 @@ struct diagnostic_op
     std::string code;
     std::string message;
     range diag_range;
+    diagnostic_tag tag;
+
     diagnostic_op() = default;
 
-    diagnostic_op(diagnostic_severity severity, std::string code, std::string message, range diag_range = {})
+    diagnostic_op(diagnostic_severity severity,
+        std::string code,
+        std::string message,
+        range diag_range = {},
+        diagnostic_tag tag = diagnostic_tag::none)
         : severity(severity)
         , code(std::move(code))
         , message(std::move(message))
-        , diag_range(std::move(diag_range)) {};
+        , diag_range(std::move(diag_range))
+        , tag(tag) {};
 
     static diagnostic_op error_I999(std::string_view instr_name, const range& range);
 
@@ -407,11 +414,11 @@ struct diagnostic_op
 
     static bool is_error(const diagnostic_op& diag);
 
-    static diagnostic_op error_M000(std::string_view instr_name, int number, const range& range);
+    static diagnostic_op error_M000(std::string_view instr_name, size_t number, const range& range);
 
-    static diagnostic_op error_M001(std::string_view instr_name, int one, int two, const range& range);
+    static diagnostic_op error_M001(std::string_view instr_name, size_t one, size_t two, const range& range);
 
-    static diagnostic_op error_M002(std::string_view instr_name, int one, int two, const range& range);
+    static diagnostic_op error_M002(std::string_view instr_name, size_t one, size_t two, const range& range);
 
     static diagnostic_op error_M003(std::string_view instr_name, const range& range);
 
@@ -454,6 +461,7 @@ struct diagnostic_op
     static diagnostic_op error_D030(const range& range, std::string_view type);
     static diagnostic_op error_D031(const range& range);
     static diagnostic_op warn_D032(const range& range, std::string_view modifier);
+    static diagnostic_op error_D033(const range& range);
 
     static diagnostic_op error_M102(std::string_view instr_name, const range& range);
 
@@ -493,8 +501,10 @@ struct diagnostic_op
 
     static diagnostic_op error_M135(std::string_view instr_name, long long from, long long to, const range& range);
 
+    static diagnostic_op warn_M136(const range& range);
+
     static diagnostic_op error_optional_number_of_operands(
-        std::string_view instr_name, int optional_no, int operands_no, const range& range);
+        std::string_view instr_name, size_t optional_no, size_t operands_no, const range& range);
 
     static diagnostic_op error_M010(std::string_view instr_name, const range& range);
 
@@ -568,7 +578,7 @@ struct diagnostic_op
 
     static diagnostic_op error_E062(const range& range);
 
-    static diagnostic_op error_E063(const range& range);
+    static diagnostic_op error_W063(const range& range);
 
     static diagnostic_op error_E064(const range& range);
 
@@ -596,6 +606,8 @@ struct diagnostic_op
 
     static diagnostic_op error_E076(const range& range);
 
+    static diagnostic_op error_E077(const range& range);
+
     static diagnostic_op warning_W010(std::string_view message, const range& range);
 
     static diagnostic_op warning_W011(const range& range);
@@ -617,6 +629,22 @@ struct diagnostic_op
     static diagnostic_op error_ME002(const range& range);
 
     static diagnostic_op error_ME003(const range& range);
+
+    static diagnostic_op error_ME004(const range& range);
+
+    static diagnostic_op error_ME005(std::string_view label, std::string_view sect, const range& range);
+
+    static diagnostic_op error_ME006(const range& range);
+
+    static diagnostic_op error_ME007(const range& range);
+
+    static diagnostic_op error_ME008(long, const range& range);
+
+    static diagnostic_op error_ME009(const range& range);
+
+    static diagnostic_op error_ME010(const range& range);
+
+    static diagnostic_op error_ME011(const range& range);
 
     static diagnostic_op error_CE001(const range& range);
 
@@ -687,6 +715,8 @@ struct diagnostic_op
         int e_off);
 
     static diagnostic_op error_U006_duplicate_base_specified(const range& range);
+
+    static diagnostic_op mnote_diagnostic(unsigned level, std::string_view message, const range& range);
 };
 
 struct range_uri_s
@@ -733,7 +763,8 @@ public:
         diagnostic_severity severity,
         std::string code,
         std::string message,
-        std::vector<diagnostic_related_info_s> related)
+        std::vector<diagnostic_related_info_s> related,
+        diagnostic_tag tag)
         : file_name(std::move(file_name))
         , diag_range(range)
         , severity(severity)
@@ -741,6 +772,7 @@ public:
         , source("HLASM Plugin")
         , message(std::move(message))
         , related(std::move(related))
+        , tag(tag)
     {}
     diagnostic_s(std::string file_name, diagnostic_op diag_op)
         : file_name(std::move(file_name))
@@ -749,6 +781,7 @@ public:
         , code(std::move(diag_op.code))
         , source("HLASM Plugin")
         , message(std::move(diag_op.message))
+        , tag(diag_op.tag)
     {}
     diagnostic_s(diagnostic_op diag_op)
         : diag_range(std::move(diag_op.diag_range))
@@ -756,6 +789,7 @@ public:
         , code(std::move(diag_op.code))
         , source("HLASM Plugin")
         , message(std::move(diag_op.message))
+        , tag(diag_op.tag)
     {}
 
 
@@ -766,6 +800,7 @@ public:
     std::string source;
     std::string message;
     std::vector<diagnostic_related_info_s> related;
+    diagnostic_tag tag = diagnostic_tag::none;
 
     /*
     Lxxxx - local library messages
@@ -784,13 +819,15 @@ public:
 
     static diagnostic_s warning_L0005(std::string_view pattern, size_t limit);
 
-    static diagnostic_s error_W002(std::string_view file_name, std::string_view ws_name);
+    static diagnostic_s error_W0002(std::string_view file_name, std::string_view ws_name);
 
-    static diagnostic_s error_W003(std::string_view file_name, std::string_view ws_name);
+    static diagnostic_s error_W0003(std::string_view file_name, std::string_view ws_name);
 
-    static diagnostic_s error_W004(std::string_view file_name, std::string_view ws_name);
+    static diagnostic_s error_W0004(std::string_view file_name, std::string_view ws_name);
 
-    static diagnostic_s error_W005(std::string_view file_name, std::string_view proc_group);
+    static diagnostic_s error_W0005(std::string_view file_name, std::string_view name, std::string_view type);
+
+    static diagnostic_s error_W0006(std::string_view file_name, std::string_view proc_group);
 
     /*
     E01x - wrong format

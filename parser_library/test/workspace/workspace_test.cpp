@@ -196,6 +196,27 @@ std::string pgroups_file_invalid_assembler_options = R"({
   ]
 })";
 
+std::string pgroups_file_invalid_preprocessor_options = R"({
+  "pgroups": [
+    {
+      "name": "P1",
+      "libs": [
+        {
+          "path": "missing",
+          "optional": true
+        },
+        "lib"
+      ],
+      "preprocessor": {
+        "name": "DB2",
+        "options": {
+          "version": "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEFFFFFFFFFFGGGGGGGGGG"
+        }
+      }
+    }
+  ]
+})";
+
 std::string pgmconf_file = R"({
   "pgms": [
     {
@@ -209,6 +230,30 @@ std::string pgmconf_file = R"({
 	{
       "program": "source3",
       "pgroup": "P1"
+    }
+  ]
+})";
+
+std::string pgmconf_file_invalid_assembler_options = R"({
+  "pgms": [
+    {
+      "program": "source1",
+      "pgroup": "P1"
+    },
+	{
+      "program": "source2",
+      "pgroup": "P1"
+    },
+	{
+      "program": "source3",
+      "pgroup": "P1"
+    },
+	{
+      "program": "invalid",
+      "pgroup": "P1",
+      "asm_options": {
+        "SYSPARM": "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEFFFFFFFFFFGGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEFFFFFFFFFFGGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEFFFFFFFFFFGGGGGGGGGGHHHHHHHHHHIIIIIIIIIIJJJJJJJJJJ"
+      }
     }
   ]
 })";
@@ -270,6 +315,8 @@ enum class file_manager_opt_variant
     required,
     optional,
     invalid_assembler_options,
+    invalid_preprocessor_options,
+    invalid_assembler_options_in_pgm_conf,
 };
 
 class file_manager_opt : public file_manager_impl
@@ -279,6 +326,7 @@ class file_manager_opt : public file_manager_impl
         switch (variant)
         {
             case file_manager_opt_variant::old_school:
+            case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
                 return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_old_school, *this);
             case file_manager_opt_variant::default_to_required:
                 return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_default, *this);
@@ -289,16 +337,29 @@ class file_manager_opt : public file_manager_impl
             case file_manager_opt_variant::invalid_assembler_options:
                 return std::make_unique<file_with_text>(
                     "proc_grps.json", pgroups_file_invalid_assembler_options, *this);
+            case file_manager_opt_variant::invalid_preprocessor_options:
+                return std::make_unique<file_with_text>(
+                    "proc_grps.json", pgroups_file_invalid_preprocessor_options, *this);
         }
         throw std::logic_error("Not implemented");
+    }
+
+    std::unique_ptr<file_with_text> generate_pgm_conf_file(file_manager_opt_variant variant)
+    {
+        switch (variant)
+        {
+            case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
+                return std::make_unique<file_with_text>("pgm_conf.json", pgmconf_file_invalid_assembler_options, *this);
+            default:
+                return std::make_unique<file_with_text>("pgm_conf.json", pgmconf_file, *this);
+        }
     }
 
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
         files_.emplace(hlasmplugin_folder + "proc_grps.json", generate_proc_grps_file(variant));
-        files_.emplace(hlasmplugin_folder + "pgm_conf.json",
-            std::make_unique<file_with_text>("pgm_conf.json", pgmconf_file, *this));
+        files_.emplace(hlasmplugin_folder + "pgm_conf.json", generate_pgm_conf_file(variant));
         files_.emplace("source1", std::make_unique<file_with_text>("source1", source_using_macro_file_no_error, *this));
         files_.emplace(
             correct_macro_path, std::make_unique<file_with_text>(correct_macro_path, correct_macro_file, *this));
@@ -323,13 +384,13 @@ TEST_F(workspace_test, did_close_file)
     // 3 files are open
     //	- open codes source1 and source2 with syntax errors using macro ERROR
     //	- macro file lib/ERROR with syntax error
-    // on first reparse, there should be 3 diagnotics from sources and lib/ERROR file
+    // on first reparse, there should be 3 diagnostics from sources and lib/ERROR file
     ws.did_open_file("source1");
     ws.did_open_file("source2");
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)3);
     EXPECT_TRUE(match_strings({ faulty_macro_path, "source2", "source1" }));
 
-    // when we close source1, only its diagnostics should disapear
+    // when we close source1, only its diagnostics should disappear
     // macro's and source2's diagnostics should stay as it is still open
     ws.did_close_file("source1");
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)2);
@@ -341,7 +402,7 @@ TEST_F(workspace_test, did_close_file)
     EXPECT_TRUE(match_strings({ faulty_macro_path, "source2" }));
 
     // if we remove the line using ERROR macro in the source2. its diagnostics will be removed as it is no longer a
-    // dependendancy of source2
+    // dependency of source2
     std::vector<document_change> changes;
     std::string new_text = "";
     changes.push_back(document_change({ { 0, 0 }, { 0, 6 } }, new_text.c_str(), new_text.size()));
@@ -419,6 +480,28 @@ TEST_F(workspace_test, invalid_assembler_options)
 
     EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
     EXPECT_TRUE(std::any_of(diags().begin(), diags().end(), [](const auto& d) { return d.code == "W0005"; }));
+}
+
+TEST_F(workspace_test, invalid_assembler_options_in_pgm_conf)
+{
+    file_manager_opt file_manager(file_manager_opt_variant::invalid_assembler_options_in_pgm_conf);
+    lib_config config;
+    workspace ws("", "workspace_name", file_manager, config);
+    ws.open();
+
+    EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
+    EXPECT_TRUE(std::any_of(diags().begin(), diags().end(), [](const auto& d) { return d.code == "W0005"; }));
+}
+
+TEST_F(workspace_test, invalid_preprocessor_options)
+{
+    file_manager_opt file_manager(file_manager_opt_variant::invalid_preprocessor_options);
+    lib_config config;
+    workspace ws("", "workspace_name", file_manager, config);
+    ws.open();
+
+    EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
+    EXPECT_TRUE(std::any_of(diags().begin(), diags().end(), [](const auto& d) { return d.code == "W0006"; }));
 }
 
 class file_manager_list_dir_failed : public file_manager_opt

@@ -16,6 +16,7 @@
 
 #include <limits>
 
+#include "context/using.h"
 #include "semantics/operand_impls.h"
 
 namespace hlasm_plugin::parser_library::processing {
@@ -71,14 +72,12 @@ int32_t data_def_dependency<instr_type>::get_operands_length(const semantics::op
             // enforce data def alignment
             round_up_bytes(solver.operands_bit_length, dd->get_alignment().boundary);
         }
-        const auto o = op->access_data_def()->get_operand_value(solver, diags);
-        const auto* dd_op = dynamic_cast<checking::data_definition_operand*>(o.get());
+        long long len = op->access_data_def()->evaluate_total_length(solver, instr_type, diags);
 
-
-        if (!dd_op->check<instr_type>(diagnostic_collector()))
+        if (len < 0)
             return 0;
 
-        solver.operands_bit_length += dd_op->get_length();
+        solver.operands_bit_length += len;
     }
 
     // align to whole byte
@@ -124,6 +123,17 @@ context::id_index data_def_dependency_solver::get_literal_id(
     const std::shared_ptr<const expressions::data_definition>& dd)
 {
     return base.get_literal_id(dd);
+}
+
+bool data_def_dependency_solver::using_active(context::id_index label, const context::section* sect) const
+{
+    return base.using_active(label, sect);
+}
+
+context::using_evaluate_result data_def_dependency_solver::using_evaluate(
+    context::id_index label, const context::section* owner, int32_t offset, bool long_offset) const
+{
+    return base.using_evaluate(label, owner, offset, long_offset);
 }
 
 } // namespace hlasm_plugin::parser_library::processing

@@ -141,7 +141,8 @@ void file_manager_impl::did_open_file(const std::string& document_uri, version_t
 void file_manager_impl::did_change_file(
     const std::string& document_uri, version_t, const document_change* changes, size_t ch_size)
 {
-    // the version is the version after the changes -> I dont see how is that useful
+    // TODO
+    // the version is the version after the changes -> I don't see how is that useful
     // should we just overwrite the version??
     // on the other hand, the spec clearly specifies that each change increments version by one.
 
@@ -187,6 +188,26 @@ bool file_manager_impl::file_exists(const std::string& file_name)
 bool file_manager_impl::lib_file_exists(const std::string& lib_path, const std::string& file_name)
 {
     return std::filesystem::exists(utils::path::join(lib_path, file_name));
+}
+
+void file_manager_impl::put_virtual_file(unsigned long long id, std::string_view text)
+{
+    std::lock_guard guard(virtual_files_mutex);
+    m_virtual_files.try_emplace(id, text);
+}
+
+void file_manager_impl::remove_virtual_file(unsigned long long id)
+{
+    std::lock_guard guard(virtual_files_mutex);
+    m_virtual_files.erase(id);
+}
+
+std::string file_manager_impl::get_virtual_file(unsigned long long id) const
+{
+    std::lock_guard guard(virtual_files_mutex);
+    if (auto it = m_virtual_files.find(id); it != m_virtual_files.end())
+        return it->second;
+    return {};
 }
 
 } // namespace hlasm_plugin::parser_library::workspaces

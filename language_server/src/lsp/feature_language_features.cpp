@@ -106,10 +106,11 @@ void feature_language_features::definition(const json& id, const json& params)
 
 
     auto definition_position_uri = ws_mngr_.definition(uri_to_path(document_uri).c_str(), pos);
-    document_uri =
-        (definition_position_uri.file()[0] == '\0') ? document_uri : path_to_uri(definition_position_uri.file());
-    json to_ret { { "uri", document_uri },
-        { "range", range_to_json({ definition_position_uri.pos(), definition_position_uri.pos() }) } };
+    document_uri = definition_position_uri.file().empty() ? document_uri : path_to_uri(definition_position_uri.file());
+    json to_ret {
+        { "uri", document_uri },
+        { "range", range_to_json({ definition_position_uri.pos(), definition_position_uri.pos() }) },
+    };
     response_->respond(id, "", to_ret);
 }
 
@@ -135,7 +136,7 @@ void feature_language_features::hover(const json& id, const json& params)
         parser_library::position(params["position"]["line"].get<int>(), params["position"]["character"].get<int>());
 
 
-    auto hover_list = ws_mngr_.hover(uri_to_path(document_uri).c_str(), pos);
+    auto hover_list = std::string_view(ws_mngr_.hover(uri_to_path(document_uri).c_str(), pos));
 
     response_->respond(id, "", json { { "contents", hover_list.empty() ? json() : get_markup_content(hover_list) } });
 }
@@ -331,7 +332,7 @@ void feature_language_features::semantic_tokens(const json& id, const json& para
 {
     auto document_uri = params["textDocument"]["uri"].get<std::string>();
 
-    auto tokens = ws_mngr_.semantic_tokens(uri_to_path(document_uri).c_str());
+    auto tokens = std::vector<parser_library::token_info>(ws_mngr_.semantic_tokens(uri_to_path(document_uri).c_str()));
     json num_array = convert_tokens_to_num_array(tokens);
 
     response_->respond(id, "", { { "data", num_array } });

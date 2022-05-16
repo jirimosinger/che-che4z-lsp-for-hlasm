@@ -17,6 +17,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 
 namespace hlasm_plugin::parser_library {
 
@@ -32,7 +33,7 @@ struct concat_helper
 
     size_t len(std::string_view t) const { return t.size(); }
     template<typename T>
-    std::enable_if_t<!std::is_convertible_v<T&&, std::string_view>, size_t> len(T&&) const
+    std::enable_if_t<!std::is_convertible_v<T&&, std::string_view>, size_t> len(const T&) const
     {
         return 8; // arbitrary estimate for the length of the stringified argument (typically small numbers)
     }
@@ -45,7 +46,7 @@ std::string concat(Args&&... args)
 
     concat_helper h;
 
-    result.reserve((... + h.len(std::forward<Args>(args))));
+    result.reserve((... + h.len(std::as_const(args))));
 
     (h(result, std::forward<Args>(args)), ...);
 
@@ -55,7 +56,7 @@ std::string concat(Args&&... args)
 
 // diagnostic_op errors
 
-// asembler instruction errors
+// assembler instruction errors
 
 diagnostic_op diagnostic_op::error_I999(std::string_view instr_name, const range& range)
 {
@@ -506,7 +507,7 @@ diagnostic_op diagnostic_op::error_A133_EQU_len_att_format(const range& range)
     return diagnostic_op(diagnostic_severity::error,
         "A133",
         "Error at EQU instruction: operand representing length attribute value must either be an absolute value in the "
-        "range 0 throught 65535 or must be omitted",
+        "range 0 through 65535 or must be omitted",
         range);
 }
 
@@ -515,7 +516,7 @@ diagnostic_op diagnostic_op::error_A134_EQU_type_att_format(const range& range)
     return diagnostic_op(diagnostic_severity::error,
         "A134",
         "Error at EQU instruction: operand representing type attribute value must either be an absolute value in the "
-        "range 0 throught 255 or must be omitted",
+        "range 0 through 255 or must be omitted",
         range);
 }
 
@@ -1243,7 +1244,7 @@ diagnostic_op diagnostic_op::warning_A243_END_expr_format(const range& range)
 {
     return diagnostic_op(diagnostic_severity::warning,
         "A243",
-        "First operand must either be an expresison or the operand must be omitted",
+        "First operand must either be an expression or the operand must be omitted",
         range);
 }
 
@@ -1720,6 +1721,14 @@ diagnostic_op diagnostic_op::warn_D032(const range& range, std::string_view oper
         range);
 }
 
+diagnostic_op diagnostic_op::error_D033(const range& range)
+{
+    return diagnostic_op(diagnostic_severity::error,
+        "D033",
+        "Address in form D(B) or a simple relocatable expression resolvable by USING expected.",
+        range);
+}
+
 
 diagnostic_op diagnostic_op::error_M135(std::string_view instr_name, long long from, long long to, const range& range)
 {
@@ -1734,8 +1743,16 @@ diagnostic_op diagnostic_op::error_M135(std::string_view instr_name, long long f
         range);
 }
 
+diagnostic_op diagnostic_op::warn_M136(const range& range)
+{
+    return diagnostic_op(diagnostic_severity::warning,
+        "M136",
+        "Relative Immediate reference across sections used in non-GOFF object",
+        range);
+}
+
 diagnostic_op diagnostic_op::error_optional_number_of_operands(
-    std::string_view instr_name, int optional_no, int operands_no, const range& range)
+    std::string_view instr_name, size_t optional_no, size_t operands_no, const range& range)
 {
     if (optional_no == 0)
         return error_M000(instr_name, operands_no, range);
@@ -1746,7 +1763,7 @@ diagnostic_op diagnostic_op::error_optional_number_of_operands(
 }
 
 diagnostic_op hlasm_plugin::parser_library::diagnostic_op::error_M000(
-    std::string_view instr_name, int number, const range& range)
+    std::string_view instr_name, size_t number, const range& range)
 {
     return diagnostic_op(diagnostic_severity::error,
         "M000",
@@ -1754,7 +1771,7 @@ diagnostic_op hlasm_plugin::parser_library::diagnostic_op::error_M000(
         range);
 }
 
-diagnostic_op diagnostic_op::error_M001(std::string_view instr_name, int one, int two, const range& range)
+diagnostic_op diagnostic_op::error_M001(std::string_view instr_name, size_t one, size_t two, const range& range)
 {
     return diagnostic_op(diagnostic_severity::error,
         "M001",
@@ -1775,7 +1792,7 @@ diagnostic_op hlasm_plugin::parser_library::diagnostic_op::error_M010(std::strin
         range);
 }
 
-diagnostic_op diagnostic_op::error_M002(std::string_view instr_name, int one, int two, const range& range)
+diagnostic_op diagnostic_op::error_M002(std::string_view instr_name, size_t one, size_t two, const range& range)
 {
     return diagnostic_op(diagnostic_severity::error,
         "M002",
@@ -1887,7 +1904,7 @@ diagnostic_op diagnostic_op::error_E033(const range& range)
 
 diagnostic_op diagnostic_op::error_E042(const range& range)
 {
-    return diagnostic_op(diagnostic_severity::error, "E042", "Macro name ommited - ASPACE instead", range);
+    return diagnostic_op(diagnostic_severity::error, "E042", "Macro name omitted - ASPACE instead", range);
 }
 
 diagnostic_op diagnostic_op::error_E043(const range& range)
@@ -1964,7 +1981,7 @@ diagnostic_op diagnostic_op::error_E055(const range& range)
 
 diagnostic_op diagnostic_op::error_E056(const range& range)
 {
-    return diagnostic_op(diagnostic_severity::error, "E055", "ACTR counter exceeded", range);
+    return diagnostic_op(diagnostic_severity::error, "E056", "ACTR counter exceeded", range);
 }
 
 diagnostic_op diagnostic_op::error_E057(const range& range)
@@ -2000,9 +2017,10 @@ diagnostic_op diagnostic_op::error_E062(const range& range)
     return diagnostic_op(diagnostic_severity::error, "E062", "Recursive COPY", range);
 }
 
-diagnostic_op diagnostic_op::error_E063(const range& range)
+diagnostic_op diagnostic_op::error_W063(const range& range)
 {
-    return diagnostic_op(diagnostic_severity::error, "E063", "Too many ACTR calls, exiting", range);
+    return diagnostic_op(
+        diagnostic_severity::warning, "W063", "Too many ACTR calls, review the use of the ACTR instruction", range);
 }
 
 diagnostic_op diagnostic_op::error_E064(const range& range)
@@ -2050,7 +2068,7 @@ diagnostic_op diagnostic_op::error_E071(const range& range)
 
 diagnostic_op diagnostic_op::error_E072(const range& range)
 {
-    return diagnostic_op(diagnostic_severity::error, "E072", "SYSNDX limit reached, macro call supressed.", range);
+    return diagnostic_op(diagnostic_severity::error, "E072", "SYSNDX limit reached, macro call suppressed.", range);
 }
 
 diagnostic_op diagnostic_op::error_E073(const range& range)
@@ -2078,6 +2096,11 @@ diagnostic_op diagnostic_op::error_E076(const range& range)
 {
     return diagnostic_op(
         diagnostic_severity::error, "E076", "SYSLIST must be subscripted; using default subscript is 1", range);
+}
+
+diagnostic_op diagnostic_op::error_E077(const range& range)
+{
+    return diagnostic_op(diagnostic_severity::error, "E077", "Statement count limit reached", range);
 }
 
 diagnostic_op diagnostic_op::warning_W010(std::string_view message, const range& range)
@@ -2142,6 +2165,56 @@ diagnostic_op diagnostic_op::error_ME003(const range& range)
 {
     return diagnostic_op(
         diagnostic_severity::error, "ME003", "Relative Immediate operand must evaluate into an even offset.", range);
+}
+
+diagnostic_op diagnostic_op::error_ME004(const range& range)
+{
+    return diagnostic_op(
+        diagnostic_severity::error, "ME004", "Absolute expression cannot be qualified with a label.", range);
+}
+
+diagnostic_op diagnostic_op::error_ME005(std::string_view label, std::string_view sect, const range& range)
+{
+    return diagnostic_op(diagnostic_severity::error,
+        "ME005",
+        concat("Labeled USING '", label, "' does not map section '", sect, "'."),
+        range);
+}
+
+diagnostic_op diagnostic_op::error_ME006(const range& range)
+{
+    return diagnostic_op(
+        diagnostic_severity::error, "ME006", "Complex relocatable expression cannot be qualified with a label.", range);
+}
+
+diagnostic_op diagnostic_op::error_ME007(const range& range)
+{
+    return diagnostic_op(diagnostic_severity::error, "ME007", "No active USING.", range);
+}
+
+diagnostic_op diagnostic_op::error_ME008(long missed_by, const range& range)
+{
+    return diagnostic_op(
+        diagnostic_severity::error, "ME008", concat("Beyond active USING range by ", missed_by, "."), range);
+}
+
+diagnostic_op diagnostic_op::error_ME009(const range& range)
+{
+    return diagnostic_op(
+        diagnostic_severity::error, "ME009", "A simple relocatable expression resolvable by USING expected.", range);
+}
+
+diagnostic_op diagnostic_op::error_ME010(const range& range)
+{
+    return diagnostic_op(diagnostic_severity::error, "ME010", "Expression must evaluate to an absolute value.", range);
+}
+
+diagnostic_op diagnostic_op::error_ME011(const range& range)
+{
+    return diagnostic_op(diagnostic_severity::error,
+        "ME011",
+        "Cannot combine relocatable displacement with an explicit base register.",
+        range);
 }
 
 diagnostic_op diagnostic_op::error_CE001(const range& range)
@@ -2339,27 +2412,39 @@ diagnostic_op diagnostic_op::error_U006_duplicate_base_specified(const range& ra
     return diagnostic_op(diagnostic_severity::error, "U006", "Base registers must be distinct.", range);
 }
 
-diagnostic_s diagnostic_s::error_W002(std::string_view ws_uri, std::string_view ws_name)
+diagnostic_op diagnostic_op::mnote_diagnostic(unsigned level, std::string_view message, const range& range)
+{
+    const auto lvl = level >= 8 ? diagnostic_severity::error
+        : level >= 4            ? diagnostic_severity::warning
+        : level >= 2            ? diagnostic_severity::info
+                                : diagnostic_severity::hint;
+    const auto tag = level >= 2 ? diagnostic_tag::none : diagnostic_tag::unnecessary;
+    return diagnostic_op(lvl, "MNOTE", std::string(message), range, tag);
+}
+
+diagnostic_s diagnostic_s::error_W0002(std::string_view ws_uri, std::string_view ws_name)
 {
     return diagnostic_s(std::string(ws_uri),
         {},
         diagnostic_severity::error,
         "W0002",
         concat("The configuration file proc_grps for workspace ", ws_name, " is malformed."),
-        {});
+        {},
+        diagnostic_tag::none);
 }
 
-diagnostic_s diagnostic_s::error_W003(std::string_view file_name, std::string_view ws_name)
+diagnostic_s diagnostic_s::error_W0003(std::string_view file_name, std::string_view ws_name)
 {
     return diagnostic_s(std::string(file_name),
         {},
         diagnostic_severity::error,
         "W0003",
         concat("The configuration file pgm_conf for workspace ", ws_name, " is malformed."),
-        {});
+        {},
+        diagnostic_tag::none);
 }
 
-diagnostic_s diagnostic_s::error_W004(std::string_view file_name, std::string_view ws_name)
+diagnostic_s diagnostic_s::error_W0004(std::string_view file_name, std::string_view ws_name)
 {
     return diagnostic_s(std::string(file_name),
         {},
@@ -2368,17 +2453,30 @@ diagnostic_s diagnostic_s::error_W004(std::string_view file_name, std::string_vi
         concat("The configuration file pgm_conf for workspace ",
             ws_name,
             " refers to a processor group, that is not defined in proc_grps"),
-        {});
+        {},
+        diagnostic_tag::none);
 }
 
-diagnostic_s diagnostic_s::error_W005(std::string_view file_name, std::string_view proc_group)
+diagnostic_s diagnostic_s::error_W0005(std::string_view file_name, std::string_view name, std::string_view type)
 {
     return diagnostic_s(std::string(file_name),
         {},
         diagnostic_severity::warning,
         "W0005",
-        concat("The processor group '", proc_group, "' from '", file_name, "' defines invalid assembler options."),
-        {});
+        concat("The ", type, " '", name, "' from '", file_name, "' defines invalid assembler options."),
+        {},
+        diagnostic_tag::none);
+}
+
+diagnostic_s diagnostic_s::error_W0006(std::string_view file_name, std::string_view proc_group)
+{
+    return diagnostic_s(std::string(file_name),
+        {},
+        diagnostic_severity::warning,
+        "W0006",
+        concat("The processor group '", proc_group, "' from '", file_name, "' defines invalid preprocessor options."),
+        {},
+        diagnostic_tag::none);
 }
 
 diagnostic_s diagnostic_s::error_L0001(std::string_view path)
@@ -2401,7 +2499,8 @@ diagnostic_s diagnostic_s::warning_L0003(std::string_view path)
         concat("Macros from library '",
             path,
             "' were selected by a deprecated mechanism to specify file extensions (alwaysRecognize in pgm_conf.json)."),
-        {});
+        {},
+        diagnostic_tag::none);
 }
 
 diagnostic_s diagnostic_s::warning_L0004(std::string_view path, std::string_view macro_name)
@@ -2411,7 +2510,8 @@ diagnostic_s diagnostic_s::warning_L0004(std::string_view path, std::string_view
         diagnostic_severity::warning,
         "L0004",
         concat("Library '", path, "' contains multiple definitions of the macro '", macro_name, "'."),
-        {});
+        {},
+        diagnostic_tag::none);
 }
 
 diagnostic_s diagnostic_s::warning_L0005(std::string_view pattern, size_t limit)
@@ -2421,7 +2521,8 @@ diagnostic_s diagnostic_s::warning_L0005(std::string_view pattern, size_t limit)
         diagnostic_severity::warning,
         "L0005",
         concat("Limit of ", limit, " directories was reached while evaluating library pattern '", pattern, "'."),
-        {});
+        {},
+        diagnostic_tag::none);
 }
 
 diagnostic_op diagnostic_op::error_S100(std::string_view message, const range& range)

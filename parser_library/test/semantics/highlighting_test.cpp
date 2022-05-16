@@ -205,7 +205,7 @@ TEST(highlighting, macro_alternative_continuation)
         token_info({ { 3, 1 }, { 3, 5 } }, hl_scopes::instruction),
         token_info({ { 4, 1 }, { 4, 4 } }, hl_scopes::instruction),
         token_info({ { 4, 5 }, { 4, 8 } }, hl_scopes::operand),
-        token_info({ { 4, 8 }, { 4, 71 } }, hl_scopes::operator_symbol),
+        token_info({ { 4, 8 }, { 4, 9 } }, hl_scopes::operator_symbol),
         token_info({ { 4, 10 }, { 4, 71 } }, hl_scopes::remark),
         token_info({ { 4, 71 }, { 4, 72 } }, hl_scopes::continuation),
         token_info({ { 5, 0 }, { 5, 15 } }, hl_scopes::ignored),
@@ -282,6 +282,112 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         token_info({ { 5, 1 }, { 5, 4 } }, hl_scopes::instruction),
         token_info({ { 6, 0 }, { 6, 80 } }, hl_scopes::string),
         token_info({ { 6, 80 }, { 6, 90 } }, hl_scopes::ignored),
+    };
+
+    EXPECT_EQ(tokens, expected);
+}
+
+TEST(highlighting, single_chars)
+{
+    std::string source_file = "file_name";
+    const std::string contents = R"(
+&C SETC 'A'
+&C SETC 'B'
+&C SETC 'C'
+&C SETC 'D'
+&C SETC 'E'
+&C SETC 'F'
+&C SETC 'G'
+&C SETC 'H'
+&C SETC 'I'
+&C SETC 'J'
+&C SETC 'K'
+&C SETC 'L'
+&C SETC 'M'
+&C SETC 'N'
+&C SETC 'O'
+&C SETC 'P'
+&C SETC 'Q'
+&C SETC 'R'
+&C SETC 'S'
+&C SETC 'T'
+&C SETC 'U'
+&C SETC 'V'
+&C SETC 'W'
+&C SETC 'X'
+&C SETC 'Y'
+&C SETC 'Z'
+)";
+    analyzer a(contents, analyzer_options { source_file, collect_highlighting_info::yes });
+    a.analyze();
+    const auto& tokens = a.source_processor().semantic_tokens();
+    semantics::lines_info expected;
+
+    for (size_t i = 1; i <= 'Z' - 'A' + 1; ++i)
+    {
+        expected.emplace_back(token_info({ { i, 0 }, { i, 2 } }, hl_scopes::var_symbol));
+        expected.emplace_back(token_info({ { i, 3 }, { i, 7 } }, hl_scopes::instruction));
+        expected.emplace_back(token_info({ { i, 8 }, { i, 11 } }, hl_scopes::string));
+    }
+
+    EXPECT_EQ(tokens, expected);
+}
+
+TEST(highlighting, multiline_macro_param)
+{
+    const std::string contents = R"(
+        MACRO
+        MAC
+        MEND
+
+        MAC   (L1,                     comment                         X
+               L2,                     comment                         X
+               L3,                     comment                         X
+               L4)                     comment                         
+)";
+    analyzer a(contents, analyzer_options { collect_highlighting_info::yes });
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty());
+
+    auto tokens = a.source_processor().semantic_tokens();
+    std::sort(tokens.begin(), tokens.end(), [](const auto& l, const auto& r) {
+        return position::min(l.token_range.start, r.token_range.start) != r.token_range.start;
+    });
+    semantics::lines_info expected = {
+        token_info({ { 1, 8 }, { 1, 13 } }, hl_scopes::instruction),
+        token_info({ { 2, 8 }, { 2, 11 } }, hl_scopes::instruction),
+        token_info({ { 3, 8 }, { 3, 12 } }, hl_scopes::instruction),
+
+        token_info({ { 5, 8 }, { 5, 11 } }, hl_scopes::instruction),
+
+        token_info({ { 5, 14 }, { 5, 15 } }, hl_scopes::operator_symbol),
+
+        token_info({ { 5, 15 }, { 5, 17 } }, hl_scopes::operand),
+        token_info({ { 5, 17 }, { 5, 18 } }, hl_scopes::operator_symbol),
+        token_info({ { 5, 39 }, { 5, 71 } }, hl_scopes::remark),
+
+        token_info({ { 5, 71 }, { 5, 72 } }, hl_scopes::continuation),
+        token_info({ { 6, 0 }, { 6, 15 } }, hl_scopes::ignored),
+
+        token_info({ { 6, 15 }, { 6, 17 } }, hl_scopes::operand),
+        token_info({ { 6, 17 }, { 6, 18 } }, hl_scopes::operator_symbol),
+        token_info({ { 6, 39 }, { 6, 71 } }, hl_scopes::remark),
+
+        token_info({ { 6, 71 }, { 6, 72 } }, hl_scopes::continuation),
+        token_info({ { 7, 0 }, { 7, 15 } }, hl_scopes::ignored),
+
+        token_info({ { 7, 15 }, { 7, 17 } }, hl_scopes::operand),
+        token_info({ { 7, 17 }, { 7, 18 } }, hl_scopes::operator_symbol),
+        token_info({ { 7, 39 }, { 7, 71 } }, hl_scopes::remark),
+
+        token_info({ { 7, 71 }, { 7, 72 } }, hl_scopes::continuation),
+        token_info({ { 8, 0 }, { 8, 15 } }, hl_scopes::ignored),
+
+        token_info({ { 8, 15 }, { 8, 17 } }, hl_scopes::operand),
+        token_info({ { 8, 17 }, { 8, 18 } }, hl_scopes::operator_symbol),
+        token_info({ { 8, 39 }, { 8, 71 } }, hl_scopes::remark),
     };
 
     EXPECT_EQ(tokens, expected);

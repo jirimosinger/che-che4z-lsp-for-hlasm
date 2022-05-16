@@ -138,6 +138,7 @@ protected:
     void resolve_expression(expressions::ca_expr_ptr& expr, context::SET_t_enum type) const;
     void resolve_expression(std::vector<expressions::ca_expr_ptr>& expr, context::SET_t_enum type) const;
     void resolve_expression(expressions::ca_expr_ptr& expr) const;
+    void resolve_concat_chain(const semantics::concat_chain& chain) const;
 
     lexing::token_stream& input;
     context::hlasm_context* hlasm_ctx = nullptr;
@@ -149,6 +150,7 @@ protected:
     bool ASM();
     bool DAT();
     bool ALIAS();
+    static bool is_previous_attribute_consuming(bool top_level, const antlr4::Token* token);
 
     void add_diagnostic(diagnostic_severity severity, std::string code, std::string message, range diag_range) const;
     void add_diagnostic(diagnostic_op d) const;

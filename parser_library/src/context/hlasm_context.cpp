@@ -31,11 +31,53 @@ code_scope* hlasm_context::curr_scope() { return &scope_stack_.back(); }
 
 const code_scope* hlasm_context::curr_scope() const { return &scope_stack_.back(); }
 
-hlasm_context::instruction_storage hlasm_context::init_instruction_map(id_storage& ids)
+namespace {
+constexpr bool operator<=(z_arch_affiliation z_affil, instruction_set_version instr_set)
+{
+    return static_cast<uint16_t>(z_affil) <= static_cast<uint16_t>(instr_set);
+}
+
+bool instruction_available(instruction_set_affiliation instr_set_affiliation, instruction_set_version active_instr_set)
+{
+    switch (active_instr_set)
+    {
+        case instruction_set_version::UNI:
+            return instr_set_affiliation.uni;
+        case instruction_set_version::DOS:
+            return instr_set_affiliation.dos;
+        case instruction_set_version::_370:
+            return instr_set_affiliation._370;
+        case instruction_set_version::XA:
+            return instr_set_affiliation.xa;
+        case instruction_set_version::ESA:
+            return instr_set_affiliation.esa;
+        case instruction_set_version::ZOP:
+        case instruction_set_version::YOP:
+        case instruction_set_version::Z9:
+        case instruction_set_version::Z10:
+        case instruction_set_version::Z11:
+        case instruction_set_version::Z12:
+        case instruction_set_version::Z13:
+        case instruction_set_version::Z14:
+        case instruction_set_version::Z15:
+            return instr_set_affiliation.z_arch == z_arch_affiliation::NO_AFFILIATION
+                ? false
+                : instr_set_affiliation.z_arch <= active_instr_set;
+        default:
+            return false;
+    }
+}
+} // namespace
+
+hlasm_context::instruction_storage hlasm_context::init_instruction_map(
+    id_storage& ids, instruction_set_version active_instr_set)
 {
     hlasm_context::instruction_storage instr_map;
     for (const auto& instr : instruction::all_machine_instructions())
     {
+        if (!instruction_available(instr.instr_set_affiliation(), active_instr_set))
+            continue;
+
         auto id = ids.add(std::string(instr.name()));
         instr_map.emplace(id, &instr);
     }
@@ -51,9 +93,13 @@ hlasm_context::instruction_storage hlasm_context::init_instruction_map(id_storag
     }
     for (const auto& instr : instruction::all_mnemonic_codes())
     {
+        if (!instruction_available(instr.instr_set_affiliation(), active_instr_set))
+            continue;
+
         auto id = ids.add(std::string(instr.name()));
         instr_map.emplace(id, &instr);
     }
+
     return instr_map;
 }
 
@@ -285,6 +331,11 @@ void hlasm_context::add_global_system_vars(code_scope& scope)
         }
 
         {
+            globals_.insert(create_system_variable<system_variable>(
+                ids(), "SYSOPT_XOBJECT", std::to_string(asm_options_.sysopt_xobject), true));
+        }
+
+        {
             globals_.insert(create_system_variable<system_variable>(ids(), "SYSPARM", asm_options_.sysparm, true));
         }
 
@@ -303,6 +354,7 @@ void hlasm_context::add_global_system_vars(code_scope& scope)
     add_global_system_var_to_scope(ids(), "SYSDATE", scope);
     add_global_system_var_to_scope(ids(), "SYSTIME", scope);
     add_global_system_var_to_scope(ids(), "SYSOPT_RENT", scope);
+    add_global_system_var_to_scope(ids(), "SYSOPT_XOBJECT", scope);
     add_global_system_var_to_scope(ids(), "SYSPARM", scope);
     add_global_system_var_to_scope(ids(), "SYSSTMT", scope);
     add_global_system_var_to_scope(ids(), "SYSTEM_ID", scope);
@@ -310,16 +362,17 @@ void hlasm_context::add_global_system_vars(code_scope& scope)
 
 bool hlasm_context::is_opcode(id_index symbol) const
 {
-    return macros_.find(symbol) != macros_.end() || instruction_map_.find(symbol) != instruction_map_.end();
+    return macros_.contains(symbol) || m_instruction_map.contains(symbol);
 }
 
 hlasm_context::hlasm_context(std::string file_name, asm_option asm_options, std::shared_ptr<id_storage> init_ids)
     : ids_(std::move(init_ids))
     , opencode_file_name_(file_name)
     , asm_options_(std::move(asm_options))
-    , instruction_map_(init_instruction_map(*ids_))
+    , m_instruction_map(init_instruction_map(*ids_, asm_options_.instr_set))
     , m_usings(std::make_unique<using_collection>())
     , m_active_usings(1, m_usings->remove_all())
+    , m_statements_remaining(asm_options_.statement_count_limit)
     , ord_ctx(*ids_, *this)
 {
     add_global_system_vars(scope_stack_.emplace_back());
@@ -401,10 +454,11 @@ void hlasm_context::pop_statement_processing()
 }
 
 id_storage& hlasm_context::ids() { return *ids_; }
+const id_storage& hlasm_context::ids() const { return *ids_; }
 
 std::shared_ptr<id_storage> hlasm_context::ids_ptr() { return ids_; }
 
-const hlasm_context::instruction_storage& hlasm_context::instruction_map() const { return instruction_map_; }
+const hlasm_context::instruction_storage& hlasm_context::instruction_map() const { return m_instruction_map; }
 
 processing_stack_t hlasm_context::processing_stack() const
 {
@@ -566,10 +620,10 @@ const sequence_symbol* hlasm_context::get_opencode_sequence_symbol(id_index name
     return nullptr;
 }
 
-void hlasm_context::set_branch_counter(A_t value)
+size_t hlasm_context::set_branch_counter(A_t value)
 {
     curr_scope()->branch_counter = value;
-    ++curr_scope()->branch_counter_change;
+    return ++curr_scope()->branch_counter_change;
 }
 
 int hlasm_context::get_branch_counter() const { return curr_scope()->branch_counter; }
@@ -592,7 +646,7 @@ void hlasm_context::add_mnemonic(id_index mnemo, id_index op_code)
 
         if (auto mac_it = macros_.find(op_code); mac_it != macros_.end())
             value.opcode_detail = mac_it->second;
-        else if (auto instr_it = instruction_map_.find(op_code); instr_it != instruction_map_.end())
+        else if (auto instr_it = m_instruction_map.find(op_code); instr_it != m_instruction_map.end())
             value.opcode_detail = instr_it->second;
         else
             throw std::invalid_argument("undefined operation code");
@@ -618,7 +672,7 @@ opcode_t hlasm_context::get_operation_code(id_index symbol) const
 
     if (auto mac_it = macros_.find(symbol); mac_it != macros_.end())
         value = opcode_t { symbol, mac_it->second };
-    else if (auto instr_it = instruction_map_.find(symbol); instr_it != instruction_map_.end())
+    else if (auto instr_it = m_instruction_map.find(symbol); instr_it != m_instruction_map.end())
         value = opcode_t { symbol, instr_it->second };
 
     return value;
@@ -736,14 +790,10 @@ struct opcode_attr_visitor
 
 C_t hlasm_context::get_opcode_attr(id_index symbol)
 {
-    auto it = instruction_map_.find(symbol);
-
-    auto mac_it = macros_.find(symbol);
-
-    if (mac_it != macros_.end())
+    if (auto it = macros_.find(symbol); it != macros_.end())
         return "M";
 
-    if (it != instruction_map_.end())
+    if (auto it = m_instruction_map.find(symbol); it != m_instruction_map.end())
     {
         auto& [opcode, detail] = *it;
         return std::visit(opcode_attr_visitor(), detail);
@@ -776,8 +826,8 @@ macro_def_ptr hlasm_context::add_macro(id_index name,
 void hlasm_context::add_macro(macro_def_ptr macro)
 {
     const auto& m = macros_[macro->id] = std::move(macro);
-    // associate mnemonic if previously deleted by OPSYN
-    if (auto m_op = opcode_mnemo_.find(m->id); m_op != opcode_mnemo_.end() && !m_op->second)
+    // override associate mnemonic if exists
+    if (auto m_op = opcode_mnemo_.find(m->id); m_op != opcode_mnemo_.end())
         m_op->second = opcode_t { m->id, m };
 };
 

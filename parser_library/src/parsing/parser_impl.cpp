@@ -173,8 +173,6 @@ void parser_impl::resolve_expression(expressions::ca_expr_ptr& expr) const
     else if (opcode.value == wk.SETC)
     {
         resolve_expression(expr, context::SET_t_enum::C_TYPE);
-        if (!expr->is_character_expression(character_expression_purpose::assignment))
-            diags.add_diagnostic(diagnostic_op::error_CE017_character_expression_expected(expr->expr_range));
     }
     else if (opcode.value == wk.AREAD)
     {
@@ -185,6 +183,16 @@ void parser_impl::resolve_expression(expressions::ca_expr_ptr& expr) const
         assert(false);
         resolve_expression(expr, context::SET_t_enum::UNDEF_TYPE);
     }
+}
+
+void parser_impl::resolve_concat_chain(const semantics::concat_chain& chain) const
+{
+    diagnostic_consumer_transform diags([this](diagnostic_op d) {
+        if (diagnoser_)
+            diagnoser_->add_diagnostic(std::move(d));
+    });
+    for (const auto& e : chain)
+        e->resolve(diags);
 }
 
 bool parser_impl::MACH()
@@ -209,6 +217,21 @@ bool parser_impl::ALIAS()
 {
     auto& [_, opcode] = *proc_status;
     return opcode.type == instruction_type::ASM && opcode.value == hlasm_ctx->ids().well_known.ALIAS;
+}
+
+bool parser_impl::is_previous_attribute_consuming(bool top_level, const antlr4::Token* token)
+{
+    if (!token)
+        return false;
+
+    auto text = token->getText();
+    if (text.empty() || text.size() >= 2 && std::isalpha((unsigned char)text[text.size() - 2]))
+        return false;
+
+    auto tmp = std::toupper((unsigned char)text.back());
+
+    // this almost looks like a bug in the original assembler
+    return tmp == 'O' && top_level || tmp == 'S' || tmp == 'I' || tmp == 'L' || tmp == 'T';
 }
 
 antlr4::misc::IntervalSet parser_impl::getExpectedTokens()

@@ -949,3 +949,63 @@ TEST(db2_preprocessor, sql_type_warn_on_continuation)
     ASSERT_EQ(diags.diags.size(), 1U);
     EXPECT_EQ(diags.diags[0].code, "DB005");
 }
+
+TEST(db2_preprocessor, no_codegen_for_unacceptable_sql_statement)
+{
+    std::string input = R"(
+    EXEC SQL BEGIN DECLARE SECTION
+    EXEC SQL END DECLARE SECTION
+)";
+
+    analyzer a(input, analyzer_options(db2_preprocessor_options()));
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty()); // TODO(optional): original warns
+}
+
+TEST(db2_preprocessor, package_info_missing)
+{
+    std::string input = R"(
+    LARL 0,SQLVERSP
+    END
+)";
+
+    analyzer a(input, analyzer_options(db2_preprocessor_options()));
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(matches_message_codes(a.diags(), { "E010" }));
+}
+
+TEST(db2_preprocessor, package_info_short)
+{
+    std::string input = R"(
+    LARL 0,SQLVERSP
+    LARL 0,SQLVERD1
+    END
+)";
+
+    analyzer a(input, analyzer_options(db2_preprocessor_options("AAA")));
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty());
+}
+
+TEST(db2_preprocessor, package_info_long)
+{
+    std::string input = R"(
+    LARL 0,SQLVERSP
+    LARL 0,SQLVERS
+    LARL 0,SQLVERD1
+    LARL 0,SQLVERD2
+    END
+)";
+
+    analyzer a(input, analyzer_options(db2_preprocessor_options(std::string(48, 'A'))));
+    a.analyze();
+    a.collect_diags();
+
+    EXPECT_TRUE(a.diags().empty());
+}

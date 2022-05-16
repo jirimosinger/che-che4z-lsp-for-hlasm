@@ -28,12 +28,12 @@
 #include "config/proc_grps.h"
 #include "diagnosable_impl.h"
 #include "file_manager.h"
+#include "file_manager_vfm.h"
 #include "lib_config.h"
 #include "library.h"
 #include "message_consumer.h"
 #include "processor.h"
 #include "processor_group.h"
-
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -47,13 +47,15 @@ struct library_local_options;
 // information that a program uses certain processor group
 struct program
 {
-    program(program_id prog_id, proc_grp_id pgroup)
-        : prog_id(prog_id)
-        , pgroup(pgroup)
+    program(program_id prog_id, proc_grp_id pgroup, config::assembler_options asm_opts)
+        : prog_id(std::move(prog_id))
+        , pgroup(std::move(pgroup))
+        , asm_opts(std::move(asm_opts))
     {}
 
     program_id prog_id;
     proc_grp_id pgroup;
+    config::assembler_options asm_opts;
 };
 
 
@@ -87,12 +89,14 @@ public:
     void add_proc_grp(processor_group pg);
     const processor_group& get_proc_grp(const proc_grp_id& proc_grp) const;
     const processor_group& get_proc_grp_by_program(const std::string& program) const;
+    const processor_group& get_proc_grp_by_program(const program& program) const;
+    const program* get_program(const std::string& filename) const;
 
     workspace_file_info parse_file(const std::string& file_uri);
     void refresh_libraries();
     workspace_file_info did_open_file(const std::string& file_uri);
     void did_close_file(const std::string& file_uri);
-    void did_change_file(const std::string document_uri, const document_change* changes, size_t ch_size);
+    void did_change_file(const std::string& document_uri, const document_change* changes, size_t ch_size);
     void did_change_watched_files(const std::string& file_uri);
 
     location definition(const std::string& document_uri, position pos) const override;
@@ -119,7 +123,6 @@ public:
 
     processor_file_ptr get_processor_file(const std::string& filename);
 
-protected:
     file_manager& get_file_manager();
 
 private:
@@ -132,6 +135,7 @@ private:
     std::string name_;
     ws_uri uri_;
     file_manager& file_manager_;
+    file_manager_vfm fm_vfm_;
 
     std::unordered_map<proc_grp_id, processor_group> proc_grps_;
     std::map<std::string, program> exact_pgm_conf_;
@@ -147,15 +151,23 @@ private:
     void find_and_add_libs(
         std::string root, const std::string& path_pattern, processor_group& prc_grp, const library_local_options& opts);
 
+    bool is_config_file(const std::string& file_uri) const;
+    workspace_file_info parse_config_file();
+
     bool load_and_process_config();
     // Loads the pgm_conf.json and proc_grps.json from disk, adds them to file_manager_ and parses both jsons.
     // Returns false if there is any error.
-    bool load_config(config::proc_grps& proc_groups, config::pgm_conf& pgm_config, file_ptr& pgm_conf_file);
+    bool load_config(config::proc_grps& proc_groups,
+        config::pgm_conf& pgm_config,
+        file_ptr& proc_grps_file,
+        file_ptr& pgm_conf_file);
 
     bool is_wildcard(const std::string& str);
 
     // files, that depend on others (e.g. open code files that use macros)
-    std::set<std::string> dependants_;
+    std::set<std::string, std::less<>> dependants_;
+
+    std::set<std::string, std::less<>> opened_files_;
 
     diagnostic_container config_diags_;
 

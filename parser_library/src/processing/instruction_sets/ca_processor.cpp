@@ -161,13 +161,20 @@ template ca_processor::SET_info ca_processor::get_SET_symbol<context::C_t>(const
 bool ca_processor::prepare_SET_operands(
     const semantics::complete_statement& stmt, std::vector<expressions::ca_expression*>& expr_values)
 {
-    bool has_operand = false;
-    for (auto& op : stmt.operands_ref().value)
+    const auto& ops = stmt.operands_ref().value;
+    if (ops.empty())
+    {
+        add_diagnostic(diagnostic_op::error_E022("SET instruction", stmt.instruction_ref().field_range));
+        return false;
+    }
+
+    for (const auto& op : ops)
     {
         if (op->type == semantics::operand_type::EMPTY)
+        {
+            expr_values.push_back(nullptr);
             continue;
-
-        has_operand = true;
+        }
 
         auto ca_op = op->access_ca();
         assert(ca_op);
@@ -179,12 +186,6 @@ bool ca_processor::prepare_SET_operands(
         }
 
         expr_values.push_back(ca_op->access_expr()->expression.get());
-    }
-
-    if (!has_operand)
-    {
-        add_diagnostic(diagnostic_op::error_E022("SET instruction", stmt.instruction_ref().field_range));
-        return false;
     }
     return true;
 }
@@ -263,7 +264,7 @@ bool ca_processor::prepare_ACTR(const semantics::complete_statement& stmt, conte
     const auto* ca_op = stmt.operands_ref().value[0]->access_ca();
     assert(ca_op);
 
-    if (ca_op->kind == semantics::ca_kind::EXPR || ca_op->kind == semantics::ca_kind::VAR)
+    if (ca_op->kind == semantics::ca_kind::EXPR)
     {
         ctr = ca_op->access_expr()->expression->evaluate<context::A_t>(eval_ctx);
         return true;
@@ -279,11 +280,14 @@ void ca_processor::process_ACTR(const semantics::complete_statement& stmt)
 {
     register_seq_sym(stmt);
 
-    context::A_t ctr;
-    bool ok = prepare_ACTR(stmt, ctr);
-
-    if (ok)
-        hlasm_ctx.set_branch_counter(ctr);
+    if (context::A_t ctr; prepare_ACTR(stmt, ctr))
+    {
+        static constexpr size_t ACTR_LIMIT = 1000;
+        if (hlasm_ctx.set_branch_counter(ctr) == ACTR_LIMIT)
+        {
+            add_diagnostic(diagnostic_op::error_W063(stmt.stmt_range_ref()));
+        }
+    }
 }
 
 bool ca_processor::prepare_AGO(const semantics::complete_statement& stmt,
@@ -605,8 +609,9 @@ void ca_processor::process_SET(const semantics::complete_statement& stmt)
     {
         // first obtain a place to put the result in
         auto& val = set_symbol->template access_set_symbol<T>()->reserve_value(index - 1 + i);
-        // then evaluate the new value and save it
-        val = expr_values[i]->template evaluate<T>(eval_ctx);
+        // then evaluate the new value and save it unless the opreand is empty
+        if (expr_values[i])
+            val = expr_values[i]->template evaluate<T>(eval_ctx);
     }
 }
 

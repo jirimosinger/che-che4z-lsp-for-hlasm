@@ -132,7 +132,7 @@ void ordinary_processor::end_processing()
         hlasm_ctx.ord_ctx.set_location_counter(ltorg->name, {});
         hlasm_ctx.ord_ctx.set_available_location_counter_value(0, 0);
 
-        hlasm_ctx.ord_ctx.generate_pool(*this);
+        hlasm_ctx.ord_ctx.generate_pool(*this, hlasm_ctx.using_current());
     }
 
     hlasm_ctx.ord_ctx.symbol_dependencies.add_defined(&asm_proc_);
@@ -175,8 +175,10 @@ struct processing_status_visitor
 
     processing_status operator()(const context::assembler_instruction* i) const
     {
-        const auto f = id == hlasm_ctx.ids().add("DC") || id == hlasm_ctx.ids().add("DS") ? processing_form::DAT
-                                                                                          : processing_form::ASM;
+        const auto f =
+            id == hlasm_ctx.ids().add("DC") || id == hlasm_ctx.ids().add("DS") || id == hlasm_ctx.ids().add("DXD")
+            ? processing_form::DAT
+            : processing_form::ASM;
         const auto o = i->max_operands() == 0 ? operand_occurence::ABSENT : operand_occurence::PRESENT;
         return return_value(f, o, context::instruction_type::ASM);
     }
@@ -271,6 +273,13 @@ void ordinary_processor::check_postponed_statements(
 
 bool ordinary_processor::check_fatals(range line_range)
 {
+    if (!hlasm_ctx.next_statement())
+    {
+        add_diagnostic(diagnostic_op::error_E077(line_range));
+        finished_flag_ = true;
+        return true;
+    }
+
     if (hlasm_ctx.scope_stack().size() > NEST_LIMIT)
     {
         while (hlasm_ctx.is_in_macro())
@@ -288,13 +297,6 @@ bool ordinary_processor::check_fatals(range line_range)
         else
             finished_flag_ = true;
 
-        return true;
-    }
-
-    if (hlasm_ctx.scope_stack().back().branch_counter_change > ACTR_LIMIT)
-    {
-        add_diagnostic(diagnostic_op::error_E063(line_range));
-        finished_flag_ = true;
         return true;
     }
 

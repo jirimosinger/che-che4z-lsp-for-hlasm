@@ -16,6 +16,7 @@
 
 #include <optional>
 
+#include "checking/using_label_checker.h"
 #include "processing/statement_processors/ordinary_processor.h"
 
 using namespace hlasm_plugin::parser_library;
@@ -222,9 +223,9 @@ low_language_processor::transform_result low_language_processor::transform_mnemo
     // operands obtained from the user
     const auto& operands = stmt.operands_ref().value;
     // the name of the instruction (mnemonic) obtained from the user
-    auto instr_name = *stmt.opcode_ref().value;
+    const auto& instr_name = *stmt.opcode_ref().value;
     // the associated mnemonic structure with the given name
-    auto mnemonic = context::instruction::get_mnemonic_codes(instr_name);
+    const auto& mnemonic = context::instruction::get_mnemonic_codes(instr_name);
     // the machine instruction structure associated with the given instruction name
     auto curr_instr = mnemonic.instruction();
 
@@ -238,7 +239,7 @@ low_language_processor::transform_result low_language_processor::transform_mnemo
     {
         auto curr_diag = diagnostic_op::error_optional_number_of_operands(instr_name,
             curr_instr->optional_operand_count(),
-            (int)curr_instr->operands().size() - (int)replaced.size(),
+            curr_instr->operands().size() - replaced.size(),
             stmt.stmt_range_ref());
 
         add_diagnostic(curr_diag);
@@ -246,7 +247,7 @@ low_language_processor::transform_result low_language_processor::transform_mnemo
     }
 
     std::vector<checking::check_op_ptr> substituted_mnems;
-    for (auto mnem : replaced)
+    for (const auto& mnem : replaced)
         substituted_mnems.push_back(std::make_unique<checking::one_operand>((int)mnem.second));
 
     std::vector<checking::check_op_ptr> operand_vector;
@@ -330,14 +331,19 @@ checking::check_op_ptr low_language_processor::get_check_op(const semantics::ope
 
     checking::check_op_ptr uniq;
 
+    checking::using_label_checker lc(dep_solver, diags);
+    ev_op.apply_mach_visitor(lc);
+
     if (auto mach_op = dynamic_cast<const semantics::machine_operand*>(&ev_op))
     {
+        // TODO: this is less than ideal, we should probably create operand structures
+        // with the correct "type" while parsing and reject incompatible arguments
+        // early when the syntax is incompatible
         const auto* instr = mnemonic ? mnemonic->instruction()
                                      : &context::instruction::get_machine_instructions(*stmt.opcode_ref().value);
         if (op_position < instr->operands().size())
         {
-            auto type = instr->operands()[op_position].identifier.type;
-            uniq = mach_op->get_operand_value(dep_solver, type, diags);
+            uniq = mach_op->get_operand_value(dep_solver, instr->operands()[op_position], diags);
         }
         else
             uniq = ev_op.get_operand_value(dep_solver, diags);
