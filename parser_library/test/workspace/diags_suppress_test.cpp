@@ -66,7 +66,7 @@ TEST(diags_suppress, no_suppress)
     ws.open();
     ws.did_open_file(file_name_res);
 
-    auto pfile = fm.find(file_name_res.get_url());
+    auto pfile = fm.find(file_name_res);
     ASSERT_TRUE(pfile);
 
     pfile->collect_diags();

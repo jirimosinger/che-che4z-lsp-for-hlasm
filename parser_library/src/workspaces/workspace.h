@@ -113,8 +113,9 @@ public:
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override;
     bool has_library(const std::string& library, const utils::path::external_resource& program) const override;
-    std::optional<std::string> get_library(
-        const std::string& library, const std::string& program, std::string* uri) const override;
+    std::optional<std::string> get_library(const std::string& library,
+        const utils::path::external_resource& program,
+        std::optional<utils::path::external_resource>* uri) const override;
     virtual asm_option get_asm_options(const utils::path::external_resource& file_name) const;
     virtual preprocessor_options get_preprocessor_options(const utils::path::external_resource& file_name) const;
     const ws_uri& uri();

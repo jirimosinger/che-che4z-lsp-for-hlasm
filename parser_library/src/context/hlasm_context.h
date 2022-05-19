@@ -239,7 +239,7 @@ public:
     void leave_copy_member();
 
     // register preprocessor dependency
-    void add_preprocessor_dependency(const std::string& file);
+    void add_preprocessor_dependency(const utils::path::external_resource& file);
 
     // creates specified global set symbol
     template<typename T>

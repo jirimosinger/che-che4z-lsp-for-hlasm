@@ -86,7 +86,7 @@ public:
 
         notify_diagnostics_consumers();
         // only on open
-        notify_performance_consumers(document_uri.get_url(), metadata); // todo
+        notify_performance_consumers(document_uri, metadata); // todo
     }
     void did_change_file(const utils::path::external_resource& document_uri,
         version_t version,
@@ -273,13 +273,14 @@ private:
         }
     }
 
-    void notify_performance_consumers(const std::string& document_uri, workspace_file_info ws_file_info) const
+    void notify_performance_consumers(
+        const utils::path::external_resource& document_uri, workspace_file_info ws_file_info) const
     {
         auto file = file_manager_.find(document_uri);
         auto proc_file = dynamic_cast<workspaces::processor_file*>(file.get());
         if (proc_file)
         {
-            auto metrics = proc_file->get_metrics();
+            const auto& metrics = proc_file->get_metrics();
             for (auto consumer : parsing_metadata_consumers_)
             {
                 consumer->consume_parsing_metadata({ metrics, ws_file_info });

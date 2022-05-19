@@ -36,8 +36,9 @@ struct files_parse_lib_provider : public workspaces::parse_lib_provider
     {
         return file_mngr->find(library) != nullptr;
     }
-    virtual std::optional<std::string> get_library(
-        const std::string& library, const std::string&, std::string*) const override
+    virtual std::optional<std::string> get_library(const std::string& library,
+        const utils::path::external_resource&,
+        std::optional<utils::path::external_resource>*) const override
     {
         auto macro = file_mngr->add_processor_file(utils::path::external_resource(library));
         if (!macro)

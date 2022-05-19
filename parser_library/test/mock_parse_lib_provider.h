@@ -54,8 +54,9 @@ public:
     }
 
 
-    std::optional<std::string> get_library(
-        const std::string& library, const std::string&, std::string* uri) const override
+    std::optional<std::string> get_library(const std::string& library,
+        const utils::path::external_resource&,
+        std::optional<utils::path::external_resource>* uri) const override
     {
         auto it = m_files.find(library);
         if (it == m_files.end())

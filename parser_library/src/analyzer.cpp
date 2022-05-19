@@ -73,14 +73,13 @@ analyzer::analyzer(const std::string& text, analyzer_options opts)
                 src_proc_,
                 *this,
                 opts.get_preprocessor(
-                    [libs = &opts.get_lib_provider(), program = opts.resource.get_url(), &ctx = ctx_](
-                        std::string_view library) {
-                        std::string uri;
+                    [libs = &opts.get_lib_provider(), program = opts.resource, &ctx = ctx_](std::string_view library) {
+                        std::optional<utils::path::external_resource> uri;
 
                         auto result = libs->get_library(std::string(library), program, &uri);
 
-                        if (!uri.empty())
-                            ctx.hlasm_ctx->add_preprocessor_dependency(uri);
+                        if (uri.has_value())
+                            ctx.hlasm_ctx->add_preprocessor_dependency(uri.value());
 
                         return result;
                     },

@@ -50,8 +50,9 @@ public:
         return ws_.has_library(library, program);
     }
 
-    std::optional<std::string> get_library(
-        const std::string& library, const std::string& program, std::string* uri) const override
+    std::optional<std::string> get_library(const std::string& library,
+        const utils::path::external_resource& program,
+        std::optional<utils::path::external_resource>* uri) const override
     {
         return ws_.get_library(library, program, uri);
     }

@@ -40,7 +40,7 @@ workspace::workspace(const utils::path::external_resource& uri,
     const lib_config& global_config,
     std::atomic<bool>* cancel)
     : cancel_(cancel)
-    , name_(name) // todo delete name_?
+    , name_(name)
     , uri_(uri)
     , file_manager_(file_manager)
     , fm_vfm_(file_manager_)
@@ -774,8 +774,9 @@ bool workspace::has_library(const std::string& library, const utils::path::exter
     return false;
 }
 
-std::optional<std::string> workspace::get_library(
-    const std::string& library, const std::string& program, std::string* uri) const
+std::optional<std::string> workspace::get_library(const std::string& library,
+    const utils::path::external_resource& program,
+    std::optional<utils::path::external_resource>* uri) const
 {
     auto& proc_grp = get_proc_grp_by_program(program);
     for (auto&& lib : proc_grp.libraries())
@@ -789,7 +790,7 @@ std::optional<std::string> workspace::get_library(
             return std::nullopt;
 
         if (uri)
-            *uri = f->get_file_name().get_url(); // todo?
+            *uri = f->get_file_name();
 
         return f->get_text();
     }
