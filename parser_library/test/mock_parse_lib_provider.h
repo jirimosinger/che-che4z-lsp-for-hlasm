@@ -48,7 +48,7 @@ public:
         return true;
     }
 
-    bool has_library(const std::string& library, const std::string&) const override { return m_files.count(library); }
+    bool has_library(const std::string& library, const utils::path::external_resource&) const override { return m_files.count(library); }
 
 
     std::optional<std::string> get_library(

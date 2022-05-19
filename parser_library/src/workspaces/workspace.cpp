@@ -40,7 +40,7 @@ workspace::workspace(const utils::path::external_resource& uri,
     const lib_config& global_config,
     std::atomic<bool>* cancel)
     : cancel_(cancel)
-    , name_(name)
+    , name_(name) // todo delete name_?
     , uri_(uri)
     , file_manager_(file_manager)
     , fm_vfm_(file_manager_)
@@ -289,7 +289,7 @@ void workspace::did_close_file(const utils::path::external_resource& file_uri)
 
     // first check whether the file is a dependency
     // if so, simply close it, no other action is needed
-    if (is_dependency_(file_uri.get_url()))
+    if (is_dependency_(file_uri))
     {
         file_manager_.did_close_file(file_uri);
         return;
@@ -307,7 +307,7 @@ void workspace::did_close_file(const utils::path::external_resource& file_uri)
         {
             auto proc_file = file_manager_.get_processor_file(dep);
             if (proc_file)
-                proc_file->erase_cache_of_opencode(file_uri.get_url());
+                proc_file->erase_cache_of_opencode(file_uri);
         }
         // remove it from dependants
         dependants_.erase(fname);
@@ -709,7 +709,7 @@ void workspace::filter_and_close_dependencies_(
     }
 
     // filters the files that are dependencies of other dependants and externally open files
-    for (auto dependant : dependants_)
+    for (const auto& dependant : dependants_)
     {
         auto fdependant = file_manager_.find_processor_file(utils::path::external_resource(dependant));
         if (!fdependant)
@@ -729,9 +729,9 @@ void workspace::filter_and_close_dependencies_(
     }
 }
 
-bool workspace::is_dependency_(const std::string& file_uri)
+bool workspace::is_dependency_(const utils::path::external_resource& file_uri)
 {
-    for (auto dependant : dependants_)
+    for (const auto& dependant : dependants_)
     {
         auto fdependant = file_manager_.find_processor_file(utils::path::external_resource(dependant));
         if (!fdependant)
@@ -758,9 +758,9 @@ parse_result workspace::parse_library(const std::string& library, analyzing_cont
     return false;
 }
 
-bool workspace::has_library(const std::string& library, const std::string& program) const
+bool workspace::has_library(const std::string& library, const utils::path::external_resource& program) const
 {
-    auto& proc_grp = get_proc_grp_by_program(program);
+    auto& proc_grp = get_proc_grp_by_program(program.get_absolute_path());
     for (auto&& lib : proc_grp.libraries())
     {
         std::shared_ptr<processor> found = lib->find_file(library);

@@ -31,7 +31,8 @@ enum class uri_type
     LOCAL_RELATIVE,
     NETWORK,
     UNTITLED,
-    UNKNOWN
+    UNKNOWN,
+    CORRUPT
 };
 
 class external_resource

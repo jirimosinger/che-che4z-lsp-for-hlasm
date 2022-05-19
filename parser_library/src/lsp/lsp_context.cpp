@@ -102,7 +102,7 @@ std::string lsp_context::find_macro_copy_id(const context::processing_stack_t& s
 {
     assert(i != 0);
     assert(i < stack.size());
-    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.file.get_absolute_path()
+    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.file.get_url()
                                                                  : *stack[i].member_name;
 }
 
@@ -427,7 +427,7 @@ void lsp_context::document_symbol_opencode_ord_symbol(document_symbol_list_s& re
 }
 
 void lsp_context::document_symbol_opencode_var_seq_symbol_aux(document_symbol_list_s& result,
-    const std::unordered_map<std::string_view, std::string_view>& name_to_uri_cache,
+    const std::unordered_map<std::string_view, utils::path::external_resource>& name_to_uri_cache,
     long long& limit,
     document_symbol_cache& cache) const
 {
@@ -436,11 +436,11 @@ void lsp_context::document_symbol_opencode_var_seq_symbol_aux(document_symbol_li
         if (item.kind != document_symbol_kind::MACRO)
             continue;
 
-        auto uri = name_to_uri_cache.find(item.name); // todo name_to_uri_cache -> external_resource?
-        if (uri == name_to_uri_cache.end() || uri->second.empty())
+        auto uri = name_to_uri_cache.find(item.name);
+        if (uri == name_to_uri_cache.end() || uri->second.get_type() == utils::path::uri_type::UNKNOWN)
             return;
 
-        if (const auto& file = m_files.find(std::string(uri->second)); file != m_files.end())
+        if (const auto& file = m_files.find(uri->second); file != m_files.end())
         {
             if (file->second->type == file_type::MACRO)
                 document_symbol_macro(item.children, file->first, item.symbol_range, limit, cache);
@@ -460,12 +460,6 @@ document_symbol_list_s lsp_context::document_symbol(
     if (file == m_files.end() || limit <= 0)
         return result;
 
-    std::unordered_map<std::string_view, std::string_view> name_to_uri;
-    for (const auto& [def, info] : m_macros)
-        name_to_uri.insert_or_assign(*def->id, info->definition_location.file.get_absolute_path()); // todo
-    for (const auto& [def, info] : m_hlasm_ctx->copy_members())
-        name_to_uri.insert_or_assign(*info->name, info->definition_location.file.get_absolute_path()); // todo
-
     document_symbol_cache cache;
 
     switch (file->second->type)
@@ -480,6 +474,12 @@ document_symbol_list_s lsp_context::document_symbol(
             break;
 
         default:
+            std::unordered_map<std::string_view, utils::path::external_resource> name_to_uri;
+            for (const auto& [def, info] : m_macros)
+                name_to_uri.insert_or_assign(*def->id, info->definition_location.file);
+            for (const auto& [def, info] : m_hlasm_ctx->copy_members())
+                name_to_uri.insert_or_assign(*info->name, info->definition_location.file);
+
             document_symbol_opencode_ord_symbol(result, limit);
             document_symbol_opencode_var_seq_symbol_aux(result, name_to_uri, limit, cache);
 
@@ -563,11 +563,11 @@ location lsp_context::definition(const utils::path::external_resource& resource,
     auto [occ, macro_scope] = find_occurence_with_scope(resource, pos);
 
     if (!occ)
-        return { pos, resource.get_url() };
+        return { pos, resource };
 
     if (auto def = find_definition_location(*occ, macro_scope))
         return { def->pos, def->file };
-    return { pos, resource.get_url() };
+    return { pos, resource };
 }
 
 void collect_references(location_list& refs, const symbol_occurence& occ, const file_occurences_t& file_occs)
@@ -798,7 +798,7 @@ completion_list_s lsp_context::complete_instr(const file_info&, position) const
 
 template<typename T, typename H>
 bool files_present(const std::unordered_map<utils::path::external_resource, file_info_ptr, H>& files,
-    const std::unordered_map<utils::path::external_resource, T, H>& scopes) // todo unite this with previous
+    const std::unordered_map<utils::path::external_resource, T, H>& scopes)
 {
     bool present = true;
     for (const auto& [file, _] : scopes)

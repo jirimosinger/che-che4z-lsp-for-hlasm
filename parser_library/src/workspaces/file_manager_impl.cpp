@@ -107,13 +107,14 @@ processor_file_ptr file_manager_impl::find_processor_file(const utils::path::ext
     return change_into_processor_file_if_not_already_(ret->second);
 }
 
-list_directory_result file_manager_impl::list_directory_files(const std::string& path)
+list_directory_result file_manager_impl::list_directory_files(const utils::path::external_resource& path)
 {
-    std::filesystem::path lib_p(path);
+    std::filesystem::path lib_p(path.get_absolute_path());
     list_directory_result result;
 
     result.second = utils::path::list_directory_regular_files(lib_p, [&result](const std::filesystem::path& f) {
-        result.first[utils::path::filename(f).string()] = utils::path::absolute(f).string();
+        result.first[utils::path::filename(f).string()] =
+            utils::path::external_resource(utils::path::path_to_uri(utils::path::absolute(f).string()));
     });
     return result;
 }

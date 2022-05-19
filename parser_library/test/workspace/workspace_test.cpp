@@ -309,12 +309,12 @@ public:
             correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
     }
 
-    list_directory_result list_directory_files(const std::string&) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource&) override
     {
         if (insert_correct_macro)
-            return { { { "ERROR", "ERROR" }, { "CORRECT", "CORRECT" } },
+            return { { { "ERROR", faulty_macro_path }, { "CORRECT", correct_macro_path } },
                 hlasm_plugin::utils::path::list_directory_rc::done };
-        return { { { "ERROR", "ERROR" } }, hlasm_plugin::utils::path::list_directory_rc::done };
+        return { { { "ERROR", faulty_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
     }
 
     bool insert_correct_macro = true;
@@ -380,10 +380,10 @@ public:
             correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
     }
 
-    list_directory_result list_directory_files(const std::string& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
     {
         if (path == "lib/" || path == "lib\\")
-            return { { { "CORRECT", "CORRECT" } }, hlasm_plugin::utils::path::list_directory_rc::done };
+            return { { { "CORRECT", correct_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
 
         return { {}, hlasm_plugin::utils::path::list_directory_rc::not_exists };
     }
@@ -527,7 +527,7 @@ public:
         : file_manager_opt(file_manager_opt_variant::old_school)
     {}
 
-    list_directory_result list_directory_files(const std::string& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
     {
         if (path == "lib/" || path == "lib\\")
             return { {}, hlasm_plugin::utils::path::list_directory_rc::other_failure };

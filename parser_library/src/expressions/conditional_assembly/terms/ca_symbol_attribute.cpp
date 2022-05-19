@@ -227,7 +227,7 @@ context::SET_t ca_symbol_attribute::evaluate_ordsym(context::id_index name, cons
     {
         auto tmp = eval_ctx.hlasm_ctx.get_attribute_value_ca(attribute, name);
         if (tmp.access_c() == "U"
-            && eval_ctx.lib_provider.has_library(*name, eval_ctx.hlasm_ctx.opencode_file_name().get_absolute_path()))
+            && eval_ctx.lib_provider.has_library(*name, eval_ctx.hlasm_ctx.opencode_file_name()))
             return std::string("S");
         return tmp;
     }

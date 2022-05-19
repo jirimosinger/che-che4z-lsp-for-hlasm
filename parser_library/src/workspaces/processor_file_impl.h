@@ -52,7 +52,7 @@ public:
     const std::set<utils::path::external_resource, utils::path::external_resource_comp>& files_to_close() override;
     const performance_metrics& get_metrics() override;
 
-    void erase_cache_of_opencode(const std::string& opencode_file_name) override;
+    void erase_cache_of_opencode(const utils::path::external_resource& opencode_file_name) override;
 
 private:
     std::unique_ptr<analyzer> last_analyzer_ = nullptr;

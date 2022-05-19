@@ -32,7 +32,7 @@ struct files_parse_lib_provider : public workspaces::parse_lib_provider
             return false;
         return macro->parse_macro(*this, std::move(ctx), std::move(data));
     }
-    virtual bool has_library(const std::string& library, const std::string&) const override
+    virtual bool has_library(const std::string& library, const utils::path::external_resource&) const override
     {
         return file_mngr->find(library) != nullptr;
     }

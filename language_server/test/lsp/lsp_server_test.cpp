@@ -245,9 +245,10 @@ TEST(lsp_server, request_error_no_message)
     s.message_received(request_response);
 }
 
-TEST(lsp_server_test, wrong_message_received)
+TEST(lsp_server_test, wrong_message_received_wrong_uri)
 {
-    test::ws_mngr_mock ws_mngr;
+    //test::ws_mngr_mock ws_mngr;
+    parser_library::workspace_manager ws_mngr;
     send_message_provider_mock smpm;
     lsp::server s(ws_mngr);
     s.set_send_message_provider(&smpm);

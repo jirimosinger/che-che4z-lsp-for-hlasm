@@ -88,7 +88,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
         return true;
     }
 
-    bool has_library(const std::string& library, const std::string&) const override
+    bool has_library(const std::string& library, const hlasm_plugin::utils::path::external_resource&) const override
     {
         return files_by_library_.count(library) > 0;
     };

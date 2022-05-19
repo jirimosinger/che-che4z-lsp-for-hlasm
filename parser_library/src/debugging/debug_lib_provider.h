@@ -45,7 +45,7 @@ public:
         return false;
     }
 
-    bool has_library(const std::string& library, const std::string& program) const override
+    bool has_library(const std::string& library, const utils::path::external_resource& program) const override
     {
         return ws_.has_library(library, program);
     }

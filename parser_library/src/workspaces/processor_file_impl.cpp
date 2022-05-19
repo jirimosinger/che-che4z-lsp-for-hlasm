@@ -154,7 +154,7 @@ class empty_feature_provider final : public lsp::feature_provider
     // Inherited via feature_provider
     location definition(const utils::path::external_resource& resource, position pos) const override
     {
-        return location(pos, resource.get_url());
+        return location(pos, resource);
     }
     location_list references(const utils::path::external_resource&, position) const override { return location_list(); }
     lsp::hover_result hover(const utils::path::external_resource&, position) const override
@@ -196,7 +196,7 @@ const performance_metrics& processor_file_impl::get_metrics()
     return metrics;
 }
 
-void processor_file_impl::erase_cache_of_opencode(const std::string& opencode_file_name)
+void processor_file_impl::erase_cache_of_opencode(const utils::path::external_resource& opencode_file_name)
 {
     macro_cache_.erase_cache_of_opencode(opencode_file_name);
 }

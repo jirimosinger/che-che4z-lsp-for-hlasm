@@ -139,10 +139,10 @@ public:
         files_.emplace(sam31_macro_res, std::make_unique<file_with_text>(sam31_macro_res, sam31_macro, *this));
     }
 
-    list_directory_result list_directory_files(const std::string& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
     {
         if (path == "lib/" || path == "lib\\")
-            return { { { "SAM31", "SAM31" } }, hlasm_plugin::utils::path::list_directory_rc::done };
+            return { { { "SAM31", sam31_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
 
         return { {}, hlasm_plugin::utils::path::list_directory_rc::not_exists };
     }

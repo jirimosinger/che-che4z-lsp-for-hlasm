@@ -95,3 +95,11 @@ TEST(external_resource, external_resource_untitled)
     external_resource res(uri);
     EXPECT_EQ(res.get_type(), uri_type::UNTITLED);
 }
+
+TEST(external_resource, external_resource_unknown)
+{
+    std::string uri = "";
+
+    external_resource res(uri);
+    EXPECT_EQ(res.get_type(), uri_type::UNKNOWN);
+}

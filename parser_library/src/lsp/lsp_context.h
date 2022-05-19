@@ -108,7 +108,7 @@ private:
         long long& limit) const;
     void document_symbol_opencode_ord_symbol(document_symbol_list_s& result, long long& limit) const;
     void document_symbol_opencode_var_seq_symbol_aux(document_symbol_list_s& result,
-        const std::unordered_map<std::string_view, std::string_view>& name_to_uri_cache,
+        const std::unordered_map<std::string_view, utils::path::external_resource>& name_to_uri_cache,
         long long& limit,
         document_symbol_cache& cache) const;
     bool belongs_to_copyfile(

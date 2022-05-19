@@ -53,7 +53,7 @@ public:
     file_ptr find(const std::string& key) const override;
     processor_file_ptr find_processor_file(const utils::path::external_resource& key) override;
 
-    list_directory_result list_directory_files(const std::string& path) override;
+    list_directory_result list_directory_files(const utils::path::external_resource& path) override;
 
     void did_open_file(
         const utils::path::external_resource& document_uri, version_t version, std::string text) override;

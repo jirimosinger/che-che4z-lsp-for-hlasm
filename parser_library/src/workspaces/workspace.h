@@ -112,7 +112,7 @@ public:
         const utils::path::external_resource& resource, long long limit) const override;
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override;
-    bool has_library(const std::string& library, const std::string& program) const override;
+    bool has_library(const std::string& library, const utils::path::external_resource& program) const override;
     std::optional<std::string> get_library(
         const std::string& library, const std::string& program, std::string* uri) const override;
     virtual asm_option get_asm_options(const std::string& file_name) const;
@@ -176,7 +176,7 @@ private:
     void filter_and_close_dependencies_(
         const std::set<utils::path::external_resource, utils::path::external_resource_comp>& dependencies,
         processor_file_ptr file);
-    bool is_dependency_(const std::string& file_uri);
+    bool is_dependency_(const utils::path::external_resource& file_uri);
 
     bool program_id_match(const std::string& filename, const program_id& program) const;
 

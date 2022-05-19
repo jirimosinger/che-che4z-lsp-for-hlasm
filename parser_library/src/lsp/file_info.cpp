@@ -60,7 +60,7 @@ occurence_scope_t file_info::find_occurence_with_scope(position pos) const
         return occ.occurence_range.end.line < p.line;
     });
     auto it_limit = occurences_start_limit.begin() + std::distance(occurences.begin(), l);
-    // find in occurences
+    // find in occurrences
     for (auto it = l; it != occurences.end() && *it_limit <= pos.line; ++it, ++it_limit)
     {
         const auto& occ = *it;
