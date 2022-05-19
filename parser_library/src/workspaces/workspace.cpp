@@ -186,8 +186,7 @@ workspace_file_info workspace::parse_config_file()
         {
             auto found = file_manager_.find_processor_file(fname);
             if (found)
-                found->parse(
-                    *this, get_asm_options(fname), get_preprocessor_options(fname), &fm_vfm_);
+                found->parse(*this, get_asm_options(fname), get_preprocessor_options(fname), &fm_vfm_);
         }
 
         for (const auto& fname : dependants_)
@@ -627,7 +626,8 @@ bool workspace::load_and_process_config()
         }
         else
         {
-            config_diags_.push_back(diagnostic_s::error_W0004(pgm_conf_file->get_file_name().get_absolute_path(), name_));
+            config_diags_.push_back(
+                diagnostic_s::error_W0004(pgm_conf_file->get_file_name().get_absolute_path(), name_));
         }
     }
 
@@ -652,8 +652,8 @@ bool workspace::load_config(
         for (const auto& pg : proc_groups.pgroups)
         {
             if (!pg.asm_options.valid())
-                config_diags_.push_back(
-                    diagnostic_s::error_W0005(proc_grps_file->get_file_name().get_absolute_path(), pg.name, "processor group"));
+                config_diags_.push_back(diagnostic_s::error_W0005(
+                    proc_grps_file->get_file_name().get_absolute_path(), pg.name, "processor group"));
             if (!pg.preprocessor.valid())
                 config_diags_.push_back(
                     diagnostic_s::error_W0006(proc_grps_file->get_file_name().get_absolute_path(), pg.name));

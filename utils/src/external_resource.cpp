@@ -268,7 +268,6 @@ external_resource::external_resource(std::string uri)
 {
     // if (m_type == uri_type::CORRUPT)
     //     while (1)
-    
 }
 
 external_resource::external_resource(const char* uri)
@@ -283,7 +282,7 @@ external_resource::external_resource(const external_resource& r)
 
 const std::string& external_resource::get_absolute_path() const
 {
-    //assert(m_type != uri_type::CORRUPT);
+    // assert(m_type != uri_type::CORRUPT);
 
     if (m_absolute_path.has_value())
         return m_absolute_path.value();
@@ -297,7 +296,7 @@ uri_type external_resource::get_type() const { return m_type; }
 
 const std::string& external_resource::get_url() const
 {
-    //assert(m_type != uri_type::CORRUPT);
+    // assert(m_type != uri_type::CORRUPT);
     return m_uri;
 }
 

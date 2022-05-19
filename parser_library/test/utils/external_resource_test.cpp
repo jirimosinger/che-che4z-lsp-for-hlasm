@@ -56,13 +56,13 @@ TEST(external_resource, path_to_uri)
     }
 }
 
- TEST(external_resource, external_resource_local_relative)
+TEST(external_resource, external_resource_local_relative)
 {
-     std::string uri = is_windows() ? "folder" : "user/somefile";
+    std::string uri = is_windows() ? "folder" : "user/somefile";
 
-     external_resource res(uri);
-     EXPECT_EQ(res.get_type(), uri_type::LOCAL_RELATIVE);
- }
+    external_resource res(uri);
+    EXPECT_EQ(res.get_type(), uri_type::LOCAL_RELATIVE);
+}
 
 // TEST(external_resource, external_resource_local_absolute)
 //{

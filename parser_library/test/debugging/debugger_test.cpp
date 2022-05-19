@@ -327,7 +327,10 @@ public:
 
         return false;
     }
-    asm_option get_asm_options(const hlasm_plugin::utils::path::external_resource&) const override { return { "SEVEN", "" }; }
+    asm_option get_asm_options(const hlasm_plugin::utils::path::external_resource&) const override
+    {
+        return { "SEVEN", "" };
+    }
     preprocessor_options get_preprocessor_options(const hlasm_plugin::utils::path::external_resource&) const override
     {
         return {};

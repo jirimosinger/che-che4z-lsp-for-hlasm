@@ -42,8 +42,8 @@ public:
     external_resource(std::string uri);
     external_resource(const char* uri);
 
-    //external_resource(external_resource&) = default;
-    //external_resource& operator=(external_resource&) = default;
+    // external_resource(external_resource&) = default;
+    // external_resource& operator=(external_resource&) = default;
     external_resource(const external_resource&);
     external_resource& operator=(const external_resource&) = default;
     external_resource(external_resource&&) = default;

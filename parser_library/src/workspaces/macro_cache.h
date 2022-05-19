@@ -62,7 +62,8 @@ bool inline operator<(const macro_cache_key& lhs, const macro_cache_key& rhs)
     return tie_macro_cache_key(lhs) < tie_macro_cache_key(rhs);
 }
 
-using version_stamp = std::unordered_map<utils::path::external_resource, version_t, utils::path::external_resource_hasher>;
+using version_stamp =
+    std::unordered_map<utils::path::external_resource, version_t, utils::path::external_resource_hasher>;
 
 // Pair of version stamp and analyzer that parsed the version of file(s)
 struct macro_cache_data

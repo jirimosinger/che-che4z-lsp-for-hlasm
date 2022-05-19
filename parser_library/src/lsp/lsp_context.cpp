@@ -469,8 +469,7 @@ document_symbol_list_s lsp_context::document_symbol(
             break;
 
         case file_type::COPY:
-            document_symbol_copy(
-                result, file->second->get_occurences(), resource, std::nullopt, limit);
+            document_symbol_copy(result, file->second->get_occurences(), resource, std::nullopt, limit);
             break;
 
         default:
@@ -503,10 +502,7 @@ document_symbol_list_s lsp_context::document_symbol(
 
 
 
-void lsp_context::add_file(file_info file_i)
-{
-    m_files.try_emplace(file_i.name, std::make_unique<file_info>(file_i));
-}
+void lsp_context::add_file(file_info file_i) { m_files.try_emplace(file_i.name, std::make_unique<file_info>(file_i)); }
 
 lsp_context::lsp_context(std::shared_ptr<context::hlasm_context> h_ctx)
     : m_hlasm_ctx(std::move(h_ctx))
