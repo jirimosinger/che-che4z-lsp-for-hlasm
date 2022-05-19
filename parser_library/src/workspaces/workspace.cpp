@@ -639,8 +639,7 @@ bool workspace::load_config(
     std::filesystem::path hlasm_base = utils::path::join(uri_.get_absolute_path(), HLASM_PLUGIN_FOLDER);
 
     // proc_grps.json parse
-    proc_grps_file = file_manager_.add_file(
-        utils::path::external_resource(utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string()));
+    proc_grps_file = file_manager_.add_file(utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string());
 
     if (proc_grps_file->update_and_get_bad())
         return false;

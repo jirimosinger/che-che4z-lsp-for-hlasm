@@ -264,7 +264,6 @@ std::optional<std::string> get_path(const std::string& uri, uri_type uri_type)
 external_resource::external_resource(std::string uri)
     : m_uri(std::move(uri))
     , m_type("" == m_uri ? uri_type::UNKNOWN : get_uri_type(m_uri))
-    , m_absolute_path(get_path(m_uri, m_type))
 {
     // if (m_type == uri_type::CORRUPT)
     //     while (1)
@@ -277,15 +276,14 @@ external_resource::external_resource(const char* uri)
 external_resource::external_resource(const external_resource& r)
     : m_uri(r.m_uri)
     , m_type(r.m_type)
-    , m_absolute_path(r.m_absolute_path)
 {}
 
-const std::string& external_resource::get_absolute_path() const
-{
-    // assert(m_type != uri_type::CORRUPT);
+const std::string& external_resource::get_url() const { return m_uri; }
 
-    if (m_absolute_path.has_value())
-        return m_absolute_path.value();
+std::string external_resource::get_absolute_path() const
+{
+    if (uri_type::LOCAL_URI == m_type)
+        return uri_to_path(m_uri);
 
     return m_uri;
 }
@@ -294,11 +292,6 @@ std::string external_resource::get_content() const { return std::string(); }
 
 uri_type external_resource::get_type() const { return m_type; }
 
-const std::string& external_resource::get_url() const
-{
-    // assert(m_type != uri_type::CORRUPT);
-    return m_uri;
-}
 
 // bool external_resource::operator==(const external_resource& r) const { return m_uri == r.m_uri && m_type == r.m_type;
 // }

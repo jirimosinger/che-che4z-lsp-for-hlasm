@@ -55,7 +55,7 @@ public:
     // template<class T>
     // external_resource(T, uri_type) = delete;
 
-    const std::string& get_absolute_path() const;
+    std::string get_absolute_path() const;
 
     const std::string& get_url() const;
 
@@ -70,7 +70,6 @@ public:
 private:
     std::string m_uri;
     uri_type m_type;
-    std::optional<std::string> m_absolute_path;
 };
 
 struct external_resource_hasher
