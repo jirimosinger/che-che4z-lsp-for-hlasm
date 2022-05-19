@@ -21,10 +21,11 @@
 
 #include "diagnosable.h"
 #include "protocol.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
-using file_uri = std::string;
+using file_uri = utils::path::external_resource;
 
 // Interface that represents both file opened in LSP
 // as well as a file opened by parser library from the disk.

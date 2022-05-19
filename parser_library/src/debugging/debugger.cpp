@@ -131,7 +131,7 @@ public:
     {
         // TODO: check if already running???
         auto open_code = workspace.get_processor_file(std::string(source));
-        opencode_source_path_ = open_code->get_file_name();
+        opencode_source_path_ = open_code->get_file_name().get_url();
         stop_on_next_stmt_ = stop_on_entry;
 
         thread_ = std::thread([this, open_code = std::move(open_code), &workspace, lib_provider]() {

@@ -89,11 +89,11 @@ public:
 
     void add_proc_grp(processor_group pg);
     const processor_group& get_proc_grp(const proc_grp_id& proc_grp) const;
-    const processor_group& get_proc_grp_by_program(const std::string& program) const;
+    const processor_group& get_proc_grp_by_program(const utils::path::external_resource& program) const;
     const processor_group& get_proc_grp_by_program(const program& program) const;
-    const program* get_program(const std::string& filename) const;
+    const program* get_program(const utils::path::external_resource& filename) const;
 
-    workspace_file_info parse_file(const std::string& file_uri);
+    workspace_file_info parse_file(const utils::path::external_resource& file_uri);
     void refresh_libraries();
     workspace_file_info did_open_file(const utils::path::external_resource& file_uri);
     void did_close_file(const utils::path::external_resource& file_uri);
@@ -115,8 +115,8 @@ public:
     bool has_library(const std::string& library, const utils::path::external_resource& program) const override;
     std::optional<std::string> get_library(
         const std::string& library, const std::string& program, std::string* uri) const override;
-    virtual asm_option get_asm_options(const std::string& file_name) const;
-    virtual preprocessor_options get_preprocessor_options(const std::string& file_name) const;
+    virtual asm_option get_asm_options(const utils::path::external_resource& file_name) const;
+    virtual preprocessor_options get_preprocessor_options(const utils::path::external_resource& file_name) const;
     const ws_uri& uri();
 
     void open();
@@ -153,7 +153,7 @@ private:
     void find_and_add_libs(
         std::string root, const std::string& path_pattern, processor_group& prc_grp, const library_local_options& opts);
 
-    bool is_config_file(const std::string& file_uri) const;
+    bool is_config_file(const utils::path::external_resource& file_uri) const;
     workspace_file_info parse_config_file();
 
     bool load_and_process_config();
@@ -167,7 +167,7 @@ private:
     bool is_wildcard(const std::string& str);
 
     // files, that depend on others (e.g. open code files that use macros)
-    std::set<std::string, std::less<>> dependants_;
+    std::set<utils::path::external_resource, utils::path::external_resource_comp> dependants_;
 
     std::set<utils::path::external_resource, utils::path::external_resource_comp> opened_files_;
 
@@ -188,7 +188,8 @@ private:
     message_consumer* message_consumer_ = nullptr;
 
     // A map that holds true values for files that have diags suppressed and the user was already notified about it
-    std::unordered_map<std::string, bool> diag_suppress_notified_;
+    std::unordered_map<utils::path::external_resource, bool, utils::path::external_resource_hasher>
+        diag_suppress_notified_;
     const lib_config& global_config_;
     lib_config local_config_;
     lib_config get_config();

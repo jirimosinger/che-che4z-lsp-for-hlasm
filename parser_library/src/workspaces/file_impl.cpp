@@ -34,7 +34,7 @@ file_impl::file_impl(utils::path::external_resource uri)
 
 void file_impl::collect_diags() const {}
 
-const file_uri& file_impl::get_file_name() { return file_.get_url(); }
+const file_uri& file_impl::get_file_name() { return file_; }
 
 const std::string& file_impl::get_text()
 {

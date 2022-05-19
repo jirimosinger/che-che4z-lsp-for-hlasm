@@ -47,7 +47,7 @@ public:
     MOCK_METHOD(processor_file_ptr, add_processor_file, (const external_resource&), (override));
     MOCK_METHOD(processor_file_ptr, get_processor_file, (const external_resource&), (override));
     MOCK_METHOD(void, remove_file, (const external_resource&), (override));
-    MOCK_METHOD(file_ptr, find, (const std::string& key), (const override));
+    MOCK_METHOD(file_ptr, find, (const external_resource& key), (const override));
     MOCK_METHOD(processor_file_ptr, find_processor_file, (const external_resource& key), (override));
     MOCK_METHOD(list_directory_result, list_directory_files, (const hlasm_plugin::utils::path::external_resource& path), (override));
     MOCK_METHOD(bool, file_exists, (const std::string& file_name), (override));

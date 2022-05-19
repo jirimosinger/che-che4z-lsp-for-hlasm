@@ -79,14 +79,14 @@ public:
         if (cancel_ && *cancel_)
             return;
 
-        workspaces::workspace& ws = ws_path_match(document_uri.get_url());
+        workspaces::workspace& ws = ws_path_match(document_uri.get_url()); // todo
         auto metadata = ws.did_open_file(document_uri);
         if (cancel_ && *cancel_)
             return;
 
         notify_diagnostics_consumers();
         // only on open
-        notify_performance_consumers(document_uri.get_url(), metadata);
+        notify_performance_consumers(document_uri.get_url(), metadata); // todo
     }
     void did_change_file(const utils::path::external_resource& document_uri,
         version_t version,
@@ -216,12 +216,12 @@ public:
     virtual void configuration_changed(const lib_config& new_config) { global_config_ = new_config; }
 
     std::vector<token_info> empty_tokens;
-    const std::vector<token_info>& semantic_tokens(const char* document_uri)
+    const std::vector<token_info>& semantic_tokens(const char* document_uri) // todo
     {
         if (cancel_ && *cancel_)
             return empty_tokens;
 
-        auto file = file_manager_.find(document_uri);
+        auto file = file_manager_.find(document_uri); // todo
         if (dynamic_cast<workspaces::processor_file*>(file.get()) != nullptr)
             return file_manager_.find_processor_file(utils::path::external_resource(document_uri))->get_hl_info();
 

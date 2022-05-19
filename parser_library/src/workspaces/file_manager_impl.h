@@ -50,7 +50,7 @@ public:
     processor_file_ptr get_processor_file(const utils::path::external_resource&) override;
     void remove_file(const utils::path::external_resource&) override;
 
-    file_ptr find(const std::string& key) const override;
+    file_ptr find(const utils::path::external_resource& key) const override;
     processor_file_ptr find_processor_file(const utils::path::external_resource& key) override;
 
     list_directory_result list_directory_files(const utils::path::external_resource& path) override;

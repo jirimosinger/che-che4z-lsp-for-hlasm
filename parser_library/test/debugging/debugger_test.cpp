@@ -327,8 +327,11 @@ public:
 
         return false;
     }
-    asm_option get_asm_options(const std::string&) const override { return { "SEVEN", "" }; }
-    preprocessor_options get_preprocessor_options(const std::string&) const override { return {}; }
+    asm_option get_asm_options(const hlasm_plugin::utils::path::external_resource&) const override { return { "SEVEN", "" }; }
+    preprocessor_options get_preprocessor_options(const hlasm_plugin::utils::path::external_resource&) const override
+    {
+        return {};
+    }
 };
 
 TEST(debugger, test)

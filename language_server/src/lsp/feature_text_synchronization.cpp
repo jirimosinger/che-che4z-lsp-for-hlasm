@@ -61,14 +61,6 @@ void feature_text_synchronization::on_did_open(const json&, const json& params)
     auto version = text_doc["version"].get<nlohmann::json::number_unsigned_t>();
     std::string text = text_doc["text"].get<std::string>();
 
-    // auto path = utils::path::uri_to_path(doc_uri);
-
-    // if (path.empty())
-    //{
-    //     LOG_WARNING("Ignoring on_did_open with unsupported scheme for document URI. URI was " + doc_uri);
-    //     return;
-    // }
-
     ws_mngr_.did_open_file(doc_uri.c_str(), version, text.c_str(), text.size());
 }
 

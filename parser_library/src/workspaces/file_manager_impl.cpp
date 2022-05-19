@@ -87,10 +87,10 @@ void file_manager_impl::remove_file(const utils::path::external_resource& docume
     files_.erase(document_uri);
 }
 
-file_ptr file_manager_impl::find(const std::string& key) const
+file_ptr file_manager_impl::find(const utils::path::external_resource& key) const
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.find(utils::path::external_resource(key));
+    auto ret = files_.find(key);
     if (ret == files_.end())
         return nullptr;
 

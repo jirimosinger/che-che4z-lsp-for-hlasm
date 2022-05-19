@@ -136,7 +136,7 @@ bool macro_cache::load_from_cache(const macro_cache_key& key, const analyzing_co
             // Add all copy members on which this macro is dependant
             for (const auto& copy_ptr : info->macro_definition->used_copy_members)
             {
-                auto copy_file = file_mngr_->find(copy_ptr->definition_location.file.get_url()); // todo
+                auto copy_file = file_mngr_->find(copy_ptr->definition_location.file);
                 ctx.hlasm_ctx->add_copy_member(copy_ptr);
                 ctx.lsp_ctx->add_copy(copy_ptr, lsp::text_data_ref_t(copy_file->get_text()));
             }
@@ -159,7 +159,7 @@ version_stamp macro_cache::get_copy_member_versions(context::macro_def_ptr macro
 
     for (const auto& copy_ptr : macro->used_copy_members)
     {
-        auto file = file_mngr_->find(copy_ptr->definition_location.file.get_url()); // todo
+        auto file = file_mngr_->find(copy_ptr->definition_location.file);
         if (!file)
             throw std::runtime_error("Dependencies of a macro must be open right after parsing the macro.");
         result.try_emplace(file->get_file_name(), file->get_version());

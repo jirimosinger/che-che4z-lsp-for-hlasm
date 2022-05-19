@@ -36,7 +36,10 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 {
     const static inline size_t lib_prefix_length = 4;
 
-    std::unordered_map<std::string, std::shared_ptr<file_with_text>> files_by_fname_;
+    std::unordered_map<hlasm_plugin::utils::path::external_resource,
+        std::shared_ptr<file_with_text>,
+        hlasm_plugin::utils::path::external_resource_hasher>
+        files_by_fname_;
     std::unordered_map<std::string, std::pair<std::shared_ptr<file_with_text>, macro_cache>> files_by_library_;
 
     std::shared_ptr<context::hlasm_context> hlasm_ctx;
@@ -61,7 +64,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
     }
 
 
-    file_ptr find(const std::string& key) const override
+    file_ptr find(const hlasm_plugin::utils::path::external_resource& key) const override
     {
         auto it = files_by_fname_.find(key);
         return it == files_by_fname_.end() ? nullptr : it->second;
