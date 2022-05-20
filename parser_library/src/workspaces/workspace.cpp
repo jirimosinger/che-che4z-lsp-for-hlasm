@@ -821,7 +821,7 @@ preprocessor_options workspace::get_preprocessor_options(const utils::path::exte
     return proc_grp.preprocessor();
 }
 
-processor_file_ptr workspace::get_processor_file(const std::string& filename)
+processor_file_ptr workspace::get_processor_file(const utils::path::external_resource& filename)
 {
     return get_file_manager().get_processor_file(filename);
 }

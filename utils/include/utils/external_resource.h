@@ -40,6 +40,7 @@ class external_resource
 public:
     external_resource() = default;
     external_resource(std::string uri);
+    external_resource(std::string_view uri);
     external_resource(const char* uri);
 
     // external_resource(external_resource&) = default;

@@ -269,6 +269,10 @@ external_resource::external_resource(std::string uri)
     //     while (1)
 }
 
+external_resource::external_resource(std::string_view uri)
+    : external_resource(std::string(uri))
+{}
+
 external_resource::external_resource(const char* uri)
     : external_resource(std::string(uri))
 {}

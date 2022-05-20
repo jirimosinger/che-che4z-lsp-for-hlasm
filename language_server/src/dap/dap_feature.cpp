@@ -21,17 +21,17 @@
 namespace {
 using namespace hlasm_plugin::language_server::dap;
 
-std::string convert_path(const std::string& path, path_format path_format)
+std::string convert_path_to_uri(const std::string& path, path_format path_format)
 {
     if (path_format == path_format::URI)
-        return hlasm_plugin::utils::path::uri_to_path(path);
+        return path;
 
-    // Theia sends us relative path (while not accepting it back) change, to absolute
+    // Theia sends us relative path while not accepting it back. Change to absolute
     std::filesystem::path p = hlasm_plugin::utils::path::absolute(path);
 
     std::string result = hlasm_plugin::utils::path::lexically_normal(p).string();
 
-    // on windows, VS code sends us path with capital drive letter through DAP and
+    // On windows, VS code sends us path with capital drive letter through DAP and
     // lowercase drive letter through LSP.
     // Remove, once we implement case-insensitive comparison of paths in parser_library for windows
     if (hlasm_plugin::utils::platform::is_windows())
@@ -40,7 +40,15 @@ std::string convert_path(const std::string& path, path_format path_format)
             result[0] = (char)tolower((unsigned char)result[0]);
     }
 
-    return result;
+    return hlasm_plugin::utils::path::path_to_uri(result);
+}
+
+std::string server_conformant_path(const std::string& url_path, path_format path_format)
+{
+    if (path_format == path_format::URI)
+        return url_path;
+
+    return hlasm_plugin::utils::path::uri_to_path(url_path);
 }
 
 constexpr const int THREAD_ID = 1;
@@ -127,7 +135,7 @@ void dap_feature::on_launch(const json& request_seq, const json& args)
         return;
 
     // wait for configurationDone?
-    std::string program_path = convert_path(args["program"].get<std::string>(), path_format_);
+    std::string program_path = convert_path_to_uri(args["program"].get<std::string>(), path_format_);
     bool stop_on_entry = args["stopOnEntry"].get<bool>();
     auto workspace_id = ws_mngr_.find_workspace(program_path.c_str());
     debugger->set_event_consumer(this);
@@ -143,7 +151,7 @@ void dap_feature::on_set_breakpoints(const json& request_seq, const json& args)
 
     json breakpoints_verified = json::array();
 
-    std::string source = convert_path(args["source"]["path"].get<std::string>(), path_format_);
+    std::string source = convert_path_to_uri(args["source"]["path"].get<std::string>(), path_format_);
     std::vector<parser_library::breakpoint> breakpoints;
 
     if (auto bpoints_found = args.find("breakpoints"); bpoints_found != args.end())
@@ -176,9 +184,9 @@ void dap_feature::on_threads(const json& request_seq, const json&)
         json { { "threads", json::array({ json { { "id", THREAD_ID }, { "name", "main" } } }) } });
 }
 
-[[nodiscard]] json source_to_json(parser_library::source source)
+[[nodiscard]] json source_to_json(parser_library::source source, path_format path_format)
 {
-    return json { { "path", std::string_view(source.path) } };
+    return json { { "path", server_conformant_path(std::string(source.path), path_format) } };
 }
 
 void dap_feature::on_stack_trace(const json& request_seq, const json&)
@@ -193,7 +201,7 @@ void dap_feature::on_stack_trace(const json& request_seq, const json&)
         frames_json.push_back(json {
             { "id", frame.id },
             { "name", std::string_view(frame.name) },
-            { "source", source_to_json(frame.source_file) },
+            { "source", source_to_json(frame.source_file, path_format_) },
             { "line", frame.source_range.start.line + line_1_based_ },
             { "column", frame.source_range.start.column + column_1_based_ },
             { "endLine", frame.source_range.end.line + line_1_based_ },
@@ -219,7 +227,7 @@ void dap_feature::on_scopes(const json& request_seq, const json& args)
         json scope_json = json { { "name", std::string_view(scope.name) },
             { "variablesReference", scope.variable_reference },
             { "expensive", false },
-            { "source", source_to_json(scope.source_file) } };
+            { "source", source_to_json(scope.source_file, path_format_) } };
         scopes_json.push_back(std::move(scope_json));
     }
 

@@ -125,7 +125,7 @@ public:
 
     void set_message_consumer(message_consumer* consumer);
 
-    processor_file_ptr get_processor_file(const std::string& filename);
+    processor_file_ptr get_processor_file(const utils::path::external_resource& filename);
 
     file_manager& get_file_manager();
 

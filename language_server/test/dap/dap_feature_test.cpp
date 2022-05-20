@@ -22,6 +22,7 @@
 
 #include "dap/dap_server.h"
 #include "feature.h"
+#include "utils/external_resource.h"
 #include "utils/path.h"
 #include "workspace_manager.h"
 
@@ -163,7 +164,8 @@ std::string file_stop_on_entry = "  LR 1,1";
 
 TEST_F(feature_launch_test, stop_on_entry)
 {
-    ws_mngr.did_open_file(file_name.c_str(), 0, file_stop_on_entry.c_str(), file_stop_on_entry.size());
+    ws_mngr.did_open_file(
+        utils::path::path_to_uri(file_name).c_str(), 0, file_stop_on_entry.c_str(), file_stop_on_entry.size());
 
     feature.on_launch("0"_json, nlohmann::json { { "program", file_name }, { "stopOnEntry", true } });
     std::vector<response_mock> expected_resp = { { "0"_json, "launch", json() } };
@@ -190,7 +192,7 @@ std::string file_step = R"(  LR 1,1
 
 TEST_F(feature_launch_test, step)
 {
-    ws_mngr.did_open_file(file_name.c_str(), 0, file_step.c_str(), file_step.size());
+    ws_mngr.did_open_file(utils::path::path_to_uri(file_name).c_str(), 0, file_step.c_str(), file_step.size());
 
     feature.on_launch("0"_json, nlohmann::json { { "program", file_name }, { "stopOnEntry", true } });
     std::vector<response_mock> expected_resp = { { "0"_json, "launch", json() } };
@@ -266,7 +268,8 @@ std::string file_breakpoint = R"(  LR 1,1
 
 TEST_F(feature_launch_test, breakpoint)
 {
-    ws_mngr.did_open_file(file_name.c_str(), 0, file_breakpoint.c_str(), file_breakpoint.size());
+    ws_mngr.did_open_file(
+        utils::path::path_to_uri(file_name).c_str(), 0, file_breakpoint.c_str(), file_breakpoint.size());
 
     nlohmann::json bp_args { { "source", { { "path", file_name } } },
         { "breakpoints", R"([{"line":1}, {"line":3}])"_json } };
@@ -307,7 +310,8 @@ std::string file_variables = R"(&VARA SETA 4
 
 TEST_F(feature_launch_test, variables)
 {
-    ws_mngr.did_open_file(file_name.c_str(), 0, file_variables.c_str(), file_variables.size());
+    ws_mngr.did_open_file(
+        utils::path::path_to_uri(file_name).c_str(), 0, file_variables.c_str(), file_variables.size());
 
     feature.on_launch("0"_json, nlohmann::json { { "program", file_name }, { "stopOnEntry", true } });
     std::vector<response_mock> expected_resp = { { "0"_json, "launch", json() } };

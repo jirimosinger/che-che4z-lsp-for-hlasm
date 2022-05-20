@@ -115,7 +115,8 @@ class debugger::impl final : public processing::statement_analyzer
     size_t next_var_ref_ = 1;
     context::processing_stack_t proc_stack_;
 
-    std::unordered_map<std::string, std::vector<breakpoint>> breakpoints_;
+    std::unordered_map<utils::path::external_resource, std::vector<breakpoint>, utils::path::external_resource_hasher>
+        breakpoints_;
 
     size_t add_variable(std::vector<variable_ptr> vars)
     {
@@ -130,7 +131,7 @@ public:
         std::string_view source, workspaces::workspace& workspace, bool stop_on_entry, parse_lib_provider* lib_provider)
     {
         // TODO: check if already running???
-        auto open_code = workspace.get_processor_file(std::string(source));
+        auto open_code = workspace.get_processor_file(source);
         opencode_source_path_ = open_code->get_file_name().get_url();
         stop_on_next_stmt_ = stop_on_entry;
 
@@ -192,7 +193,7 @@ public:
         auto stack = ctx_->processing_stack();
         const auto stack_depth = stack.size();
 
-        for (const auto& bp : breakpoints(stack.back().proc_location.file.get_absolute_path()))
+        for (const auto& bp : breakpoints(stack.back().proc_location.file))
         {
             if (bp.line >= stmt_range.start.line && bp.line <= stmt_range.end.line)
                 breakpoint_hit = true;
@@ -279,7 +280,7 @@ public:
             return stack_frames_;
         for (size_t i = proc_stack_.size() - 1; i != (size_t)-1; --i)
         {
-            source source(proc_stack_[i].proc_location.file.get_absolute_path());
+            source source(proc_stack_[i].proc_location.file.get_url());
             std::string name;
             switch (proc_stack_[i].proc_type)
             {
@@ -387,16 +388,16 @@ public:
         return it->second;
     }
 
-    void breakpoints(std::string_view source, std::vector<breakpoint> bps)
+    void breakpoints(utils::path::external_resource source, std::vector<breakpoint> bps)
     {
         std::lock_guard g(breakpoints_mutex_);
-        breakpoints_[std::string(source)] = std::move(bps);
+        breakpoints_[source] = std::move(bps);
     }
 
-    [[nodiscard]] std::vector<breakpoint> breakpoints(std::string_view source) const
+    [[nodiscard]] std::vector<breakpoint> breakpoints(utils::path::external_resource source) const
     {
         std::lock_guard g(breakpoints_mutex_);
-        if (auto it = breakpoints_.find(std::string(source)); it != breakpoints_.end())
+        if (auto it = breakpoints_.find(source); it != breakpoints_.end())
             return it->second;
         return {};
     }
