@@ -14,6 +14,7 @@
 import * as assert from 'assert';
 import * as vscode from "vscode";
 import * as path from 'path';
+import { integer } from 'vscode-languageclient';
 
 export function getWorkspacePath(): string {
     return vscode.workspace.workspaceFolders[0].uri.fsPath;;
@@ -36,6 +37,20 @@ export async function showDocument(workspace_file: string) {
     const document = await vscode.workspace.openTextDocument(file);
 
     await vscode.window.showTextDocument(document);
+}
+
+export function moveCursor(editor: vscode.TextEditor, position: vscode.Position)
+{
+    editor.selection = new vscode.Selection(position, position);
+}
+
+export async function toggleBreakpoint(file: string, line: integer)
+{
+    await showDocument(file);
+    sleep(1000);
+    moveCursor(get_editor(file), new vscode.Position(line,0));
+    await vscode.commands.executeCommand('editor.debug.action.toggleBreakpoint');
+    sleep(1000);
 }
 
 export async function insertString(editor: vscode.TextEditor, position: vscode.Position, str: string): Promise<vscode.Position> {

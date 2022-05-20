@@ -144,12 +144,75 @@ suite('Integration Test Suite', () => {
         const reference = scopes.find((scope: { name: string }) => scope.name == 'Locals').variablesReference;
         const variablesResult = await session.customRequest('variables', { variablesReference: reference });
 
-        await vscode.commands.executeCommand('workbench.action.debug.stop');
-
         const variables = variablesResult.body ? variablesResult.body.variables : variablesResult.variables;
 
         assert.ok(variables.length == 1 && variables[0].value == 'SOMETHING' && variables[0].name == '&VAR2', 'Wrong debug variable &VAR2');
-    }).timeout(10000).slow(4000);
+
+        // Continue by stepping into a macro and checking the file has been accessed
+        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
+        await helper.sleep(1000);
+        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
+        await helper.sleep(1000);
+        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
+        await helper.sleep(1000);
+        await vscode.commands.executeCommand('workbench.action.debug.stepInto');
+        await helper.sleep(1000);
+
+        assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === path.join(helper.getWorkspacePath(), 'libs', 'mac.asm'), 'Wrong macro file entered');
+
+        // await vscode.commands.executeCommand('workbench.action.debug.stepOut');
+        // await helper.sleep(1000);
+        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
+        await helper.sleep(1000);
+        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
+        await helper.sleep(1000);
+        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
+        await helper.sleep(1000);
+        assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === editor.document.uri.fsPath, 'Stepped out to a wrong file');
+
+        await vscode.commands.executeCommand('workbench.action.debug.stop');
+
+    }).timeout(20000).slow(10000);
+
+    test('Breakpoint test', async () => {
+        // await helper.toggleBreakpoint(path.join(helper.getWorkspacePath(), 'libs', 'mac.asm'), 3);
+        await helper.toggleBreakpoint(path.join('libs', 'mac.asm'), 3);
+        await helper.toggleBreakpoint('open', 3);
+        await helper.toggleBreakpoint('open', 9);
+        
+        const session_started_event = new Promise<vscode.DebugSession>((resolve) => {
+            // when the debug session starts
+            const disposable = vscode.debug.onDidStartDebugSession((session) => {
+                disposable.dispose();
+                resolve(session);
+            });
+        });
+
+        // start debugging
+        if (!await vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], 'Macro tracer: current program'))
+            throw new Error("Failed to start a debugging session");
+
+        await session_started_event;
+
+        // wait a second to let the debug session complete
+        await helper.sleep(1000);
+
+        // step over once
+        await vscode.commands.executeCommand('workbench.action.debug.continue');
+        await helper.sleep(1000);
+        assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === editor.document.uri.fsPath, 'Expected to be in the source file');
+
+        await vscode.commands.executeCommand('workbench.action.debug.continue');
+        await helper.sleep(1000);
+        assert.ok(vscode.window.activeTextEditor.document.uri.fsPath == path.join(helper.getWorkspacePath(), 'libs', 'mac.asm'), 'Expected to be in the macro file');
+
+        await vscode.commands.executeCommand('workbench.action.debug.continue');
+        await helper.sleep(1000);
+        assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === editor.document.uri.fsPath, 'Expected to be in the source file');
+
+        await vscode.commands.executeCommand('workbench.action.debug.stop');
+
+    }).timeout(20000).slow(10000);
 
     // verify that library patterns are working
     test('Test library patterns', async () => {
