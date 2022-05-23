@@ -107,7 +107,7 @@ class debugger::impl final : public processing::statement_analyzer
 
     // Debugging information retrieval
     context::hlasm_context* ctx_ = nullptr;
-    std::string opencode_source_path_;
+    std::string opencode_source_url_;
     std::vector<stack_frame> stack_frames_;
     std::vector<scope> scopes_;
 
@@ -132,7 +132,7 @@ public:
     {
         // TODO: check if already running???
         auto open_code = workspace.get_processor_file(source);
-        opencode_source_path_ = open_code->get_file_name().get_url();
+        opencode_source_url_ = open_code->get_file_uri().get_url();
         stop_on_next_stmt_ = stop_on_entry;
 
         thread_ = std::thread([this, open_code = std::move(open_code), &workspace, lib_provider]() {
@@ -145,10 +145,10 @@ public:
 
             analyzer a(open_code->get_text(),
                 analyzer_options {
-                    open_code->get_file_name(),
+                    open_code->get_file_uri(),
                     lib_provider ? lib_provider : &debug_provider,
-                    workspace.get_asm_options(open_code->get_file_name()),
-                    workspace.get_preprocessor_options(open_code->get_file_name()),
+                    workspace.get_asm_options(open_code->get_file_uri()),
+                    workspace.get_preprocessor_options(open_code->get_file_uri()),
                     &vfm,
                 });
 
@@ -359,10 +359,10 @@ public:
 
 
 
-        scopes_.emplace_back("Globals", add_variable(std::move(globals)), source(opencode_source_path_));
-        scopes_.emplace_back("Locals", add_variable(std::move(scope_vars)), source(opencode_source_path_));
+        scopes_.emplace_back("Globals", add_variable(std::move(globals)), source(opencode_source_url_));
+        scopes_.emplace_back("Locals", add_variable(std::move(scope_vars)), source(opencode_source_url_));
         scopes_.emplace_back(
-            "Ordinary symbols", add_variable(std::move(ordinary_symbols)), source(opencode_source_path_));
+            "Ordinary symbols", add_variable(std::move(ordinary_symbols)), source(opencode_source_url_));
 
         return scopes_;
     }

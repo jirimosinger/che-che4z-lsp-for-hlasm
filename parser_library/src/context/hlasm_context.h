@@ -69,7 +69,7 @@ class hlasm_context
     std::vector<source_context> source_stack_;
 
     // path to the opencode
-    utils::path::external_resource opencode_file_name_;
+    utils::path::external_resource opencode_file_uri_;
     // all files processes via macro or copy member invocation
     std::set<utils::path::external_resource> visited_files_;
 
@@ -103,13 +103,13 @@ class hlasm_context
     long long m_statements_remaining;
 
 public:
-    hlasm_context(utils::path::external_resource file_name = "",
+    hlasm_context(utils::path::external_resource file_uri = "",
         asm_option asm_opts = {},
         std::shared_ptr<id_storage> init_ids = std::make_shared<id_storage>());
     ~hlasm_context();
 
     // gets name of file where is open-code located
-    const utils::path::external_resource& opencode_file_name() const; // todo rename
+    const utils::path::external_resource& opencode_file_uri() const;
     // accesses visited files
     const std::set<utils::path::external_resource>& get_visited_files();
 

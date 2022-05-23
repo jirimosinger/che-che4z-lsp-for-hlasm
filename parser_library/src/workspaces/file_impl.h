@@ -30,7 +30,7 @@ namespace hlasm_plugin::parser_library::workspaces {
 class file_impl : public virtual file, public virtual diagnosable_impl
 {
 public:
-    explicit file_impl(utils::path::external_resource uri);
+    explicit file_impl(file_uri uri);
     explicit file_impl(const file_impl&) = default;
     file_impl& operator=(const file_impl&) = default;
 
@@ -39,7 +39,7 @@ public:
 
     void collect_diags() const override;
 
-    const file_uri& get_file_name() override;
+    const file_uri& get_file_uri() override;
     const std::string& get_text() override;
     version_t get_version() override;
     bool update_and_get_bad() override;
@@ -63,7 +63,7 @@ protected:
     const std::string& get_text_ref();
 
 private:
-    utils::path::external_resource file_;
+    file_uri file_uri_;
     std::string text_;
     // Array of "pointers" to text_ where lines start.
     std::vector<size_t> lines_ind_;

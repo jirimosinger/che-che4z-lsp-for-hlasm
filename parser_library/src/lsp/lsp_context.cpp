@@ -504,10 +504,10 @@ void lsp_context::document_symbol_opencode_var_seq_symbol_aux(document_symbol_li
 }
 
 document_symbol_list_s lsp_context::document_symbol(
-    const utils::path::external_resource& resource, long long limit) const
+    const utils::path::external_resource& document_uri, long long limit) const
 {
     document_symbol_list_s result;
-    const auto& file = m_files.find(resource);
+    const auto& file = m_files.find(document_uri);
     if (file == m_files.end() || limit <= 0)
         return result;
 
@@ -516,11 +516,11 @@ document_symbol_list_s lsp_context::document_symbol(
     switch (file->second->type)
     {
         case file_type::MACRO:
-            document_symbol_macro(result, resource, std::nullopt, limit, cache);
+            document_symbol_macro(result, document_uri, std::nullopt, limit, cache);
             break;
 
         case file_type::COPY:
-            document_symbol_copy(result, file->second->get_occurences(), resource, std::nullopt, limit);
+            document_symbol_copy(result, file->second->get_occurences(), document_uri, std::nullopt, limit);
             break;
 
         default:
@@ -537,7 +537,7 @@ document_symbol_list_s lsp_context::document_symbol(
             {
                 if (limit <= 0)
                     break;
-                if (!belongs_to_copyfile(resource, sym.def_position, sym.name))
+                if (!belongs_to_copyfile(document_uri, sym.def_position, sym.name))
                 {
                     result.emplace_back(*sym.name, document_symbol_kind::VAR, range(sym.def_position));
                     --limit;
@@ -553,7 +553,7 @@ document_symbol_list_s lsp_context::document_symbol(
 
 
 
-void lsp_context::add_file(file_info file_i) { m_files.try_emplace(file_i.name, std::make_unique<file_info>(file_i)); }
+void lsp_context::add_file(file_info file_i) { m_files.try_emplace(file_i.file, std::make_unique<file_info>(file_i)); }
 
 lsp_context::lsp_context(std::shared_ptr<context::hlasm_context> h_ctx)
     : m_hlasm_ctx(std::move(h_ctx))
@@ -575,7 +575,7 @@ void lsp_context::add_macro(macro_info_ptr macro_i, text_data_ref_t text_data)
 void lsp_context::add_opencode(opencode_info_ptr opencode_i, text_data_ref_t text_data)
 {
     m_opencode = std::move(opencode_i);
-    add_file(file_info(m_hlasm_ctx->opencode_file_name(), std::move(text_data)));
+    add_file(file_info(m_hlasm_ctx->opencode_file_uri(), std::move(text_data)));
 
     // distribute all occurrences as all files are present
     for (const auto& [_, m] : m_macros)
@@ -597,24 +597,24 @@ macro_info_ptr lsp_context::get_macro_info(context::id_index macro_name) const
         return m_macros.at(it->second);
 }
 
-const file_info* lsp_context::get_file_info(const utils::path::external_resource& file_name) const
+const file_info* lsp_context::get_file_info(const utils::path::external_resource& file_uri) const
 {
-    if (auto it = m_files.find(file_name); it != m_files.end())
+    if (auto it = m_files.find(file_uri); it != m_files.end())
         return it->second.get();
     else
         return nullptr;
 }
 
-location lsp_context::definition(const utils::path::external_resource& resource, const position pos) const
+location lsp_context::definition(const utils::path::external_resource& document_uri, const position pos) const
 {
-    auto [occ, macro_scope] = find_occurence_with_scope(resource, pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(document_uri, pos);
 
     if (!occ)
-        return { pos, resource };
+        return { pos, document_uri };
 
     if (auto def = find_definition_location(*occ, macro_scope))
         return { def->pos, def->file };
-    return { pos, resource };
+    return { pos, document_uri };
 }
 
 void collect_references(location_list& refs, const symbol_occurence& occ, const file_occurences_t& file_occs)
@@ -627,11 +627,11 @@ void collect_references(location_list& refs, const symbol_occurence& occ, const 
     }
 }
 
-location_list lsp_context::references(const utils::path::external_resource& resource, const position pos) const
+location_list lsp_context::references(const utils::path::external_resource& document_uri, const position pos) const
 {
     location_list result;
 
-    auto [occ, macro_scope] = find_occurence_with_scope(resource, pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(document_uri, pos);
 
     if (!occ)
         return {};
@@ -653,9 +653,9 @@ location_list lsp_context::references(const utils::path::external_resource& reso
     return result;
 }
 
-hover_result lsp_context::hover(const utils::path::external_resource& resource, const position pos) const
+hover_result lsp_context::hover(const utils::path::external_resource& document_uri, const position pos) const
 {
-    auto [occ, macro_scope] = find_occurence_with_scope(resource, pos);
+    auto [occ, macro_scope] = find_occurence_with_scope(document_uri, pos);
 
     if (!occ)
         return {};
@@ -680,12 +680,12 @@ bool lsp_context::should_complete_instr(const text_data_ref_t& text, const posit
     return !line_before_continued && std::regex_match(line_so_far.begin(), line_so_far.end(), instruction_regex);
 }
 
-completion_list_s lsp_context::completion(const utils::path::external_resource& resource,
+completion_list_s lsp_context::completion(const utils::path::external_resource& document_uri,
     const position pos,
     const char trigger_char,
     completion_trigger_kind trigger_kind) const
 {
-    auto file_it = m_files.find(resource);
+    auto file_it = m_files.find(document_uri);
     if (file_it == m_files.end())
         return completion_list_s();
     const text_data_ref_t& text = file_it->second->data;

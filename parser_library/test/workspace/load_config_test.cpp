@@ -40,7 +40,7 @@ public:
 
     file_uri uri = "test_uri";
 
-    const file_uri& get_file_name() override { return uri; }
+    const file_uri& get_file_uri() override { return uri; }
 
     const std::string& get_text() override { return file; }
 
@@ -112,7 +112,7 @@ public:
 
     file_uri uri = "test_uri";
 
-    const file_uri& get_file_name() override { return uri; }
+    const file_uri& get_file_uri() override { return uri; }
 
     const std::string& get_text() override { return file; }
 
@@ -209,7 +209,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_path());
+        EXPECT_EQ(expected[i], libl->get_lib_uri());
     }
 
     auto& pg2 = ws.get_proc_grp("P2");
@@ -229,7 +229,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg2.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_path());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri());
     }
 
 
@@ -242,7 +242,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg3.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_path());
+        EXPECT_EQ(expected[i], libl->get_lib_uri());
     }
 
 
@@ -254,7 +254,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg4.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_path());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri());
     }
     // test of asm_options
     const auto& asm_options = ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm1" : "test_proc_grps_uri/pgm1");

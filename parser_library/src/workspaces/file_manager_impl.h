@@ -45,23 +45,20 @@ public:
 
     void collect_diags() const override;
 
-    file_ptr add_file(const utils::path::external_resource&) override;
-    processor_file_ptr add_processor_file(const utils::path::external_resource&) override;
-    processor_file_ptr get_processor_file(const utils::path::external_resource&) override;
-    void remove_file(const utils::path::external_resource&) override;
+    file_ptr add_file(const file_uri&) override;
+    processor_file_ptr add_processor_file(const file_uri&) override;
+    processor_file_ptr get_processor_file(const file_uri&) override;
+    void remove_file(const file_uri&) override;
 
     file_ptr find(const utils::path::external_resource& key) const override;
     processor_file_ptr find_processor_file(const utils::path::external_resource& key) override;
 
     list_directory_result list_directory_files(const utils::path::external_resource& path) override;
 
-    void did_open_file(
-        const utils::path::external_resource& document_uri, version_t version, std::string text) override;
-    void did_change_file(const utils::path::external_resource& document_uri,
-        version_t version,
-        const document_change* changes,
-        size_t ch_size) override;
-    void did_close_file(const utils::path::external_resource& document_uri) override;
+    void did_open_file(const file_uri& document_uri, version_t version, std::string text) override;
+    void did_change_file(
+        const file_uri& document_uri, version_t version, const document_change* changes, size_t ch_size) override;
+    void did_close_file(const file_uri& document_uri) override;
 
     bool file_exists(const std::string& file_name) override;
     bool lib_file_exists(const std::string& lib_path, const std::string& file_name) override;

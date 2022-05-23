@@ -48,10 +48,10 @@ public:
     void add_opencode(opencode_info_ptr opencode_i, text_data_ref_t text_data);
 
     [[nodiscard]] macro_info_ptr get_macro_info(context::id_index macro_name) const;
-    [[nodiscard]] const file_info* get_file_info(const utils::path::external_resource& file_name) const;
+    [[nodiscard]] const file_info* get_file_info(const utils::path::external_resource& file_uri) const;
 
-    location definition(const utils::path::external_resource& resource, position pos) const override;
-    location_list references(const utils::path::external_resource& resource, position pos) const override;
+    location definition(const utils::path::external_resource& document_uri, position pos) const override;
+    location_list references(const utils::path::external_resource& document_uri, position pos) const override;
     hover_result hover(const utils::path::external_resource& document_uri, position pos) const override;
     completion_list_s completion(const utils::path::external_resource& document_uri,
         position pos,

@@ -366,9 +366,9 @@ bool hlasm_context::is_opcode(id_index symbol) const
 }
 
 hlasm_context::hlasm_context(
-    utils::path::external_resource file_name, asm_option asm_options, std::shared_ptr<id_storage> init_ids)
+    utils::path::external_resource file_uri, asm_option asm_options, std::shared_ptr<id_storage> init_ids)
     : ids_(std::move(init_ids))
-    , opencode_file_name_(file_name)
+    , opencode_file_uri_(file_uri)
     , asm_options_(std::move(asm_options))
     , m_instruction_map(init_instruction_map(*ids_, asm_options_.instr_set))
     , m_usings(std::make_unique<using_collection>())
@@ -377,8 +377,8 @@ hlasm_context::hlasm_context(
     , ord_ctx(*ids_, *this)
 {
     add_global_system_vars(scope_stack_.emplace_back());
-    visited_files_.insert(file_name);
-    push_statement_processing(processing::processing_kind::ORDINARY, std::move(file_name));
+    visited_files_.insert(file_uri);
+    push_statement_processing(processing::processing_kind::ORDINARY, std::move(file_uri));
 }
 
 hlasm_context::~hlasm_context() = default;
@@ -883,7 +883,7 @@ macro_invo_ptr hlasm_context::this_macro() const
     return macro_invo_ptr();
 }
 
-const utils::path::external_resource& hlasm_context::opencode_file_name() const { return opencode_file_name_; }
+const utils::path::external_resource& hlasm_context::opencode_file_uri() const { return opencode_file_uri_; }
 
 const std::set<utils::path::external_resource>& hlasm_context::get_visited_files() { return visited_files_; }
 

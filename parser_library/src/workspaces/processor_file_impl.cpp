@@ -22,8 +22,8 @@
 namespace hlasm_plugin::parser_library::workspaces {
 
 processor_file_impl::processor_file_impl(
-    utils::path::external_resource file_name, const file_manager& file_mngr, std::atomic<bool>* cancel)
-    : file_impl(std::move(file_name))
+    utils::path::external_resource file_uri, const file_manager& file_mngr, std::atomic<bool>* cancel)
+    : file_impl(std::move(file_uri))
     , cancel_(cancel)
     , macro_cache_(file_mngr, *this)
 {}
@@ -53,7 +53,7 @@ parse_result processor_file_impl::parse(
 
     last_analyzer_ = std::make_unique<analyzer>(get_text(),
         analyzer_options {
-            get_file_name(),
+            get_file_uri(),
             &lib_provider,
             std::move(asm_opts),
             get_lsp_editing() ? collect_highlighting_info::yes : collect_highlighting_info::no,
@@ -74,7 +74,7 @@ parse_result processor_file_impl::parse(
     {
         dependencies_.clear();
         for (auto& file : last_analyzer_->hlasm_ctx().get_visited_files())
-            if (file != get_file_name())
+            if (file != get_file_uri())
                 dependencies_.insert(file);
     }
 
@@ -100,7 +100,7 @@ parse_result processor_file_impl::parse_macro(
 
     auto a = std::make_unique<analyzer>(get_text(),
         analyzer_options {
-            get_file_name(),
+            get_file_uri(),
             &lib_provider,
             std::move(ctx),
             data,
@@ -124,7 +124,7 @@ parse_result processor_file_impl::parse_no_lsp_update(
 {
     auto no_update_analyzer_ = std::make_unique<analyzer>(get_text(),
         analyzer_options {
-            get_file_name(),
+            get_file_uri(),
             &lib_provider,
             std::move(ctx),
             data,
@@ -152,9 +152,9 @@ namespace {
 class empty_feature_provider final : public lsp::feature_provider
 {
     // Inherited via feature_provider
-    location definition(const utils::path::external_resource& resource, position pos) const override
+    location definition(const utils::path::external_resource& document_uri, position pos) const override
     {
-        return location(pos, resource);
+        return location(pos, document_uri);
     }
     location_list references(const utils::path::external_resource&, position) const override { return location_list(); }
     lsp::hover_result hover(const utils::path::external_resource&, position) const override
@@ -196,9 +196,9 @@ const performance_metrics& processor_file_impl::get_metrics()
     return metrics;
 }
 
-void processor_file_impl::erase_cache_of_opencode(const utils::path::external_resource& opencode_file_name)
+void processor_file_impl::erase_cache_of_opencode(const utils::path::external_resource& opencode_file_uri)
 {
-    macro_cache_.erase_cache_of_opencode(opencode_file_name);
+    macro_cache_.erase_cache_of_opencode(opencode_file_uri);
 }
 
 bool processor_file_impl::parse_inner(analyzer& new_analyzer)

@@ -89,7 +89,7 @@ public:
 
     void add_proc_grp(processor_group pg);
     const processor_group& get_proc_grp(const proc_grp_id& proc_grp) const;
-    const processor_group& get_proc_grp_by_program(const utils::path::external_resource& program) const;
+    const processor_group& get_proc_grp_by_program(const utils::path::external_resource& uri) const;
     const processor_group& get_proc_grp_by_program(const program& program) const;
     const program* get_program(const utils::path::external_resource& filename) const;
 
@@ -101,23 +101,23 @@ public:
         const utils::path::external_resource& document_uri, const document_change* changes, size_t ch_size);
     void did_change_watched_files(const utils::path::external_resource& file_uri);
 
-    location definition(const utils::path::external_resource& resource, position pos) const override;
-    location_list references(const utils::path::external_resource& resource, position pos) const override;
-    lsp::hover_result hover(const utils::path::external_resource& resource, position pos) const override;
-    lsp::completion_list_s completion(const utils::path::external_resource& resource,
+    location definition(const utils::path::external_resource& document_uri, position pos) const override;
+    location_list references(const utils::path::external_resource& document_uri, position pos) const override;
+    lsp::hover_result hover(const utils::path::external_resource& document_uri, position pos) const override;
+    lsp::completion_list_s completion(const utils::path::external_resource& document_uri,
         position pos,
         char trigger_char,
         completion_trigger_kind trigger_kind) const override;
     lsp::document_symbol_list_s document_symbol(
-        const utils::path::external_resource& resource, long long limit) const override;
+        const utils::path::external_resource& document_uri, long long limit) const override;
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override;
     bool has_library(const std::string& library, const utils::path::external_resource& program) const override;
     std::optional<std::string> get_library(const std::string& library,
         const utils::path::external_resource& program,
         std::optional<utils::path::external_resource>* uri) const override;
-    virtual asm_option get_asm_options(const utils::path::external_resource& file_name) const;
-    virtual preprocessor_options get_preprocessor_options(const utils::path::external_resource& file_name) const;
+    virtual asm_option get_asm_options(const utils::path::external_resource& file_uri) const;
+    virtual preprocessor_options get_preprocessor_options(const utils::path::external_resource& file_uri) const;
     const ws_uri& uri();
 
     void open();
@@ -125,7 +125,7 @@ public:
 
     void set_message_consumer(message_consumer* consumer);
 
-    processor_file_ptr get_processor_file(const utils::path::external_resource& filename);
+    processor_file_ptr get_processor_file(const utils::path::external_resource& file_uri);
 
     file_manager& get_file_manager();
 

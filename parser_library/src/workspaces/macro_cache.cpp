@@ -89,7 +89,7 @@ std::vector<cached_opsyn_mnemo> macro_cache_key::get_opsyn_state(context::hlasm_
 
 macro_cache_key macro_cache_key::create_from_context(context::hlasm_context& hlasm_ctx, library_data data)
 {
-    return { hlasm_ctx.opencode_file_name(), data, get_opsyn_state(hlasm_ctx) };
+    return { hlasm_ctx.opencode_file_uri(), data, get_opsyn_state(hlasm_ctx) };
 }
 
 void macro_cache_key::sort_opsyn_state(std::vector<cached_opsyn_mnemo>& opsyn_state)
@@ -162,7 +162,7 @@ version_stamp macro_cache::get_copy_member_versions(context::macro_def_ptr macro
         auto file = file_mngr_->find(copy_ptr->definition_location.file);
         if (!file)
             throw std::runtime_error("Dependencies of a macro must be open right after parsing the macro.");
-        result.try_emplace(file->get_file_name(), file->get_version());
+        result.try_emplace(file->get_file_uri(), file->get_version());
     }
     return result;
 }
@@ -182,19 +182,19 @@ void macro_cache::save_macro(const macro_cache_key& key, const analyzer& analyze
     else // Copy members do not have additional dependencies
         cache_data.stamps.clear();
 
-    cache_data.stamps.try_emplace(macro_file_->get_file_name(), macro_file_->get_version());
+    cache_data.stamps.try_emplace(macro_file_->get_file_uri(), macro_file_->get_version());
     if (key.data.proc_kind == processing::processing_kind::MACRO)
         cache_data.cached_member = analyzer.context().lsp_ctx->get_macro_info(key.data.library_member);
     else if (key.data.proc_kind == processing::processing_kind::COPY)
         cache_data.cached_member = analyzer.context().hlasm_ctx->get_copy_member(key.data.library_member);
 }
 
-void macro_cache::erase_cache_of_opencode(const utils::path::external_resource& opencode_resource)
+void macro_cache::erase_cache_of_opencode(const utils::path::external_resource& opencode_file_uri)
 {
     auto it = cache_.begin();
     while (it != cache_.end())
     {
-        if (it->first.opencode_resource == opencode_resource)
+        if (it->first.opencode_file_uri == opencode_file_uri)
             it = cache_.erase(it);
         else
             ++it;

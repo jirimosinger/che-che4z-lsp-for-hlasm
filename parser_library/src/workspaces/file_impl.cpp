@@ -27,14 +27,14 @@
 
 namespace hlasm_plugin::parser_library::workspaces {
 
-file_impl::file_impl(utils::path::external_resource uri)
-    : file_(std::move(uri))
+file_impl::file_impl(file_uri uri)
+    : file_uri_(std::move(uri))
     , text_()
 {}
 
 void file_impl::collect_diags() const {}
 
-const file_uri& file_impl::get_file_name() { return file_; }
+const file_uri& file_impl::get_file_uri() { return file_uri_; }
 
 const std::string& file_impl::get_text()
 {
@@ -45,7 +45,7 @@ const std::string& file_impl::get_text()
 
 void file_impl::load_text()
 {
-    std::ifstream fin(file_.get_absolute_path(), std::ios::in | std::ios::binary);
+    std::ifstream fin(file_uri_.get_absolute_path(), std::ios::in | std::ios::binary);
 
     if (fin)
     {
