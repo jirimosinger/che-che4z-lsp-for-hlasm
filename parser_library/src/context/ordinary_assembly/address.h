@@ -47,8 +47,6 @@ struct address
         friend bool operator==(const base&, const base&) = default;
     };
 
-    std::string to_string() const;
-
     using space_entry = std::pair<space_ptr, int>;
     using base_entry = std::pair<base, int>;
 
@@ -56,7 +54,7 @@ private:
     // list of bases and their counts to which is the address relative
     std::vector<base_entry> bases_;
     // offset relative to bases
-    int offset_;
+    int offset_ = 0;
     // list of spaces with their counts this address contains
     std::vector<space_entry> spaces_;
 
@@ -71,7 +69,7 @@ public:
     const std::vector<space_entry>& spaces() const;
     std::vector<space_entry> normalized_spaces() const;
 
-
+    address() = default;
     address(base address_base, int offset, const space_storage& spaces);
 
     address operator+(const address& addr) const;
