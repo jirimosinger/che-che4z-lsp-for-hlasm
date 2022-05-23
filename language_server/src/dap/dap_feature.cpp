@@ -21,8 +21,9 @@
 namespace {
 using namespace hlasm_plugin::language_server::dap;
 
-std::string convert_path_to_uri(const std::string& path, path_format path_format)
+std::string server_conformant_path(const std::string& path, path_format path_format)
 {
+    // Server accepts paths in URL format
     if (path_format == path_format::URI)
         return path;
 
@@ -43,12 +44,13 @@ std::string convert_path_to_uri(const std::string& path, path_format path_format
     return hlasm_plugin::utils::path::path_to_uri(result);
 }
 
-std::string server_conformant_path(const std::string& url_path, path_format path_format)
+std::string client_conformant_path(const std::string& url, path_format client_path_format)
 {
-    if (path_format == path_format::URI)
-        return url_path;
+    // Server provides paths in URL format -> convert it to whatever the client wants
+    if (client_path_format == path_format::URI)
+        return url;
 
-    return hlasm_plugin::utils::path::uri_to_path(url_path);
+    return hlasm_plugin::utils::path::uri_to_path(url);
 }
 
 constexpr const int THREAD_ID = 1;
@@ -112,7 +114,7 @@ void dap_feature::on_initialize(const json& requested_seq, const json& args)
 
     line_1_based_ = args["linesStartAt1"].get<bool>() ? 1 : 0;
     column_1_based_ = args["columnsStartAt1"].get<bool>() ? 1 : 0;
-    path_format_ = args["pathFormat"].get<std::string>() == "path" ? path_format::PATH : path_format::URI;
+    client_path_format_ = args["pathFormat"].get<std::string>() == "path" ? path_format::PATH : path_format::URI;
 
     debugger.emplace();
 
@@ -135,7 +137,7 @@ void dap_feature::on_launch(const json& request_seq, const json& args)
         return;
 
     // wait for configurationDone?
-    std::string program_path = convert_path_to_uri(args["program"].get<std::string>(), path_format_);
+    std::string program_path = server_conformant_path(args["program"].get<std::string>(), client_path_format_);
     bool stop_on_entry = args["stopOnEntry"].get<bool>();
     auto workspace_id = ws_mngr_.find_workspace(program_path.c_str());
     debugger->set_event_consumer(this);
@@ -151,7 +153,7 @@ void dap_feature::on_set_breakpoints(const json& request_seq, const json& args)
 
     json breakpoints_verified = json::array();
 
-    std::string source = convert_path_to_uri(args["source"]["path"].get<std::string>(), path_format_);
+    std::string source = server_conformant_path(args["source"]["path"].get<std::string>(), client_path_format_);
     std::vector<parser_library::breakpoint> breakpoints;
 
     if (auto bpoints_found = args.find("breakpoints"); bpoints_found != args.end())
@@ -186,7 +188,7 @@ void dap_feature::on_threads(const json& request_seq, const json&)
 
 [[nodiscard]] json source_to_json(parser_library::source source, path_format path_format)
 {
-    return json { { "path", server_conformant_path(std::string(source.path), path_format) } };
+    return json { { "path", client_conformant_path(std::string(source.path), path_format) } };
 }
 
 void dap_feature::on_stack_trace(const json& request_seq, const json&)
@@ -201,7 +203,7 @@ void dap_feature::on_stack_trace(const json& request_seq, const json&)
         frames_json.push_back(json {
             { "id", frame.id },
             { "name", std::string_view(frame.name) },
-            { "source", source_to_json(frame.source_file, path_format_) },
+            { "source", source_to_json(frame.source_file, client_path_format_) },
             { "line", frame.source_range.start.line + line_1_based_ },
             { "column", frame.source_range.start.column + column_1_based_ },
             { "endLine", frame.source_range.end.line + line_1_based_ },
@@ -227,7 +229,7 @@ void dap_feature::on_scopes(const json& request_seq, const json& args)
         json scope_json = json { { "name", std::string_view(scope.name) },
             { "variablesReference", scope.variable_reference },
             { "expensive", false },
-            { "source", source_to_json(scope.source_file, path_format_) } };
+            { "source", source_to_json(scope.source_file, client_path_format_) } };
         scopes_json.push_back(std::move(scope_json));
     }
 

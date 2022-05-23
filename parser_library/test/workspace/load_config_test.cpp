@@ -183,10 +183,9 @@ public:
 
 TEST(workspace, load_config_synthetic)
 {
-    external_resource res(std::string("test_proc_grps_uri"));
     file_manager_proc_grps_test file_manager;
     lib_config config;
-    workspace ws(res, "test_proc_grps_name", file_manager, config);
+    workspace ws(external_resource("test_proc_grps_uri"), "test_proc_grps_name", file_manager, config);
 
     ws.open();
 
@@ -209,7 +208,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_uri());
+        EXPECT_EQ(expected[i], libl->get_lib_uri().get_absolute_path());
     }
 
     auto& pg2 = ws.get_proc_grp("P2");
@@ -229,7 +228,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg2.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_uri());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_absolute_path());
     }
 
 
@@ -242,7 +241,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg3.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_uri());
+        EXPECT_EQ(expected[i], libl->get_lib_uri().get_absolute_path());
     }
 
 
@@ -254,7 +253,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg4.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_uri());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_absolute_path());
     }
     // test of asm_options
     const auto& asm_options = ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm1" : "test_proc_grps_uri/pgm1");

@@ -439,9 +439,9 @@ void hlasm_context::push_statement_processing(const processing::processing_kind 
 }
 
 void hlasm_context::push_statement_processing(
-    const processing::processing_kind kind, utils::path::external_resource resource)
+    const processing::processing_kind kind, utils::path::external_resource file_uri)
 {
-    source_stack_.emplace_back(std::move(resource), kind);
+    source_stack_.emplace_back(std::move(file_uri), kind);
 }
 
 void hlasm_context::pop_statement_processing()

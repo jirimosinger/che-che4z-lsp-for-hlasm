@@ -20,11 +20,11 @@
 class file_with_text : public hlasm_plugin::parser_library::workspaces::processor_file_impl
 {
 public:
-    file_with_text(const hlasm_plugin::utils::path::external_resource& resource,
+    file_with_text(const hlasm_plugin::utils::path::external_resource& uri,
         const std::string& text,
         const hlasm_plugin::parser_library::workspaces::file_manager& file_mngr)
-        : file_impl(resource)
-        , processor_file_impl(resource, file_mngr)
+        : file_impl(uri)
+        , processor_file_impl(uri, file_mngr)
     {
         did_open(text, 1);
     }

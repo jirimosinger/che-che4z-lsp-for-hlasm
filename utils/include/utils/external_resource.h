@@ -22,10 +22,6 @@ namespace hlasm_plugin::utils::path {
 
 enum class uri_type
 {
-    ABSOLUTE_PATH,
-    RELATIVE_PATH,
-    URL,
-    LOCAL,
     LOCAL_URI,
     LOCAL_ABSOLUTE,
     LOCAL_RELATIVE,

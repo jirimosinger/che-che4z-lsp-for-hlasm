@@ -25,8 +25,7 @@
 
 using hlasm_plugin::utils::platform::is_windows;
 
-const char* path = is_windows() ? "c:\\test" : "/home/test";
-const std::string path_url = is_windows() ? "file:///c%3A/test" : "file:///home/test";
+const std::string uri = is_windows() ? "file:///c%3A/test" : "file:///home/test";
 
 using namespace hlasm_plugin;
 using namespace hlasm_plugin::language_server;
@@ -40,12 +39,12 @@ TEST(language_features, completion)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
         + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     EXPECT_CALL(ws_mngr,
         completion(
-            StrEq(path_url), parser_library::position(0, 1), '\0', parser_library::completion_trigger_kind::invoked));
+            StrEq(uri), parser_library::position(0, 1), '\0', parser_library::completion_trigger_kind::invoked));
     notifs["textDocument/completion"].handler("", params1);
 }
 
@@ -57,11 +56,11 @@ TEST(language_features, hover)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
         + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     std::string s("test");
-    EXPECT_CALL(ws_mngr, hover(StrEq(path_url), parser_library::position(0, 1)));
+    EXPECT_CALL(ws_mngr, hover(StrEq(uri), parser_library::position(0, 1)));
     notifs["textDocument/hover"].handler("", params1);
 }
 
@@ -74,13 +73,12 @@ TEST(language_features, hover_integration)
     f.register_methods(notifs);
 
     std::string file_text = "&VAR SETA 1";
-    std::string file_res = utils::path::path_to_uri(path);
-    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
+    ws_mngr.did_open_file(uri.c_str(), 0, file_text.c_str(), file_text.size());
 
     json response { { "contents", { { "kind", "markdown" }, { "value", "SETA variable" } } } };
     EXPECT_CALL(response_mock, respond(json(""), std::string(""), response));
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + file_res
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
         + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
     notifs["textDocument/hover"].handler("", params1);
 }
@@ -94,7 +92,7 @@ TEST(language_features, definition)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
         + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     EXPECT_CALL(response_mock, respond(json(""), "", _));
@@ -108,10 +106,10 @@ TEST(language_features, references)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + path_url
+    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
         + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
-    EXPECT_CALL(ws_mngr, references(StrEq(path_url), parser_library::position(0, 1)));
+    EXPECT_CALL(ws_mngr, references(StrEq(uri), parser_library::position(0, 1)));
     notifs["textDocument/references"].handler("", params1);
 }
 
@@ -124,10 +122,9 @@ TEST(language_features, document_symbol)
     f.register_methods(notifs);
 
     std::string file_text = "A EQU 1";
-    std::string file_res = utils::path::path_to_uri(path);
 
-    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
+    ws_mngr.did_open_file(uri.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + uri + "\"}}");
 
     json r = { { "start", { { "line", 0 }, { "character", 0 } } }, { "end", { { "line", 0 }, { "character", 0 } } } };
     json response = json::array();
@@ -146,10 +143,9 @@ TEST(language_features, semantic_tokens)
     f.register_methods(notifs);
 
     std::string file_text = "A EQU 1\n SAM31";
-    std::string file_res = utils::path::path_to_uri(path);
 
-    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
+    ws_mngr.did_open_file(uri.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + uri + "\"}}");
 
     json response { { "data", { 0, 0, 1, 0, 0, 0, 2, 3, 1, 0, 0, 4, 1, 10, 0, 1, 1, 5, 1, 0 } } };
     EXPECT_CALL(response_mock, respond(json(""), std::string(""), response));
@@ -169,10 +165,9 @@ TEST(language_features, semantic_tokens_multiline)
 D EQU                                                                 1X3145
 IIIIIIIIIIIIIII1
 )";
-    std::string file_res = utils::path::path_to_uri(path);
 
-    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
+    ws_mngr.did_open_file(uri.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + uri + "\"}}");
 
     // clang-format off
     json response { { "data",
@@ -203,10 +198,9 @@ TEST(language_features, semantic_tokens_multiline_overlap)
 .X AIF ('&X' EQ '&X').Y
 .Y ANOP
 )";
-    std::string file_res = utils::path::path_to_uri(path);
 
-    ws_mngr.did_open_file(file_res.c_str(), 0, file_text.c_str(), file_text.size());
-    json params1 = json::parse(R"({"textDocument":{"uri":")" + file_res + "\"}}");
+    ws_mngr.did_open_file(uri.c_str(), 0, file_text.c_str(), file_text.size());
+    json params1 = json::parse(R"({"textDocument":{"uri":")" + uri + "\"}}");
 
     // clang-format off
     json response { { "data",

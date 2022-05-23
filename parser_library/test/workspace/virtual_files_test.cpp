@@ -43,25 +43,24 @@ public:
     {
         // nothing to do
     }
-    MOCK_METHOD(file_ptr, add_file, (const external_resource&), (override));
-    MOCK_METHOD(processor_file_ptr, add_processor_file, (const external_resource&), (override));
-    MOCK_METHOD(processor_file_ptr, get_processor_file, (const external_resource&), (override));
-    MOCK_METHOD(void, remove_file, (const external_resource&), (override));
-    MOCK_METHOD(file_ptr, find, (const external_resource& key), (const override));
-    MOCK_METHOD(processor_file_ptr, find_processor_file, (const external_resource& key), (override));
+    MOCK_METHOD(file_ptr, add_file, (const file_uri&), (override));
+    MOCK_METHOD(processor_file_ptr, add_processor_file, (const file_uri&), (override));
+    MOCK_METHOD(processor_file_ptr, get_processor_file, (const file_uri&), (override));
+    MOCK_METHOD(void, remove_file, (const file_uri&), (override));
+    MOCK_METHOD(file_ptr, find, (const file_uri& key), (const override));
+    MOCK_METHOD(processor_file_ptr, find_processor_file, (const file_uri& key), (override));
     MOCK_METHOD(list_directory_result,
         list_directory_files,
         (const hlasm_plugin::utils::path::external_resource& path),
         (override));
     MOCK_METHOD(bool, file_exists, (const std::string& file_name), (override));
     MOCK_METHOD(bool, lib_file_exists, (const std::string& lib_path, const std::string& file_name), (override));
-    MOCK_METHOD(
-        void, did_open_file, (const external_resource& document_uri, version_t version, std::string text), (override));
+    MOCK_METHOD(void, did_open_file, (const file_uri& document_uri, version_t version, std::string text), (override));
     MOCK_METHOD(void,
         did_change_file,
-        (const external_resource& document_uri, version_t version, const document_change* changes, size_t ch_size),
+        (const file_uri& document_uri, version_t version, const document_change* changes, size_t ch_size),
         (override));
-    MOCK_METHOD(void, did_close_file, (const external_resource& document_uri), (override));
+    MOCK_METHOD(void, did_close_file, (const file_uri& document_uri), (override));
     MOCK_METHOD(void, put_virtual_file, (unsigned long long id, std::string_view text), (override));
     MOCK_METHOD(void, remove_virtual_file, (unsigned long long id), (override));
     MOCK_METHOD(std::string, get_virtual_file, (unsigned long long id), (const override));

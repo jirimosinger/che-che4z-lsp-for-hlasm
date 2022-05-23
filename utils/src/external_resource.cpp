@@ -137,15 +137,6 @@ uri_type get_uri_type(const std::string& uri)
     {
         return uri_type::CORRUPT;
 
-        // auto path = std::filesystem::path(uri);
-
-        // if (is_absolute(path))
-        //     // return uri_type::ABSOLUTE_PATH;
-        //     return uri_type::LOCAL_ABSOLUTE;
-
-        //// path = utils::path::absolute(path);
-        //// return uri_type::RELATIVE_PATH;
-        // return uri_type::LOCAL_RELATIVE;
     }
 }
 
@@ -204,40 +195,7 @@ uri_type transform_uri_by_resource_type(std::string& uri)
     catch (const std::exception&)
     {
         return uri_type::CORRUPT;
-
-        // auto path = std::filesystem::path(uri);
-
-        // if (is_absolute(path))
-        //     // return uri_type::ABSOLUTE_PATH;
-        //     return uri_type::LOCAL_ABSOLUTE;
-
-        //// path = utils::path::absolute(path);
-        //// return uri_type::RELATIVE_PATH;
-        // return uri_type::LOCAL_RELATIVE;
     }
-}
-
-uri_type detect_resource_type(const std::string& uri)
-{
-    auto path = std::filesystem::path(uri);
-
-    if (path.is_absolute())
-        return uri_type::ABSOLUTE_PATH;
-
-    try
-    {
-        uri_to_path(uri);
-        return uri_type::UNKNOWN;
-    }
-    catch (const std::exception&)
-    {
-        if (path.is_relative())
-        {
-            return uri_type::RELATIVE_PATH;
-        }
-    }
-
-    return uri_type::UNKNOWN;
 }
 
 std::optional<std::string> get_path(const std::string& uri, uri_type uri_type)
@@ -256,10 +214,6 @@ std::optional<std::string> get_path(const std::string& uri, uri_type uri_type)
 }
 
 //} // namespace
-
-// external_resource::external_resource(std::string uri)
-//     : external_resource(uri, detect_resource_type())
-//{}
 
 external_resource::external_resource(std::string uri)
     : m_uri(std::move(uri))

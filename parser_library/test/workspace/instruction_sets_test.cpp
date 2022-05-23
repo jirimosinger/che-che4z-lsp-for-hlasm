@@ -116,13 +116,13 @@ class file_manager_opt : public file_manager_impl
 {
     std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
     {
-        external_resource res(std::string("proc_grps.json"));
+        //external_resource res(std::string("proc_grps.json"));
         switch (variant)
         {
             case file_manager_opt_variant::optable_370:
-                return std::make_unique<file_with_text>(res, pgroups_file_optable_370, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optable_370, *this);
             case file_manager_opt_variant::optable_Z10:
-                return std::make_unique<file_with_text>(res, pgroups_file_optable_Z10, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optable_Z10, *this);
         }
         throw std::logic_error("Not implemented");
     }
@@ -161,7 +161,6 @@ void change_instruction_set(
 
 TEST_F(workspace_instruction_sets_test, changed_instr_set_370_Z10)
 {
-    // external_resource res(std::string("workspace_name"));
     file_manager_opt file_manager(file_manager_opt_variant::optable_370);
     lib_config config;
     workspace ws(file_manager, config);
@@ -179,7 +178,6 @@ TEST_F(workspace_instruction_sets_test, changed_instr_set_370_Z10)
 
 TEST_F(workspace_instruction_sets_test, changed_instr_set_Z10_370)
 {
-    // external_resource res(std::string("workspace_name"));
     file_manager_opt file_manager(file_manager_opt_variant::optable_Z10);
     lib_config config;
     workspace ws(file_manager, config);

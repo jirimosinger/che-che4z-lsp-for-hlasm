@@ -283,8 +283,6 @@ std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin
 
 external_resource empty_res = external_resource("");
 
-// external_resource proc_grps_res(std::string("proc_grps.json"));
-// external_resource pgm_conf_res(std::string("pgm_conf.json"));
 external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json");
 external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
 external_resource source1_res("source1");
@@ -312,9 +310,9 @@ public:
     list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource&) override
     {
         if (insert_correct_macro)
-            return { { { "ERROR", faulty_macro_path }, { "CORRECT", correct_macro_path } },
+            return { { { "ERROR", faulty_macro_res }, { "CORRECT", correct_macro_res } },
                 hlasm_plugin::utils::path::list_directory_rc::done };
-        return { { { "ERROR", faulty_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
+        return { { { "ERROR", faulty_macro_res } }, hlasm_plugin::utils::path::list_directory_rc::done };
     }
 
     bool insert_correct_macro = true;
@@ -335,37 +333,34 @@ class file_manager_opt : public file_manager_impl
 {
     std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
     {
-        external_resource res(std::string("proc_grps.json"));
-
         switch (variant)
         {
             case file_manager_opt_variant::old_school:
             case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
-                return std::make_unique<file_with_text>(res, pgroups_file_old_school, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_old_school, *this);
             case file_manager_opt_variant::default_to_required:
-                return std::make_unique<file_with_text>(res, pgroups_file_default, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_default, *this);
             case file_manager_opt_variant::required:
-                return std::make_unique<file_with_text>(res, pgroups_file_required, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_required, *this);
             case file_manager_opt_variant::optional:
-                return std::make_unique<file_with_text>(res, pgroups_file_optional, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optional, *this);
             case file_manager_opt_variant::invalid_assembler_options:
-                return std::make_unique<file_with_text>(res, pgroups_file_invalid_assembler_options, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_invalid_assembler_options, *this);
             case file_manager_opt_variant::invalid_preprocessor_options:
-                return std::make_unique<file_with_text>(res, pgroups_file_invalid_preprocessor_options, *this);
+                return std::make_unique<file_with_text>(
+                    proc_grps_res, pgroups_file_invalid_preprocessor_options, *this);
         }
         throw std::logic_error("Not implemented");
     }
 
     std::unique_ptr<file_with_text> generate_pgm_conf_file(file_manager_opt_variant variant)
     {
-        external_resource res(std::string("pgm_conf.json"));
-
         switch (variant)
         {
             case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
-                return std::make_unique<file_with_text>(res, pgmconf_file_invalid_assembler_options, *this);
+                return std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file_invalid_assembler_options, *this);
             default:
-                return std::make_unique<file_with_text>(res, pgmconf_file, *this);
+                return std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this);
         }
     }
 
@@ -383,7 +378,7 @@ public:
     list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
     {
         if (path == "lib/" || path == "lib\\")
-            return { { { "CORRECT", correct_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
+            return { { { "CORRECT", correct_macro_res } }, hlasm_plugin::utils::path::list_directory_rc::done };
 
         return { {}, hlasm_plugin::utils::path::list_directory_rc::not_exists };
     }
