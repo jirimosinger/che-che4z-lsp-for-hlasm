@@ -47,8 +47,7 @@ workspace::workspace(const utils::path::external_resource& uri,
     , implicit_proc_grp("pg_implicit", {}, {})
     , global_config_(global_config)
 {
-    auto hlasm_folder =
-        utils::path::join(uri_.get_url(), HLASM_PLUGIN_FOLDER); // todo move utils::path::join to external resource?
+    auto hlasm_folder = utils::path::join(uri_.get_url(), HLASM_PLUGIN_FOLDER);
     proc_grps_path_ = utils::path::join(hlasm_folder, FILENAME_PROC_GRPS);
     pgm_conf_path_ = utils::path::join(hlasm_folder, FILENAME_PGM_CONF);
 }
@@ -626,8 +625,7 @@ bool workspace::load_and_process_config()
         }
         else
         {
-            config_diags_.push_back(
-                diagnostic_s::error_W0004(pgm_conf_file->get_file_uri().get_absolute_path(), name_));
+            config_diags_.push_back(diagnostic_s::error_W0004(pgm_conf_file->get_file_uri().get_url(), name_));
         }
     }
 
@@ -651,23 +649,21 @@ bool workspace::load_config(
         for (const auto& pg : proc_groups.pgroups)
         {
             if (!pg.asm_options.valid())
-                config_diags_.push_back(diagnostic_s::error_W0005(
-                    proc_grps_file->get_file_uri().get_absolute_path(), pg.name, "processor group"));
-            if (!pg.preprocessor.valid())
                 config_diags_.push_back(
-                    diagnostic_s::error_W0006(proc_grps_file->get_file_uri().get_absolute_path(), pg.name));
+                    diagnostic_s::error_W0005(proc_grps_file->get_file_uri().get_url(), pg.name, "processor group"));
+            if (!pg.preprocessor.valid())
+                config_diags_.push_back(diagnostic_s::error_W0006(proc_grps_file->get_file_uri().get_url(), pg.name));
         }
     }
     catch (const nlohmann::json::exception&)
     {
         // could not load proc_grps
-        config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_file_uri().get_absolute_path(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_file_uri().get_url(), name_));
         return false;
     }
 
     // pgm_conf.json parse
-    pgm_conf_file = file_manager_.add_file(
-        utils::path::external_resource(utils::path::join(hlasm_base, FILENAME_PGM_CONF).string()));
+    pgm_conf_file = file_manager_.add_file(utils::path::join(hlasm_base, FILENAME_PGM_CONF).string());
 
     if (pgm_conf_file->update_and_get_bad())
         return false;
@@ -678,15 +674,15 @@ bool workspace::load_config(
         for (const auto& pgm : pgm_config.pgms)
         {
             if (!pgm.opts.valid())
-                config_diags_.push_back(diagnostic_s::error_W0005(
-                    pgm_conf_file->get_file_uri().get_absolute_path(), pgm.program, "program"));
+                config_diags_.push_back(
+                    diagnostic_s::error_W0005(pgm_conf_file->get_file_uri().get_url(), pgm.program, "program"));
         }
         exact_pgm_conf_.clear();
         regex_pgm_conf_.clear();
     }
     catch (const nlohmann::json::exception&)
     {
-        config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_file_uri().get_absolute_path(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_file_uri().get_url(), name_));
         return false;
     }
 

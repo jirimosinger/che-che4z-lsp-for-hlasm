@@ -22,13 +22,13 @@ namespace hlasm_plugin::utils::path {
 
 enum class uri_type
 {
-    LOCAL_URI,
-    LOCAL_ABSOLUTE,
-    LOCAL_RELATIVE,
-    NETWORK,
+    LOCAL,
+    URL_LOCAL,
+    URL_NETWORK,
+    AINSERT,
+    HLASM,
     UNTITLED,
-    UNKNOWN,
-    CORRUPT
+    UNKNOWN
 };
 
 class external_resource
@@ -56,8 +56,6 @@ public:
 
     const std::string& get_url() const;
 
-    std::string get_content() const;
-
     uri_type get_type() const;
 
     bool operator==(const external_resource& r) const;
@@ -65,8 +63,9 @@ public:
     bool operator<(const external_resource& r) const;
 
 private:
-    std::string m_uri;
     uri_type m_type;
+    std::string m_url;
+    std::string m_absolute;
 };
 
 struct external_resource_hasher

@@ -101,7 +101,8 @@ TEST(diags_suppress, do_suppress)
     EXPECT_EQ(pfile->diags().size(), 0U);
 
     ASSERT_EQ(msg_consumer.messages.size(), 1U);
-    EXPECT_EQ(msg_consumer.messages[0].first, "Diagnostics suppressed from a_file, because there is no configuration.");
+    EXPECT_EQ(msg_consumer.messages[0].first,
+        "Diagnostics suppressed from " + file_name.get_url() + ", because there is no configuration.");
     EXPECT_EQ(msg_consumer.messages[0].second, message_type::MT_INFO);
 }
 

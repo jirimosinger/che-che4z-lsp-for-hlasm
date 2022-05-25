@@ -308,10 +308,10 @@ MAC OPSYN AREAD
 
 namespace {
 std::optional<diagnostic_s> find_diag_with_filename(
-    const std::vector<diagnostic_s>& diags, const std::string& file_name)
+    const std::vector<diagnostic_s>& diags, const external_resource& file)
 {
     auto macro_diag =
-        std::find_if(diags.begin(), diags.end(), [&](const diagnostic_s& d) { return d.file_name == file_name; });
+        std::find_if(diags.begin(), diags.end(), [&](const diagnostic_s& d) { return d.file_name == file.get_url(); });
     if (macro_diag == diags.end())
         return std::nullopt;
     else
@@ -322,8 +322,7 @@ std::optional<diagnostic_s> find_diag_with_filename(
 
 TEST(macro_cache_test, overwrite_by_inline)
 {
-    std::string opencode_file_name = "opencode";
-    external_resource opencode_file_res(opencode_file_name);
+    external_resource opencode_file_res = "opencode";
     std::string opencode_text =
         R"(
        MAC
@@ -335,8 +334,7 @@ TEST(macro_cache_test, overwrite_by_inline)
        
        MAC
 )";
-    std::string macro_file_name = "MAC";
-    external_resource macro_file_res(macro_file_name);
+    external_resource macro_file_res = "MAC";
     std::string macro_text =
         R"( MACRO
        MAC
@@ -355,16 +353,16 @@ TEST(macro_cache_test, overwrite_by_inline)
     opencode->collect_diags();
 
     EXPECT_EQ(opencode->diags().size(), 2U);
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_name));
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_name));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_res));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_res));
 
     opencode->diags().clear();
 
     opencode->parse(lib_provider, {}, {}, nullptr);
     opencode->collect_diags();
     EXPECT_EQ(opencode->diags().size(), 2U);
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_name));
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_name));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_res));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_res));
 }
 
 TEST(macro_cache_test, inline_depends_on_copy)

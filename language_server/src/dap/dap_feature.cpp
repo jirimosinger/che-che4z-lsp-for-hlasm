@@ -50,6 +50,11 @@ std::string client_conformant_path(const std::string& url, path_format client_pa
     if (client_path_format == path_format::URI)
         return url;
 
+    // Return the URL without conversion if it starts with hlasm://
+    auto f = url.find("hlasm://");
+    if (0 == f)
+        return url;
+
     return hlasm_plugin::utils::path::uri_to_path(url);
 }
 

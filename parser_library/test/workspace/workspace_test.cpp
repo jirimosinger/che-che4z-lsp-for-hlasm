@@ -44,7 +44,7 @@ public:
         return diags().size();
     }
 
-    bool match_strings(std::vector<std::string> set)
+    bool match_strings(std::vector<external_resource> set)
     {
         if (diags().size() != set.size())
             return false;
@@ -53,7 +53,7 @@ public:
             bool matched = false;
             for (const auto& str : set)
             {
-                if (diag.file_name == str)
+                if (diag.file_name == str.get_url())
                     matched = true;
             }
             if (!matched)
@@ -399,18 +399,18 @@ TEST_F(workspace_test, did_close_file)
     ws.did_open_file(source1_res);
     ws.did_open_file(source2_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)3);
-    EXPECT_TRUE(match_strings({ faulty_macro_path, "source2", "source1" }));
+    EXPECT_TRUE(match_strings({ faulty_macro_res, source2_res, source1_res }));
 
     // when we close source1, only its diagnostics should disappear
     // macro's and source2's diagnostics should stay as it is still open
     ws.did_close_file(source1_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)2);
-    EXPECT_TRUE(match_strings({ faulty_macro_path, "source2" }));
+    EXPECT_TRUE(match_strings({ faulty_macro_res, source2_res }));
 
     // even though we close the ERROR macro, its diagnostics will still be there as it is a dependency of source2
     ws.did_close_file(faulty_macro_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)2);
-    EXPECT_TRUE(match_strings({ faulty_macro_path, "source2" }));
+    EXPECT_TRUE(match_strings({ faulty_macro_res, source2_res }));
 
     // if we remove the line using ERROR macro in the source2. its diagnostics will be removed as it is no longer a
     // dependency of source2
@@ -420,7 +420,7 @@ TEST_F(workspace_test, did_close_file)
     file_manager.did_change_file(source2_res, 1, changes.data(), changes.size());
     ws.did_change_file(source2_res, changes.data(), changes.size());
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)1);
-    EXPECT_TRUE(match_strings({ "source2" }));
+    EXPECT_TRUE(match_strings({ source2_res }));
 
     // finally if we close the last source2 file, its diagnostics will disappear as well
     ws.did_close_file(source2_res);

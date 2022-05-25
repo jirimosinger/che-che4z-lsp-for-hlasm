@@ -17,6 +17,7 @@
 #include "../common_testing.h"
 #include "../mock_parse_lib_provider.h"
 
+using namespace hlasm_plugin::utils::path;
 TEST(ainsert, ainsert_with_substitution)
 {
     std::string input(R"(
@@ -125,7 +126,7 @@ A        DC C
     EXPECT_EQ(d.code, "D016");
     ASSERT_EQ(d.related.size(), 3);
     EXPECT_EQ(d.related[0].location.uri, "AINSERT:1.hlasm");
-    EXPECT_EQ(d.related[1].location.uri, "COPYBOOK");
+    EXPECT_EQ(d.related[1].location.uri, external_resource("COPYBOOK").get_url());
 }
 
 TEST(ainsert, argument_limit)
