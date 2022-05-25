@@ -34,15 +34,15 @@ diagnostic_s add_stack_details(diagnostic_op diagnostic, context::processing_sta
     if (stack.empty())
         return diagnostic_s(std::move(diagnostic));
 
-    diagnostic_s diag(stack.back().proc_location.file.get_url(), std::move(diagnostic));
+    diagnostic_s diag(stack.back().proc_location.file.get_uri(), std::move(diagnostic));
 
     diag.related.reserve(stack.size() - 1);
     for (auto frame = ++stack.rbegin(); frame != stack.rend(); ++frame)
     {
-        auto file_name = frame->proc_location.file.get_url();
-        auto message = "While compiling " + file_name + '(' + std::to_string(frame->proc_location.pos.line + 1) + ")";
+        auto file_uri = frame->proc_location.file.get_uri();
+        auto message = "While compiling " + file_uri + '(' + std::to_string(frame->proc_location.pos.line + 1) + ")";
         diag.related.emplace_back(
-            range_uri_s(std::move(file_name), range(frame->proc_location.pos, frame->proc_location.pos)),
+            range_uri_s(std::move(file_uri), range(frame->proc_location.pos, frame->proc_location.pos)),
             std::move(message));
     }
 

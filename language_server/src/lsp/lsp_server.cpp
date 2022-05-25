@@ -272,7 +272,7 @@ void server::consume_diagnostics(parser_library::diagnostic_list diagnostics)
     for (size_t i = 0; i < diagnostics.diagnostics_size(); ++i)
     {
         auto d = diagnostics.diagnostics(i);
-        diags[d.file_name()].push_back(d);
+        diags[d.file_uri()].push_back(d);
         if (d.severity() == parser_library::diagnostic_severity::error)
             ++diags_error_count;
         else if (d.severity() == parser_library::diagnostic_severity::warning)

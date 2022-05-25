@@ -23,7 +23,7 @@ using namespace hlasm_plugin::language_server::dap;
 
 std::string server_conformant_path(const std::string& path, path_format path_format)
 {
-    // Server accepts paths in URL format
+    // Server accepts paths in URI format
     if (path_format == path_format::URI)
         return path;
 
@@ -44,18 +44,13 @@ std::string server_conformant_path(const std::string& path, path_format path_for
     return hlasm_plugin::utils::path::path_to_uri(result);
 }
 
-std::string client_conformant_path(const std::string& url, path_format client_path_format)
+std::string client_conformant_path(const std::string& uri, path_format client_path_format)
 {
-    // Server provides paths in URL format -> convert it to whatever the client wants
+    // Server provides paths in URI format -> convert it to whatever the client wants
     if (client_path_format == path_format::URI)
-        return url;
+        return uri;
 
-    // Return the URL without conversion if it starts with hlasm://
-    auto f = url.find("hlasm://");
-    if (0 == f)
-        return url;
-
-    return hlasm_plugin::utils::path::uri_to_path(url);
+    return hlasm_plugin::utils::path::uri_to_path(uri);
 }
 
 constexpr const int THREAD_ID = 1;
@@ -193,7 +188,7 @@ void dap_feature::on_threads(const json& request_seq, const json&)
 
 [[nodiscard]] json source_to_json(parser_library::source source, path_format path_format)
 {
-    return json { { "path", client_conformant_path(std::string(source.path), path_format) } };
+    return json { { "path", client_conformant_path(std::string(source.uri), path_format) } };
 }
 
 void dap_feature::on_stack_trace(const json& request_seq, const json&)

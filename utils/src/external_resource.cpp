@@ -25,52 +25,64 @@
 
 namespace hlasm_plugin::utils::path {
 
+
+namespace {
 const std::string untitled = "untitled";
 const std::string hlasm = "hlasm";
-const std::string ainsert = "AINSERT";
+
+} // namespace
 
 std::string uri_to_path(const std::string& uri)
 {
-    network::uri u(uri);
+    try
+    {
+        network::uri u(uri);
 
-    // vscode sometimes sends us uri in form 'untitled:Untitled-1',
-    // when user opens new file that is not saved to disk yet
-    if (!u.scheme().compare(untitled))
+        // vscode sometimes sends us uri in form 'untitled:Untitled-1',
+        // when user opens new file that is not saved to disk yet
+        if (!u.scheme().compare(untitled))
+            return uri;
+        // There is a hlasm specific schema - don't convert to path
+        if (!u.scheme().compare(hlasm))
+            return uri;
+        if (u.scheme().compare("file"))
+            return "";
+        if (!u.has_path())
+            return "";
+
+        std::string auth_path;
+        if (u.has_authority() && u.authority().to_string() != "")
+        {
+            auth_path = u.authority().to_string() + u.path().to_string();
+            if (utils::platform::is_windows())
+            {
+                // handle remote locations correctly, like \\server\path
+                auth_path = "//" + auth_path;
+            }
+        }
+        else
+        {
+            network::string_view path = u.path();
+
+            if (utils::platform::is_windows())
+            {
+                // we get path always beginning with / on windows, e.g. /c:/Users/path
+                path.remove_prefix(1);
+            }
+            auth_path = path.to_string();
+
+            if (utils::platform::is_windows())
+            {
+                auth_path[0] = (char)tolower((unsigned char)auth_path[0]);
+            }
+        }
+
+        return utils::path::lexically_normal(network::detail::decode(auth_path)).string();
+    }
+    catch (const std::exception&)
+    {
         return uri;
-
-    if (u.scheme().compare("file"))
-        return "";
-    if (!u.has_path())
-        return "";
-
-    std::string auth_path;
-    if (u.has_authority() && u.authority().to_string() != "")
-    {
-        auth_path = u.authority().to_string() + u.path().to_string();
-        if (utils::platform::is_windows())
-        {
-            // handle remote locations correctly, like \\server\path
-            auth_path = "//" + auth_path;
-        }
     }
-    else
-    {
-        network::string_view path = u.path();
-
-        if (utils::platform::is_windows())
-        {
-            // we get path always beginning with / on windows, e.g. /c:/Users/path
-            path.remove_prefix(1);
-        }
-        auth_path = path.to_string();
-
-        if (utils::platform::is_windows())
-        {
-            auth_path[0] = (char)tolower((unsigned char)auth_path[0]);
-        }
-    }
-
-    return utils::path::lexically_normal(network::detail::decode(auth_path)).string();
 }
 
 // one letter schemas are valid, but Windows paths collide
@@ -108,64 +120,8 @@ std::string path_to_uri(std::string_view path)
     return uri;
 }
 
-namespace {
-uri_type get_uri_type(const std::string& uri)
-{
-    try
-    {
-        network::uri u(uri);
-
-        // vscode sometimes sends us uri in form 'untitled:Untitled-1',
-        // when user opens new file that is not saved to disk yet
-        if (!u.scheme().compare(untitled))
-            return uri_type::UNTITLED;
-
-        if (!u.scheme().compare(hlasm))
-            return uri_type::HLASM;
-
-        if (!u.scheme().compare(ainsert))
-            return uri_type::AINSERT;
-
-        if (u.scheme().compare("file"))
-            // return uri_type::UNKNOWN; // todo
-            return uri_type::LOCAL;
-        if (!u.has_path())
-            return uri_type::UNKNOWN;
-
-        if (u.has_authority() && u.authority().to_string() != "")
-        {
-            return uri_type::URL_NETWORK;
-        }
-        else
-        {
-            return uri_type::URL_LOCAL;
-        }
-    }
-    catch (const std::exception&)
-    {
-        return uri_type::LOCAL;
-    }
-}
-
-std::string prepend_hlasm(std::string uri)
-{
-    // uri.insert(0, "hlasm://");
-    return uri;
-}
-
-} // namespace
-
 external_resource::external_resource(std::string uri)
-    : m_type("" == uri ? uri_type::UNKNOWN : get_uri_type(uri))
-    //, m_url(m_type == uri_type::LOCAL ? path_to_uri(uri) : uri)
-    //, m_absolute(m_type == uri_type::URL_LOCAL ? uri_to_path(m_url) : uri)
-, m_url(m_type == uri_type::LOCAL       ? path_to_uri(uri)
-          : m_type == uri_type::AINSERT ? prepend_hlasm(uri)
-          : m_type != uri_type::UNKNOWN ? uri
-                                        : "")
-, m_absolute(m_type == uri_type::URL_LOCAL ? uri_to_path(m_url)
-          : uri_type::UNKNOWN != m_type    ? uri
-                                           : "")
+    : m_uri(std::move(uri))
 {}
 
 external_resource::external_resource(std::string_view uri)
@@ -177,21 +133,29 @@ external_resource::external_resource(const char* uri)
 {}
 
 external_resource::external_resource(const external_resource& r)
-    : m_type(r.m_type)
-    , m_url(r.m_url)
-    , m_absolute(r.m_absolute)
+    : m_uri(r.m_uri)
 {}
 
-const std::string& external_resource::get_url() const { return m_url; }
+const std::string& external_resource::get_uri() const { return m_uri; }
 
-std::string external_resource::get_absolute_path() const { return m_absolute; }
-
-uri_type external_resource::get_type() const { return m_type; }
+std::string external_resource::get_path() const
+{
+    return m_uri.size() != 0 ? uri_to_path(m_uri) : m_uri;
+}
 
 // bool external_resource::operator==(const external_resource& r) const { return m_uri == r.m_uri && m_type == r.m_type;
 // }
-bool external_resource::operator==(const external_resource& r) const { return m_url == r.m_url; }
+bool external_resource::operator==(const external_resource& r) const { return m_uri == r.m_uri; }
 bool external_resource::operator!=(const external_resource& r) const { return !operator==(r); }
-bool external_resource::operator<(const external_resource& r) const { return m_url < r.m_url; }
+bool external_resource::operator<(const external_resource& r) const { return m_uri < r.m_uri; }
+
+std::size_t external_resource_hasher::operator()(const external_resource& r) const
+{
+    return std::hash<std::string> {}(r.get_uri());
+}
+bool external_resource_comp::operator()(const external_resource& l, const external_resource& r) const
+{
+    return l.get_uri() < r.get_uri();
+}
 
 } // namespace hlasm_plugin::utils::path

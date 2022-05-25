@@ -53,7 +53,7 @@ TEST(debugger, stopped_on_entry)
     auto frames = d.stack_frames();
     ASSERT_EQ(frames.size(), 1U);
     const auto f = frames.item(0);
-    EXPECT_EQ(std::string_view(f.source_file.path), file_res.get_url());
+    EXPECT_EQ(std::string_view(f.source_file.uri), file_res.get_uri());
     EXPECT_EQ(f.source_range.start.line, 0U);
     EXPECT_EQ(f.source_range.end.line, 0U);
     EXPECT_EQ(std::string_view(f.name), "OPENCODE");
@@ -241,7 +241,7 @@ bool check_step(
             return false;
         if (exp_frames[i].end_line != f.source_range.end.line)
             return false;
-        if (exp_frames[i].frame_source.path != std::string_view(f.source_file.path))
+        if (exp_frames[i].frame_source.uri != std::string_view(f.source_file.uri))
             return false;
         if (exp_frames[i].id != f.id)
             return false;
@@ -291,11 +291,12 @@ void step_into(debugger& d,
     std::vector<debugging::stack_frame>& exp_stack_frames,
     size_t line,
     std::string name,
-    debugging::source source)
+    external_resource source)
 {
     uint32_t next_frame_id = exp_stack_frames.empty() ? 0 : exp_stack_frames[0].id + 1;
 
-    exp_stack_frames.insert(exp_stack_frames.begin(), debugging::stack_frame(line, line, next_frame_id, name, source));
+    exp_stack_frames.insert(
+        exp_stack_frames.begin(), debugging::stack_frame(line, line, next_frame_id, name, source.get_uri()));
 
     d.step_in();
     m.wait_for_stopped();
@@ -384,7 +385,7 @@ TEST(debugger, test)
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
-    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_url() } };
+    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_uri() } };
     std::vector<frame_vars> exp_frame_vars { { {}, {}, {} } };
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
@@ -403,7 +404,7 @@ TEST(debugger, test)
     step_over_by(1, d, m, exp_frames, 12);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
-    step_into(d, m, exp_frames, 7, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 7, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars(std::unordered_map<std::string, test_var_value> { {
                        "&SYSPARM",
@@ -434,11 +435,11 @@ TEST(debugger, test)
     step_over_by(1, d, m, exp_frames, 8);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
-    step_into(d, m, exp_frames, 1, "COPY", copy1_file_res.get_url());
+    step_into(d, m, exp_frames, 1, "COPY", copy1_file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(), exp_frame_vars[0]);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
-    step_into(d, m, exp_frames, 2, "COPY", copy2_file_res.get_url());
+    step_into(d, m, exp_frames, 2, "COPY", copy2_file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(), exp_frame_vars[0]);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
@@ -473,7 +474,7 @@ TEST(debugger, sysstmt)
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
-    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_url() } };
+    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_uri() } };
     std::vector<frame_vars> exp_frame_vars { { { {
                                                    "&SYSSTMT",
                                                    "00000003",
@@ -535,13 +536,13 @@ A  MAC_IN ()
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
-    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_url() } };
+    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_uri() } };
     std::vector<frame_vars> exp_frame_vars { { {}, {}, {} } };
 
     step_over_by(3, d, m, exp_frames, 16);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
-    step_into(d, m, exp_frames, 9, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 9, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars_ignore_sys_vars({},
             std::unordered_map<std::string, test_var_value> {
@@ -567,7 +568,7 @@ A  MAC_IN ()
             ));
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
-    step_into(d, m, exp_frames, 3, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 3, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars_ignore_sys_vars({},
             std::unordered_map<std::string, test_var_value> {
@@ -602,7 +603,7 @@ A  MAC_IN ()
     step_over_by(1, d, m, exp_frames, 4);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
-    step_into(d, m, exp_frames, 1, "COPY", copy1_file_res.get_url());
+    step_into(d, m, exp_frames, 1, "COPY", copy1_file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(), exp_frame_vars[0]);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
@@ -610,7 +611,7 @@ A  MAC_IN ()
     step_over_by(3, d, m, exp_frames, 17);
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
-    step_into(d, m, exp_frames, 14, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 14, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars_ignore_sys_vars({},
             std::unordered_map<std::string, test_var_value> {
@@ -705,10 +706,10 @@ TEST(debugger, positional_parameters)
 
     d.next();
     m.wait_for_stopped();
-    std::vector<debugging::stack_frame> exp_frames { { 5, 5, 0, "OPENCODE", file_res.get_url() } };
+    std::vector<debugging::stack_frame> exp_frames { { 5, 5, 0, "OPENCODE", file_res.get_uri() } };
     std::vector<frame_vars> exp_frame_vars { { {}, {}, {} } };
 
-    step_into(d, m, exp_frames, 3, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 3, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars_ignore_sys_vars({}, // empty globals
             std::unordered_map<std::string, test_var_value> {
@@ -722,7 +723,7 @@ TEST(debugger, positional_parameters)
     erase_frames_from_top(1, exp_frames, exp_frame_vars);
     step_over_by(1, d, m, exp_frames, 6);
 
-    step_into(d, m, exp_frames, 3, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 3, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars_ignore_sys_vars({}, // empty globals
             std::unordered_map<std::string, test_var_value> {
@@ -742,7 +743,7 @@ TEST(debugger, positional_parameters)
     erase_frames_from_top(1, exp_frames, exp_frame_vars);
     step_over_by(1, d, m, exp_frames, 7);
 
-    step_into(d, m, exp_frames, 3, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 3, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars_ignore_sys_vars({}, // empty globals
             std::unordered_map<std::string, test_var_value> {
@@ -763,7 +764,7 @@ TEST(debugger, positional_parameters)
     erase_frames_from_top(1, exp_frames, exp_frame_vars);
     step_over_by(1, d, m, exp_frames, 8);
 
-    step_into(d, m, exp_frames, 3, "MACRO", file_res.get_url());
+    step_into(d, m, exp_frames, 3, "MACRO", file_res);
     exp_frame_vars.insert(exp_frame_vars.begin(),
         frame_vars_ignore_sys_vars({}, // empty globals
             std::unordered_map<std::string, test_var_value> {
@@ -823,7 +824,7 @@ TEST(debugger, arrays)
 
     d.launch(filename, lib_provider, true, &lib_provider);
     m.wait_for_stopped();
-    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_url() } };
+    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_uri() } };
     std::vector<frame_vars> exp_frame_vars { { {}, {}, {} } };
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
@@ -877,9 +878,9 @@ B EQU A
 
     file_manager.did_open_file(file_res, 0, open_code);
 
-    d.launch(file_res.get_url(), lib_provider, true, &lib_provider);
+    d.launch(file_res.get_uri(), lib_provider, true, &lib_provider);
     m.wait_for_stopped();
-    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_url() } };
+    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_uri() } };
     std::vector<frame_vars> exp_frame_vars { { {}, {}, {} } };
     EXPECT_TRUE(check_step(d, exp_frames, exp_frame_vars));
 
@@ -923,9 +924,9 @@ TEST(debugger, ainsert)
 
     file_manager.did_open_file(file_res, 0, open_code);
 
-    d.launch(file_res.get_url(), lib_provider, true, &lib_provider);
+    d.launch(file_res.get_uri(), lib_provider, true, &lib_provider);
     m.wait_for_stopped();
-    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_url() } };
+    std::vector<debugging::stack_frame> exp_frames { { 1, 1, 0, "OPENCODE", file_res.get_uri() } };
     std::vector<frame_vars> exp_frame_vars { {
         std::unordered_map<std::string, test_var_value> {
             // macro locals

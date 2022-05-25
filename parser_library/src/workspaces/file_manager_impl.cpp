@@ -109,7 +109,7 @@ processor_file_ptr file_manager_impl::find_processor_file(const utils::path::ext
 
 list_directory_result file_manager_impl::list_directory_files(const utils::path::external_resource& path)
 {
-    std::filesystem::path lib_p(path.get_absolute_path());
+    std::filesystem::path lib_p(path.get_path());
     list_directory_result result;
 
     result.second = utils::path::list_directory_regular_files(lib_p, [&result](const std::filesystem::path& f) {

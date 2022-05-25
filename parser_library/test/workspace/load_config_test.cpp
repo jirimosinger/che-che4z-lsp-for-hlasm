@@ -165,7 +165,7 @@ class file_manager_proc_grps_test : public file_manager_impl
 public:
     file_ptr add_file(const external_resource& resource) override
     {
-        if (resource.get_absolute_path().substr(resource.get_absolute_path().size() - 14) == "proc_grps.json")
+        if (resource.get_path().substr(resource.get_path().size() - 14) == "proc_grps.json")
             return proc_grps;
         else
             return pgm_conf;
@@ -208,7 +208,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_uri().get_absolute_path());
+        EXPECT_EQ(expected[i], libl->get_lib_uri().get_path());
     }
 
     auto& pg2 = ws.get_proc_grp("P2");
@@ -228,7 +228,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg2.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_absolute_path());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_path());
     }
 
 
@@ -241,7 +241,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg3.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_uri().get_absolute_path());
+        EXPECT_EQ(expected[i], libl->get_lib_uri().get_path());
     }
 
 
@@ -253,7 +253,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg4.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_absolute_path());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_path());
     }
     // test of asm_options
     const auto& asm_options = ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm1" : "test_proc_grps_uri/pgm1");

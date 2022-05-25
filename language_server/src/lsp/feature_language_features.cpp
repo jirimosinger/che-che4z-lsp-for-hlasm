@@ -107,7 +107,7 @@ void feature_language_features::definition(const json& id, const json& params)
 
 
     auto definition_position_uri = ws_mngr_.definition(document_uri.c_str(), pos);
-    document_uri = definition_position_uri.file().empty() ? document_uri : definition_position_uri.file();
+    document_uri = definition_position_uri.file_uri().empty() ? document_uri : definition_position_uri.file_uri();
     json to_ret {
         { "uri", document_uri },
         { "range", range_to_json({ definition_position_uri.pos(), definition_position_uri.pos() }) },
@@ -125,7 +125,7 @@ void feature_language_features::references(const json& id, const json& params)
     for (size_t i = 0; i < references.size(); ++i)
     {
         auto ref = references.item(i);
-        to_ret.push_back(json { { "uri", ref.file() }, { "range", range_to_json({ ref.pos(), ref.pos() }) } });
+        to_ret.push_back(json { { "uri", ref.file_uri() }, { "range", range_to_json({ ref.pos(), ref.pos() }) } });
     }
     response_->respond(id, "", to_ret);
 }

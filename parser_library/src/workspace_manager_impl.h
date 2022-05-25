@@ -79,14 +79,14 @@ public:
         if (cancel_ && *cancel_)
             return;
 
-        workspaces::workspace& ws = ws_path_match(document_uri.get_url()); // todo
+        workspaces::workspace& ws = ws_path_match(document_uri.get_uri());
         auto metadata = ws.did_open_file(document_uri);
         if (cancel_ && *cancel_)
             return;
 
         notify_diagnostics_consumers();
         // only on open
-        notify_performance_consumers(document_uri, metadata); // todo
+        notify_performance_consumers(document_uri, metadata);
     }
     void did_change_file(const utils::path::external_resource& document_uri,
         version_t version,
@@ -97,7 +97,7 @@ public:
         if (cancel_ && *cancel_)
             return;
 
-        workspaces::workspace& ws = ws_path_match(document_uri.get_url());
+        workspaces::workspace& ws = ws_path_match(document_uri.get_uri());
         ws.did_change_file(document_uri, changes, ch_size);
         if (cancel_ && *cancel_)
             return;
@@ -107,7 +107,7 @@ public:
 
     void did_close_file(const utils::path::external_resource& document_uri)
     {
-        workspaces::workspace& ws = ws_path_match(document_uri.get_url());
+        workspaces::workspace& ws = ws_path_match(document_uri.get_uri());
         ws.did_close_file(document_uri);
         notify_diagnostics_consumers();
     }
@@ -116,7 +116,7 @@ public:
     {
         for (const auto& path : paths)
         {
-            workspaces::workspace& ws = ws_path_match(path.get_url());
+            workspaces::workspace& ws = ws_path_match(path.get_uri());
             ws.did_change_watched_files(path);
         }
         notify_diagnostics_consumers();

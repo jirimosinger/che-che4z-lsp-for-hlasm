@@ -53,7 +53,7 @@ public:
             bool matched = false;
             for (const auto& str : set)
             {
-                if (diag.file_name == str.get_url())
+                if (diag.file_uri == str.get_uri())
                     matched = true;
             }
             if (!matched)

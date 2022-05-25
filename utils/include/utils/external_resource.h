@@ -20,17 +20,6 @@
 
 namespace hlasm_plugin::utils::path {
 
-enum class uri_type
-{
-    LOCAL,
-    URL_LOCAL,
-    URL_NETWORK,
-    AINSERT,
-    HLASM,
-    UNTITLED,
-    UNKNOWN
-};
-
 class external_resource
 {
 public:
@@ -52,30 +41,25 @@ public:
     // template<class T>
     // external_resource(T, uri_type) = delete;
 
-    std::string get_absolute_path() const;
-
-    const std::string& get_url() const;
-
-    uri_type get_type() const;
+    const std::string& get_uri() const;
+    std::string get_path() const;
 
     bool operator==(const external_resource& r) const;
     bool operator!=(const external_resource& r) const;
     bool operator<(const external_resource& r) const;
 
 private:
-    uri_type m_type;
-    std::string m_url;
-    std::string m_absolute;
+    std::string m_uri;
 };
 
 struct external_resource_hasher
 {
-    std::size_t operator()(const external_resource& r) const { return std::hash<std::string> {}(r.get_url()); }
+    std::size_t operator()(const external_resource& r) const;
 };
 
 struct external_resource_comp
 {
-    bool operator()(const external_resource& l, const external_resource& r) const { return l.get_url() < r.get_url(); }
+    bool operator()(const external_resource& l, const external_resource& r) const;
 };
 
 // Converts URI (RFC3986) to common filesystem path.

@@ -119,25 +119,10 @@ suite('Integration Test Suite', () => {
 
     // debug open code test
     test('Debug test', async () => {
-        const session_started_event = new Promise<vscode.DebugSession>((resolve) => {
-            // when the debug session starts
-            const disposable = vscode.debug.onDidStartDebugSession((session) => {
-                disposable.dispose();
-                resolve(session);
-            });
-        });
-        // start debugging
-        if (!await vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], 'Macro tracer: current program'))
-            throw new Error("Failed to start a debugging session");
+        const session = await helper.debugStartSession();
 
-        const session = await session_started_event;
-
-        // wait a second to let the debug session complete
-        await helper.sleep(1000);
         // step over once
-        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
-        // wait 1 more second to let step over take place
-        await helper.sleep(1000);
+        await helper.debugStepOver(1);
         // then check for VAR2 variable
         const scopesResult = await session.customRequest('scopes', { frameId: 0 });
 
@@ -151,116 +136,64 @@ suite('Integration Test Suite', () => {
         assert.ok(variables.length == 1 && variables[0].value == 'SOMETHING' && variables[0].name == '&VAR2', 'Wrong debug variable &VAR2');
 
         // Continue by stepping into a macro and checking the file has been accessed
-        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
-        await helper.sleep(1000);
-        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
-        await helper.sleep(1000);
-        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
-        await helper.sleep(1000);
-        await vscode.commands.executeCommand('workbench.action.debug.stepInto');
-        await helper.sleep(1000);
+        await helper.debugStepOver(3);
+        await helper.debugStepInto();
 
         assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === path.join(helper.getWorkspacePath(), 'libs', 'mac.asm'), 'Wrong macro file entered');
 
-        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
-        await helper.sleep(1000);
-        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
-        await helper.sleep(1000);
-        await vscode.commands.executeCommand('workbench.action.debug.stepOver');
-        await helper.sleep(1000);
+        await helper.debugStepOver(3);
         assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === editor.document.uri.fsPath, 'Stepped out to a wrong file');
 
-        await vscode.commands.executeCommand('workbench.action.debug.stop');
+        await helper.debugStop();
 
     }).timeout(20000).slow(10000);
 
     test('Breakpoint test', async () => {
-        await helper.toggleBreakpoint(path.join('libs', 'mac.asm'), 3);
-        await helper.toggleBreakpoint('open', 3);
-        await helper.toggleBreakpoint('open', 9);
+        await helper.toggleBreakpoints(path.join('libs', 'mac.asm'), [3]);
+        await helper.toggleBreakpoints('open', [3, 9]);
 
-        const session_started_event = new Promise<vscode.DebugSession>((resolve) => {
-            // when the debug session starts
-            const disposable = vscode.debug.onDidStartDebugSession((session) => {
-                disposable.dispose();
-                resolve(session);
-            });
-        });
-
-        // start debugging
-        if (!await vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], 'Macro tracer: current program'))
-            throw new Error("Failed to start a debugging session");
-
-        await session_started_event;
-
-        // wait a second to let the debug session complete
-        await helper.sleep(1000);
+        await helper.debugStartSession();
 
         // Continue until breakpoint is hit
-        await vscode.commands.executeCommand('workbench.action.debug.continue');
-        await helper.sleep(1000);
+        await helper.debugContinue();
         assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === editor.document.uri.fsPath, 'Expected to be in the source file');
 
         // Continue until breakpoint is hit
-        await vscode.commands.executeCommand('workbench.action.debug.continue');
-        await helper.sleep(1000);
+        await helper.debugContinue();
         assert.ok(vscode.window.activeTextEditor.document.uri.fsPath == path.join(helper.getWorkspacePath(), 'libs', 'mac.asm'), 'Expected to be in the macro file');
 
         // Continue until breakpoint is hit
-        await vscode.commands.executeCommand('workbench.action.debug.continue');
-        await helper.sleep(1000);
+        await helper.debugContinue();
         assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === editor.document.uri.fsPath, 'Expected to be in the source file');
 
-        await vscode.commands.executeCommand('workbench.action.debug.stop');
+        await helper.debugStop();
 
     }).timeout(20000).slow(10000);
 
     // verify that virtual files are working
-    test('Test virtual files', async () => {
-        await helper.toggleBreakpoint('virtual', 7);
-        await helper.toggleBreakpoint('virtual', 11);
-        await helper.toggleBreakpoint('virtual', 12);
+    test('Virtual files', async () => {
+        await helper.toggleBreakpoints('virtual', [7, 11, 12]);
 
-        const session_started_event = new Promise<vscode.DebugSession>((resolve) => {
-            // when the debug session starts
-            const disposable = vscode.debug.onDidStartDebugSession((session) => {
-                disposable.dispose();
-                resolve(session);
-            });
-        });
-
-        // start debugging
-        if (!await vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], 'Macro tracer: current program'))
-            throw new Error("Failed to start a debugging session");
-
-        await session_started_event;
-
-        // wait a second to let the debug session complete
-        await helper.sleep(1000);
+        await helper.debugStartSession();
 
         // Continue until breakpoint is hit
-        await vscode.commands.executeCommand('workbench.action.debug.continue');
-        await helper.sleep(1000);
+        await helper.debugContinue();
         assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === path.join(helper.getWorkspacePath(), 'virtual'), 'Expected to be in the source file');
 
         // Step into a virtual file
-        await vscode.commands.executeCommand('workbench.action.debug.stepInto');
-        await helper.sleep(1000);
+        await helper.debugStepInto();
         assert.ok(vscode.window.activeTextEditor.document.uri.path === '/AINSERT:1.hlasm', 'Expected to be in the virtual AINSERT file');
 
         // Continue until breakpoint is hit and enter the virtual file again
-        await vscode.commands.executeCommand('workbench.action.debug.continue');
-        await helper.sleep(1000);
-        await vscode.commands.executeCommand('workbench.action.debug.stepInto');
-        await helper.sleep(1000);
+        await helper.debugContinue();
+        await helper.debugStepInto();
         assert.ok(vscode.window.activeTextEditor.document.uri.path === '/AINSERT:1.hlasm', 'Expected to be in the virtual AINSERT file');
 
         // Continue until breakpoint is hit and enter virtual file through generated macro
-        await vscode.commands.executeCommand('workbench.action.debug.continue');
-        await helper.sleep(1000);
+        await helper.debugContinue();
         assert.ok(vscode.window.activeTextEditor.document.uri.fsPath === path.join(helper.getWorkspacePath(), 'virtual'), 'Expected to be in the source file');
 
-        await vscode.commands.executeCommand('workbench.action.debug.stop');
+        await helper.debugStop();
     }).timeout(20000).slow(10000);
 
     // verify that library patterns are working

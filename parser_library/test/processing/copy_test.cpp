@@ -169,14 +169,14 @@ external_resource copyr("COPYR");
 void check_diag(const hlasm_plugin::parser_library::diagnostic_s& diag, size_t expected_line, const external_resource& expected_file)
 {
     EXPECT_EQ(diag.diag_range.start.line, expected_line);
-    EXPECT_EQ(diag.file_name, expected_file.get_url());
+    EXPECT_EQ(diag.file_uri, expected_file.get_uri());
 }
 
 void check_related_diag(
     const hlasm_plugin::parser_library::diagnostic_related_info_s& diag, size_t expected_line, const external_resource& expected_file)
 {
     EXPECT_EQ(diag.location.rang.start.line, expected_line);
-    EXPECT_EQ(diag.location.uri, expected_file.get_url());
+    EXPECT_EQ(diag.location.uri, expected_file.get_uri());
 }
 
 } // namespace

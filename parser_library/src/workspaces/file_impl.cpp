@@ -45,7 +45,7 @@ const std::string& file_impl::get_text()
 
 void file_impl::load_text()
 {
-    std::ifstream fin(file_uri_.get_absolute_path(), std::ios::in | std::ios::binary);
+    std::ifstream fin(file_uri_.get_path(), std::ios::in | std::ios::binary);
 
     if (fin)
     {

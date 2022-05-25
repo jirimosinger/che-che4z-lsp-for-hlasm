@@ -47,7 +47,7 @@ workspace::workspace(const utils::path::external_resource& uri,
     , implicit_proc_grp("pg_implicit", {}, {})
     , global_config_(global_config)
 {
-    auto hlasm_folder = utils::path::join(uri_.get_url(), HLASM_PLUGIN_FOLDER);
+    auto hlasm_folder = utils::path::join(uri_.get_path(), HLASM_PLUGIN_FOLDER);
     proc_grps_path_ = utils::path::join(hlasm_folder, FILENAME_PROC_GRPS);
     pgm_conf_path_ = utils::path::join(hlasm_folder, FILENAME_PGM_CONF);
 }
@@ -56,7 +56,7 @@ workspace::workspace(const utils::path::external_resource& uri,
     file_manager& file_manager,
     const lib_config& global_config,
     std::atomic<bool>* cancel)
-    : workspace(uri, uri.get_url(), file_manager, global_config, cancel)
+    : workspace(uri, uri.get_uri(), file_manager, global_config, cancel)
 {}
 
 workspace::workspace(file_manager& file_manager, const lib_config& global_config, std::atomic<bool>* cancel)
@@ -120,7 +120,7 @@ void workspace::delete_diags(processor_file_ptr file)
     auto notified_found = diag_suppress_notified_.emplace(file->get_file_uri(), false);
     if (!notified_found.first->second)
         show_message(
-            "Diagnostics suppressed from " + file->get_file_uri().get_url() + ", because there is no configuration.");
+            "Diagnostics suppressed from " + file->get_file_uri().get_uri() + ", because there is no configuration.");
     notified_found.first->second = true;
 }
 
@@ -149,7 +149,7 @@ const program* workspace::get_program(const utils::path::external_resource& file
     assert(opened_);
 
     std::string file = utils::path::lexically_normal(
-        utils::path::lexically_relative(filename.get_absolute_path(), uri_.get_absolute_path()))
+        utils::path::lexically_relative(filename.get_path(), uri_.get_path()))
                            .string();
 
     // direct match
@@ -165,11 +165,11 @@ const program* workspace::get_program(const utils::path::external_resource& file
     return nullptr;
 }
 
-const ws_uri& workspace::uri() { return uri_.get_url(); }
+const ws_uri& workspace::uri() { return uri_.get_uri(); }
 
 bool workspace::is_config_file(const utils::path::external_resource& file_uri) const
 {
-    std::filesystem::path file_path(file_uri.get_absolute_path());
+    std::filesystem::path file_path(file_uri.get_path());
 
     return utils::path::equal(file_path, proc_grps_path_) || utils::path::equal(file_path, pgm_conf_path_);
 }
@@ -537,7 +537,7 @@ void workspace::find_and_add_libs(
 // open config files and parse them
 bool workspace::load_and_process_config()
 {
-    std::filesystem::path ws_path(uri_.get_absolute_path());
+    std::filesystem::path ws_path(uri_.get_path());
 
     config_diags_.clear();
 
@@ -625,7 +625,7 @@ bool workspace::load_and_process_config()
         }
         else
         {
-            config_diags_.push_back(diagnostic_s::error_W0004(pgm_conf_file->get_file_uri().get_url(), name_));
+            config_diags_.push_back(diagnostic_s::error_W0004(pgm_conf_file->get_file_uri().get_uri(), name_));
         }
     }
 
@@ -634,7 +634,7 @@ bool workspace::load_and_process_config()
 bool workspace::load_config(
     config::proc_grps& proc_groups, config::pgm_conf& pgm_config, file_ptr& proc_grps_file, file_ptr& pgm_conf_file)
 {
-    std::filesystem::path hlasm_base = utils::path::join(uri_.get_absolute_path(), HLASM_PLUGIN_FOLDER);
+    std::filesystem::path hlasm_base = utils::path::join(uri_.get_path(), HLASM_PLUGIN_FOLDER);
 
     // proc_grps.json parse
     proc_grps_file = file_manager_.add_file(utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string());
@@ -650,15 +650,15 @@ bool workspace::load_config(
         {
             if (!pg.asm_options.valid())
                 config_diags_.push_back(
-                    diagnostic_s::error_W0005(proc_grps_file->get_file_uri().get_url(), pg.name, "processor group"));
+                    diagnostic_s::error_W0005(proc_grps_file->get_file_uri().get_uri(), pg.name, "processor group"));
             if (!pg.preprocessor.valid())
-                config_diags_.push_back(diagnostic_s::error_W0006(proc_grps_file->get_file_uri().get_url(), pg.name));
+                config_diags_.push_back(diagnostic_s::error_W0006(proc_grps_file->get_file_uri().get_uri(), pg.name));
         }
     }
     catch (const nlohmann::json::exception&)
     {
         // could not load proc_grps
-        config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_file_uri().get_url(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_file_uri().get_uri(), name_));
         return false;
     }
 
@@ -675,14 +675,14 @@ bool workspace::load_config(
         {
             if (!pgm.opts.valid())
                 config_diags_.push_back(
-                    diagnostic_s::error_W0005(pgm_conf_file->get_file_uri().get_url(), pgm.program, "program"));
+                    diagnostic_s::error_W0005(pgm_conf_file->get_file_uri().get_uri(), pgm.program, "program"));
         }
         exact_pgm_conf_.clear();
         regex_pgm_conf_.clear();
     }
     catch (const nlohmann::json::exception&)
     {
-        config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_file_uri().get_url(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_file_uri().get_uri(), name_));
         return false;
     }
 

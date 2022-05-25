@@ -107,7 +107,7 @@ class debugger::impl final : public processing::statement_analyzer
 
     // Debugging information retrieval
     context::hlasm_context* ctx_ = nullptr;
-    std::string opencode_source_url_;
+    std::string opencode_source_uri_;
     std::vector<stack_frame> stack_frames_;
     std::vector<scope> scopes_;
 
@@ -132,7 +132,7 @@ public:
     {
         // TODO: check if already running???
         auto open_code = workspace.get_processor_file(source);
-        opencode_source_url_ = open_code->get_file_uri().get_url();
+        opencode_source_uri_ = open_code->get_file_uri().get_uri();
         stop_on_next_stmt_ = stop_on_entry;
 
         thread_ = std::thread([this, open_code = std::move(open_code), &workspace, lib_provider]() {
@@ -280,7 +280,7 @@ public:
             return stack_frames_;
         for (size_t i = proc_stack_.size() - 1; i != (size_t)-1; --i)
         {
-            source source(proc_stack_[i].proc_location.file.get_url());
+            source source(proc_stack_[i].proc_location.file.get_uri());
             std::string name;
             switch (proc_stack_[i].proc_type)
             {
@@ -359,10 +359,10 @@ public:
 
 
 
-        scopes_.emplace_back("Globals", add_variable(std::move(globals)), source(opencode_source_url_));
-        scopes_.emplace_back("Locals", add_variable(std::move(scope_vars)), source(opencode_source_url_));
+        scopes_.emplace_back("Globals", add_variable(std::move(globals)), source(opencode_source_uri_));
+        scopes_.emplace_back("Locals", add_variable(std::move(scope_vars)), source(opencode_source_uri_));
         scopes_.emplace_back(
-            "Ordinary symbols", add_variable(std::move(ordinary_symbols)), source(opencode_source_url_));
+            "Ordinary symbols", add_variable(std::move(ordinary_symbols)), source(opencode_source_uri_));
 
         return scopes_;
     }

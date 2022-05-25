@@ -153,7 +153,7 @@ std::string lsp_context::find_macro_copy_id(const context::processing_stack_t& s
 {
     assert(i != 0);
     assert(i < stack.size());
-    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.file.get_url()
+    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.file.get_uri()
                                                                  : *stack[i].member_name;
 }
 
@@ -488,7 +488,7 @@ void lsp_context::document_symbol_opencode_var_seq_symbol_aux(document_symbol_li
             continue;
 
         auto uri = name_to_uri_cache.find(item.name);
-        if (uri == name_to_uri_cache.end() || uri->second.get_type() == utils::path::uri_type::UNKNOWN)
+        if (uri == name_to_uri_cache.end() || uri->second.get_uri().size() == 0)
             return;
 
         if (const auto& file = m_files.find(uri->second); file != m_files.end())
