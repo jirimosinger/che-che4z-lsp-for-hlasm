@@ -21,13 +21,6 @@ using namespace hlasm_plugin;
 using namespace hlasm_plugin::utils::platform;
 using namespace hlasm_plugin::utils::path;
 
-std::pair<std::string, std::string> path_1 = is_windows()
-    ? std::make_pair("file://czprfs50/Public", "\\\\czprfs50\\Public")
-    : std::make_pair("file:///home/user/somefile", "/home/user/somefile");
-
-std::pair<std::string, std::string> path_2 = is_windows() ? std::make_pair("file:///C%3A/Public", "c:\\Public")
-                                                          : std::make_pair("file:///C%3A/Public", "/C:/Public");
-
 TEST(external_resource, uri_to_path)
 {
     if (is_windows())
@@ -56,4 +49,53 @@ TEST(external_resource, path_to_uri)
     }
 }
 
- // todo write tests
+TEST(external_resource, empty_uri)
+{
+    external_resource res("");
+    EXPECT_EQ(res.get_uri(), "");
+    EXPECT_EQ(res.get_path(), "");
+}
+
+TEST(external_resource, invalid_uri)
+{
+    external_resource res("src/temp");
+    EXPECT_EQ(res.get_uri(), "src/temp");
+    EXPECT_EQ(res.get_path(), "src/temp");
+}
+
+TEST(external_resource, nonsupported_uri)
+{
+    external_resource res("aaa://src/temp");
+    EXPECT_EQ(res.get_uri(), "aaa://src/temp");
+    EXPECT_EQ(res.get_path(), "");
+}
+
+TEST(external_resource, file_uri)
+{
+    if (is_windows())
+    {
+        external_resource res("file:///c%3A/Public");
+        EXPECT_EQ(res.get_uri(), "file:///c%3A/Public");
+        EXPECT_EQ(res.get_path(), "c:\\Public");
+    }
+    else
+    {
+        external_resource res("file:///home/user/somefile");
+        EXPECT_EQ(res.get_uri(), "file:///home/user/somefile");
+        EXPECT_EQ(res.get_path(), "/home/user/somefile");
+    }
+}
+
+TEST(external_resource, hlasm_uri)
+{
+    external_resource res("hlasm://0/AINSERT:1");
+    EXPECT_EQ(res.get_uri(), "hlasm://0/AINSERT:1");
+    EXPECT_EQ(res.get_path(), "hlasm://0/AINSERT:1");
+}
+
+TEST(external_resource, untitled_uri)
+{
+    external_resource res("untitled:Untitled-1");
+    EXPECT_EQ(res.get_uri(), "untitled:Untitled-1");
+    EXPECT_EQ(res.get_path(), "untitled:Untitled-1");
+}
