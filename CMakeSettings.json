@@ -9,7 +9,8 @@
       "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": []
     },
     {
       "name": "x86-Release",
@@ -20,7 +21,8 @@
       "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": []
     },
     {
       "name": "x64-Debug",
@@ -49,7 +51,8 @@
       "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": []
     },
     {
       "name": "x64-Release-Profile",
@@ -60,7 +63,8 @@
       "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "-DCMAKE_EXE_LINKER_FLAGS=\"/PROFILE\"",
       "buildCommandArgs": "-v",
-      "ctestCommandArgs": ""
+      "ctestCommandArgs": "",
+      "variables": []
     },
     {
       "name": "WSL-GNU-Release",
@@ -74,7 +78,8 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
-      "addressSanitizerRuntimeFlags": "detect_leaks=0"
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": []
     },
     {
       "name": "WSL-Clang-Release",
@@ -88,7 +93,8 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
-      "addressSanitizerRuntimeFlags": "detect_leaks=0"
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": []
     },
     {
       "name": "WSL-Clang-Debug-ASAN",
@@ -102,7 +108,8 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
-      "addressSanitizerRuntimeFlags": "detect_leaks=0"
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": []
     },
     {
       "name": "WSL-Clang-Release-ASAN",
@@ -116,7 +123,8 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
-      "addressSanitizerRuntimeFlags": "detect_leaks=0"
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": []
     },
     {
       "name": "WSL-Clang-Release-TSAN",
@@ -130,7 +138,8 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
-      "addressSanitizerRuntimeFlags": "detect_leaks=0"
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": []
     },
     {
       "name": "WSL-Clang-Debug-TSAN",
@@ -144,7 +153,8 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
-      "addressSanitizerRuntimeFlags": "detect_leaks=0"
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": []
     },
     {
       "name": "WSL-Clang-Fuzzer",
@@ -158,7 +168,8 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
-      "addressSanitizerRuntimeFlags": "detect_leaks=0"
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": []
     }
   ]
 }
