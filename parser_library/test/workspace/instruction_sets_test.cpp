@@ -116,7 +116,7 @@ class file_manager_opt : public file_manager_impl
 {
     std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
     {
-        //external_resource res(std::string("proc_grps.json"));
+        // external_resource res(std::string("proc_grps.json"));
         switch (variant)
         {
             case file_manager_opt_variant::optable_370:

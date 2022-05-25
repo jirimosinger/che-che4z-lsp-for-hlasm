@@ -39,12 +39,11 @@ TEST(language_features, completion)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
-        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
+    auto params1 = nlohmann::json::parse(
+        R"({"textDocument":{"uri":")" + uri + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     EXPECT_CALL(ws_mngr,
-        completion(
-            StrEq(uri), parser_library::position(0, 1), '\0', parser_library::completion_trigger_kind::invoked));
+        completion(StrEq(uri), parser_library::position(0, 1), '\0', parser_library::completion_trigger_kind::invoked));
     notifs["textDocument/completion"].handler("", params1);
 }
 
@@ -56,8 +55,8 @@ TEST(language_features, hover)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
-        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
+    auto params1 = nlohmann::json::parse(
+        R"({"textDocument":{"uri":")" + uri + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     std::string s("test");
     EXPECT_CALL(ws_mngr, hover(StrEq(uri), parser_library::position(0, 1)));
@@ -73,8 +72,8 @@ TEST(language_features, definition)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
-        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
+    auto params1 = nlohmann::json::parse(
+        R"({"textDocument":{"uri":")" + uri + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     EXPECT_CALL(response_mock, respond(json(""), "", _));
     notifs["textDocument/definition"].handler("", params1);
@@ -87,8 +86,8 @@ TEST(language_features, references)
     std::map<std::string, method> notifs;
     f.register_methods(notifs);
 
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
-        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
+    auto params1 = nlohmann::json::parse(
+        R"({"textDocument":{"uri":")" + uri + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
 
     EXPECT_CALL(ws_mngr, references(StrEq(uri), parser_library::position(0, 1)));
     notifs["textDocument/references"].handler("", params1);

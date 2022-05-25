@@ -78,10 +78,7 @@ void workspace_manager::did_change_file(
     impl_->did_change_file(document_uri, version, changes, ch_size);
 }
 
-void workspace_manager::did_close_file(const char* document_uri)
-{
-    impl_->did_close_file(document_uri);
-}
+void workspace_manager::did_close_file(const char* document_uri) { impl_->did_close_file(document_uri); }
 
 void workspace_manager::configuration_changed(const lib_config& new_config)
 {

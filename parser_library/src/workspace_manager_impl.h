@@ -56,8 +56,7 @@ public:
 
     void add_workspace(std::string name, std::string uri)
     {
-        auto ws = workspaces_.emplace(name,
-            workspaces::workspace(uri, name, file_manager_, global_config_, cancel_));
+        auto ws = workspaces_.emplace(name, workspaces::workspace(uri, name, file_manager_, global_config_, cancel_));
         ws.first->second.set_message_consumer(message_consumer_);
         ws.first->second.open();
 

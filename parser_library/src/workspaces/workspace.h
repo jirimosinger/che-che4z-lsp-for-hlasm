@@ -175,8 +175,7 @@ private:
     diagnostic_container config_diags_;
 
     void filter_and_close_dependencies_(
-        const std::set<utils::path::external_resource>& dependencies,
-        processor_file_ptr file);
+        const std::set<utils::path::external_resource>& dependencies, processor_file_ptr file);
     bool is_dependency_(const utils::path::external_resource& file_uri);
 
     bool program_id_match(const std::string& filename, const program_id& program) const;

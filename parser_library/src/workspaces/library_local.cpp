@@ -145,7 +145,8 @@ void library_local::load_files()
             const auto [_, inserted] = files_.try_emplace(context::to_upper_copy(std::string(filename)), file.second);
             // TODO: the stored value is a full path, yet we try to interpret it as a relative one later on // todo
             if (!inserted)
-                add_diagnostic(diagnostic_s::warning_L0004(lib_uri_.get_uri(), context::to_upper_copy(std::string(filename))));
+                add_diagnostic(
+                    diagnostic_s::warning_L0004(lib_uri_.get_uri(), context::to_upper_copy(std::string(filename))));
 
             if (extension.size())
                 extension_removed = true;

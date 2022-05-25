@@ -63,7 +63,7 @@ TEST(external_resource, invalid_uri)
     EXPECT_EQ(res.get_path(), "src/temp");
 }
 
-TEST(external_resource, nonsupported_uri)
+TEST(external_resource, non_supported_uri)
 {
     external_resource res("aaa://src/temp");
     EXPECT_EQ(res.get_uri(), "aaa://src/temp");
