@@ -72,7 +72,7 @@ TEST_F(workspace_test, parse_lib_provider)
 
     std::string test_wks_path = path::join(path::join("test", "library"), "test_wks").string();
 
-    workspace ws(external_resource(test_wks_path), file_mngr, config);
+    workspace ws(test_wks_path, file_mngr, config);
 
     ws.open();
 
@@ -80,18 +80,18 @@ TEST_F(workspace_test, parse_lib_provider)
     collect_diags_from_child(file_mngr);
     EXPECT_EQ(diags().size(), (size_t)0);
 
-    file_mngr.add_processor_file(external_resource("test\\library\\test_wks\\correct"));
+    file_mngr.add_processor_file("test\\library\\test_wks\\correct");
 
     auto [ctx_1, ctx_2] = [&ws]() {
         if (platform::is_windows())
         {
-            ws.did_open_file(external_resource("test\\library\\test_wks\\correct"));
+            ws.did_open_file("test\\library\\test_wks\\correct");
             return std::make_pair(std::make_shared<context::hlasm_context>("test\\library\\test_wks\\correct"),
                 std::make_shared<context::hlasm_context>("test\\library\\test_wks\\correct"));
         }
         else
         {
-            ws.did_open_file(external_resource("test/library/test_wks/correct"));
+            ws.did_open_file("test/library/test_wks/correct");
             return std::make_pair(std::make_shared<context::hlasm_context>("test/library/test_wks/correct"),
                 std::make_shared<context::hlasm_context>("test/library/test_wks/correct"));
         }

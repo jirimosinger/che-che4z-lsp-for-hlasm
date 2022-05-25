@@ -52,9 +52,9 @@ public:
 
     std::optional<std::string> get_library(const std::string& library,
         const utils::path::external_resource& program,
-        std::optional<utils::path::external_resource>* resource) const override
+        std::optional<utils::path::external_resource>* uri) const override
     {
-        return ws_.get_library(library, program, resource);
+        return ws_.get_library(library, program, uri);
     }
 };
 

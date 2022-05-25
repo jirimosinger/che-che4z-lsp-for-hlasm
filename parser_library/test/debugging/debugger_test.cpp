@@ -322,7 +322,7 @@ public:
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override
     {
-        std::shared_ptr<processor> found = get_file_manager().add_processor_file(external_resource(library));
+        std::shared_ptr<processor> found = get_file_manager().add_processor_file(library);
         if (found)
             return found->parse_no_lsp_update(*this, std::move(ctx), data);
 

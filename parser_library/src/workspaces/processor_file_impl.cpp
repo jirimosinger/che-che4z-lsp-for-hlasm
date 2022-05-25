@@ -134,7 +134,7 @@ parse_result processor_file_impl::parse_no_lsp_update(
     return true;
 }
 
-const std::set<utils::path::external_resource, utils::path::external_resource_comp>& processor_file_impl::dependencies()
+const std::set<utils::path::external_resource>& processor_file_impl::dependencies()
 {
     return dependencies_;
 }
@@ -182,7 +182,7 @@ const lsp::feature_provider& processor_file_impl::get_lsp_feature_provider()
     return empty_res;
 }
 
-const std::set<utils::path::external_resource, utils::path::external_resource_comp>&
+const std::set<utils::path::external_resource>&
 processor_file_impl::files_to_close()
 {
     return files_to_close_;

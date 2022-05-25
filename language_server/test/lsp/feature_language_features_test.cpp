@@ -64,25 +64,6 @@ TEST(language_features, hover)
     notifs["textDocument/hover"].handler("", params1);
 }
 
-TEST(language_features, hover_integration)
-{
-    parser_library::workspace_manager ws_mngr;
-    NiceMock<response_provider_mock> response_mock;
-    lsp::feature_language_features f(ws_mngr, response_mock);
-    std::map<std::string, method> notifs;
-    f.register_methods(notifs);
-
-    std::string file_text = "&VAR SETA 1";
-    ws_mngr.did_open_file(uri.c_str(), 0, file_text.c_str(), file_text.size());
-
-    json response { { "contents", { { "kind", "markdown" }, { "value", "SETA variable" } } } };
-    EXPECT_CALL(response_mock, respond(json(""), std::string(""), response));
-
-    auto params1 = nlohmann::json::parse(R"({"textDocument":{"uri":")" + uri
-        + R"("},"position":{"line":0,"character":1},"context":{"triggerKind":1}})");
-    notifs["textDocument/hover"].handler("", params1);
-}
-
 TEST(language_features, definition)
 {
     parser_library::workspace_manager ws_mngr;

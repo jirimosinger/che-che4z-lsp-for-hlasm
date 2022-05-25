@@ -488,7 +488,7 @@ void lsp_context::document_symbol_opencode_var_seq_symbol_aux(document_symbol_li
             continue;
 
         auto uri = name_to_uri_cache.find(item.name);
-        if (uri == name_to_uri_cache.end() || uri->second.get_uri().size() == 0)
+        if (uri == name_to_uri_cache.end() || uri->second.get_uri().empty())
             return;
 
         if (const auto& file = m_files.find(uri->second); file != m_files.end())
@@ -843,9 +843,11 @@ completion_list_s lsp_context::complete_instr(const file_info&, position) const
     return result;
 }
 
-template<typename T, typename H>
-bool files_present(const std::unordered_map<utils::path::external_resource, file_info_ptr, H>& files,
-    const std::unordered_map<utils::path::external_resource, T, H>& scopes)
+template<typename T>
+bool files_present(
+    const std::unordered_map<utils::path::external_resource, file_info_ptr, utils::path::external_resource_hasher>&
+        files,
+    const std::unordered_map<utils::path::external_resource, T, utils::path::external_resource_hasher>& scopes)
 {
     bool present = true;
     for (const auto& [file, _] : scopes)

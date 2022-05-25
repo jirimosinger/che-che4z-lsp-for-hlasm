@@ -35,7 +35,7 @@ class file_proc_grps : public file_impl
 {
 public:
     file_proc_grps()
-        : file_impl(external_resource("proc_grps.json"))
+        : file_impl("proc_grps.json")
     {}
 
     file_uri uri = "test_uri";
@@ -107,7 +107,7 @@ class file_pgm_conf : public file_impl
 {
 public:
     file_pgm_conf()
-        : file_impl(external_resource("proc_grps.json"))
+        : file_impl("proc_grps.json")
     {}
 
     file_uri uri = "test_uri";

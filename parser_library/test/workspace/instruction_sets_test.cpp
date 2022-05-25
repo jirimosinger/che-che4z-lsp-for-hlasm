@@ -154,8 +154,8 @@ void change_instruction_set(
     std::vector<document_change> changes;
     changes.push_back(document_change({ change_range }, process_group.c_str(), process_group.size()));
 
-    fm.did_change_file(external_resource(hlasmplugin_folder + "proc_grps.json"), 1, changes.data(), changes.size());
-    ws.did_change_file(external_resource(hlasmplugin_folder + "proc_grps.json"), changes.data(), changes.size());
+    fm.did_change_file(hlasmplugin_folder + "proc_grps.json", 1, changes.data(), changes.size());
+    ws.did_change_file(hlasmplugin_folder + "proc_grps.json", changes.data(), changes.size());
 }
 } // namespace
 

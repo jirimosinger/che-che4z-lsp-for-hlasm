@@ -57,7 +57,7 @@ public:
     void add_workspace(std::string name, std::string uri)
     {
         auto ws = workspaces_.emplace(name,
-            workspaces::workspace(utils::path::external_resource(uri), name, file_manager_, global_config_, cancel_));
+            workspaces::workspace(uri, name, file_manager_, global_config_, cancel_));
         ws.first->second.set_message_consumer(message_consumer_);
         ws.first->second.open();
 
@@ -157,9 +157,7 @@ public:
             return position_uri(definition_result);
         }
 
-        utils::path::external_resource res(document_uri);
-
-        definition_result = ws_path_match(document_uri).definition(res, pos);
+        definition_result = ws_path_match(document_uri).definition(document_uri, pos);
 
         return position_uri(definition_result);
     }
@@ -216,14 +214,16 @@ public:
     virtual void configuration_changed(const lib_config& new_config) { global_config_ = new_config; }
 
     std::vector<token_info> empty_tokens;
-    const std::vector<token_info>& semantic_tokens(const char* document_uri) // todo
+    const std::vector<token_info>& semantic_tokens(const char* document_uri)
     {
         if (cancel_ && *cancel_)
             return empty_tokens;
 
-        auto file = file_manager_.find(document_uri); // todo
+        utils::path::external_resource res(document_uri);
+
+        auto file = file_manager_.find(res);
         if (dynamic_cast<workspaces::processor_file*>(file.get()) != nullptr)
-            return file_manager_.find_processor_file(utils::path::external_resource(document_uri))->get_hl_info();
+            return file_manager_.find_processor_file(res)->get_hl_info();
 
         return empty_tokens;
     }

@@ -43,7 +43,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 
     auto& add_macro_or_copy(std::string file_name, std::string text)
     {
-        auto file = std::make_shared<file_with_text>(external_resource(file_name), text, *this);
+        auto file = std::make_shared<file_with_text>(file_name, text, *this);
 
         auto [it, succ] = files_by_library_.emplace(file_name.substr(lib_prefix_length),
             std::pair<std::shared_ptr<file_with_text>, macro_cache>(
@@ -55,7 +55,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 
     auto add_opencode(std::string file_name, std::string text)
     {
-        auto file = std::make_shared<file_with_text>(external_resource(file_name), text, *this);
+        auto file = std::make_shared<file_with_text>(file_name, text, *this);
         files_by_fname_.emplace(std::move(file_name), file);
         return file;
     }

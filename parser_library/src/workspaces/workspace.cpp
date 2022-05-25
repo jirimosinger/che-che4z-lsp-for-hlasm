@@ -60,7 +60,7 @@ workspace::workspace(const utils::path::external_resource& uri,
 {}
 
 workspace::workspace(file_manager& file_manager, const lib_config& global_config, std::atomic<bool>* cancel)
-    : workspace(utils::path::external_resource(""), file_manager, global_config, cancel)
+    : workspace("", file_manager, global_config, cancel)
 {
     opened_ = true;
 }
@@ -148,9 +148,8 @@ const program* workspace::get_program(const utils::path::external_resource& file
 {
     assert(opened_);
 
-    std::string file = utils::path::lexically_normal(
-        utils::path::lexically_relative(filename.get_path(), uri_.get_path()))
-                           .string();
+    std::string file =
+        utils::path::lexically_normal(utils::path::lexically_relative(filename.get_path(), uri_.get_path())).string();
 
     // direct match
     auto program = exact_pgm_conf_.find(file);
@@ -694,10 +693,9 @@ bool workspace::is_wildcard(const std::string& str)
 }
 
 void workspace::filter_and_close_dependencies_(
-    const std::set<utils::path::external_resource, utils::path::external_resource_comp>& dependencies,
-    processor_file_ptr file)
+    const std::set<utils::path::external_resource>& dependencies, processor_file_ptr file)
 {
-    std::set<utils::path::external_resource, utils::path::external_resource_comp> filtered;
+    std::set<utils::path::external_resource> filtered;
     // filters out externally open files
     for (const auto& dependency : dependencies)
     {
@@ -731,7 +729,7 @@ bool workspace::is_dependency_(const utils::path::external_resource& file_uri)
 {
     for (const auto& dependant : dependants_)
     {
-        auto fdependant = file_manager_.find_processor_file(utils::path::external_resource(dependant));
+        auto fdependant = file_manager_.find_processor_file(dependant);
         if (!fdependant)
             continue;
         for (auto& dependency : fdependant->dependencies())

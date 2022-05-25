@@ -168,14 +168,14 @@ private:
     bool is_wildcard(const std::string& str);
 
     // files, that depend on others (e.g. open code files that use macros)
-    std::set<utils::path::external_resource, utils::path::external_resource_comp> dependants_;
+    std::set<utils::path::external_resource> dependants_;
 
-    std::set<utils::path::external_resource, utils::path::external_resource_comp> opened_files_;
+    std::set<utils::path::external_resource> opened_files_;
 
     diagnostic_container config_diags_;
 
     void filter_and_close_dependencies_(
-        const std::set<utils::path::external_resource, utils::path::external_resource_comp>& dependencies,
+        const std::set<utils::path::external_resource>& dependencies,
         processor_file_ptr file);
     bool is_dependency_(const utils::path::external_resource& file_uri);
 

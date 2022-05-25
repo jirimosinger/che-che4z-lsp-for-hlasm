@@ -24,12 +24,9 @@
 
 
 namespace hlasm_plugin::utils::path {
-
-
 namespace {
 const std::string untitled = "untitled";
 const std::string hlasm = "hlasm";
-
 } // namespace
 
 std::string uri_to_path(const std::string& uri)
@@ -138,24 +135,13 @@ external_resource::external_resource(const external_resource& r)
 
 const std::string& external_resource::get_uri() const { return m_uri; }
 
-std::string external_resource::get_path() const
-{
-    return m_uri.size() != 0 ? uri_to_path(m_uri) : m_uri;
-}
+std::string external_resource::get_path() const { return m_uri.size() != 0 ? uri_to_path(m_uri) : m_uri; }
 
-// bool external_resource::operator==(const external_resource& r) const { return m_uri == r.m_uri && m_type == r.m_type;
-// }
 bool external_resource::operator==(const external_resource& r) const { return m_uri == r.m_uri; }
-bool external_resource::operator!=(const external_resource& r) const { return !operator==(r); }
 bool external_resource::operator<(const external_resource& r) const { return m_uri < r.m_uri; }
 
 std::size_t external_resource_hasher::operator()(const external_resource& r) const
 {
     return std::hash<std::string> {}(r.get_uri());
 }
-bool external_resource_comp::operator()(const external_resource& l, const external_resource& r) const
-{
-    return l.get_uri() < r.get_uri();
-}
-
 } // namespace hlasm_plugin::utils::path

@@ -49,7 +49,7 @@ enum class file_is_opencode : bool
 
 class analyzer_options
 {
-    utils::path::external_resource resource = "";
+    utils::path::external_resource file_uri = "";
     workspaces::parse_lib_provider* lib_provider = nullptr;
     std::variant<asm_option, analyzing_context> ctx_source;
     workspaces::library_data library_data = { processing::processing_kind::ORDINARY, context::id_storage::empty_id };
@@ -59,7 +59,7 @@ class analyzer_options
     preprocessor_options preprocessor_args;
     virtual_file_monitor* vf_monitor = nullptr;
 
-    void set(utils::path::external_resource r) { resource = std::move(r); }
+    void set(utils::path::external_resource r) { file_uri = std::move(r); }
     void set(workspaces::parse_lib_provider* lp) { lib_provider = lp; }
     void set(asm_option ao) { ctx_source = std::move(ao); }
     void set(analyzing_context ac) { ctx_source = std::move(ac); }

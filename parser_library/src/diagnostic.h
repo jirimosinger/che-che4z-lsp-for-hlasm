@@ -795,7 +795,7 @@ public:
     {}
 
 
-    std::string file_uri; // todo rename to file_uri
+    std::string file_uri;
     range diag_range;
     diagnostic_severity severity;
     std::string code;

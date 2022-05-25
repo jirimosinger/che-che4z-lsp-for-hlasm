@@ -27,7 +27,7 @@ struct files_parse_lib_provider : public workspaces::parse_lib_provider
     {}
     virtual parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override
     {
-        auto macro = file_mngr->add_processor_file(utils::path::external_resource(library));
+        auto macro = file_mngr->add_processor_file(library);
         if (!macro)
             return false;
         return macro->parse_macro(*this, std::move(ctx), std::move(data));
@@ -40,7 +40,7 @@ struct files_parse_lib_provider : public workspaces::parse_lib_provider
         const utils::path::external_resource&,
         std::optional<utils::path::external_resource>*) const override
     {
-        auto macro = file_mngr->add_processor_file(utils::path::external_resource(library));
+        auto macro = file_mngr->add_processor_file(library);
         if (!macro)
             return std::nullopt;
         return macro->get_text();
