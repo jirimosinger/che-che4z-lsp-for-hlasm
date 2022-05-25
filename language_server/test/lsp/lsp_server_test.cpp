@@ -244,26 +244,3 @@ TEST(lsp_server, request_error_no_message)
 
     s.message_received(request_response);
 }
-
-TEST(lsp_server_test, wrong_message_received_wrong_uri)
-{
-    // test::ws_mngr_mock ws_mngr; // todo
-    parser_library::workspace_manager ws_mngr;
-    send_message_provider_mock smpm;
-    lsp::server s(ws_mngr);
-    s.set_send_message_provider(&smpm);
-
-    json expected_telemetry =
-        R"({"jsonrpc":"2.0","method":"telemetry/event","params":{
-            "measurements":null,
-            "method_name":"server_error/lsp_server/method_unknown_error",
-            "properties":null
-           }})"_json;
-
-    // Only telemetry expected
-
-    EXPECT_CALL(smpm, reply(expected_telemetry));
-
-    s.message_received(
-        R"({"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"user_storage:/user/storage/layout","languageId":"plaintext","version":4,"text":"sad"}}})"_json);
-}
