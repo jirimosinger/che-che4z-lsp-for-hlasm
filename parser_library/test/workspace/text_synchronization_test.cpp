@@ -14,9 +14,11 @@
 
 #include "gtest/gtest.h"
 
+#include "utils/external_resource.h"
 #include "workspaces/file_impl.h"
 
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 
 TEST(file, text_synchronization_rn)
 {

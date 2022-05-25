@@ -17,7 +17,6 @@
 #include "analyzer.h"
 #include "workspaces/file_manager.h"
 
-
 namespace hlasm_plugin::parser_library::workspaces {
 
 struct files_parse_lib_provider : public workspaces::parse_lib_provider
@@ -33,12 +32,13 @@ struct files_parse_lib_provider : public workspaces::parse_lib_provider
             return false;
         return macro->parse_macro(*this, std::move(ctx), std::move(data));
     }
-    virtual bool has_library(const std::string& library, const std::string&) const override
+    virtual bool has_library(const std::string& library, const utils::path::external_resource&) const override
     {
         return file_mngr->find(library) != nullptr;
     }
-    virtual std::optional<std::string> get_library(
-        const std::string& library, const std::string&, std::string*) const override
+    virtual std::optional<std::string> get_library(const std::string& library,
+        const utils::path::external_resource&,
+        std::optional<utils::path::external_resource>*) const override
     {
         auto macro = file_mngr->add_processor_file(library);
         if (!macro)

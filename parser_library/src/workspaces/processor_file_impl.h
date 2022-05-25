@@ -19,6 +19,7 @@
 #include "file_impl.h"
 #include "macro_cache.h"
 #include "processor.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -30,7 +31,8 @@ class file_manager;
 class processor_file_impl : public virtual file_impl, public virtual processor_file
 {
 public:
-    processor_file_impl(std::string file_uri, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
+    processor_file_impl(
+        utils::path::external_resource file_uri, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
     processor_file_impl(file_impl&&, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
     processor_file_impl(const file_impl& file, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
     void collect_diags() const override;
@@ -43,14 +45,14 @@ public:
     // Used by the macro tracer.
     parse_result parse_no_lsp_update(parse_lib_provider&, analyzing_context ctx, library_data) override;
 
-    const std::set<std::string>& dependencies() override;
+    const std::set<utils::path::external_resource>& dependencies() override;
 
     const semantics::lines_info& get_hl_info() override;
     const lsp::feature_provider& get_lsp_feature_provider() override;
-    const std::set<std::string>& files_to_close() override;
+    const std::set<utils::path::external_resource>& files_to_close() override;
     const performance_metrics& get_metrics() override;
 
-    void erase_cache_of_opencode(const std::string& opencode_file_name) override;
+    void erase_cache_of_opencode(const utils::path::external_resource& opencode_file_uri) override;
 
 private:
     std::unique_ptr<analyzer> last_analyzer_ = nullptr;
@@ -61,8 +63,8 @@ private:
 
     std::atomic<bool>* cancel_;
 
-    std::set<std::string> dependencies_;
-    std::set<std::string> files_to_close_;
+    std::set<utils::path::external_resource> dependencies_;
+    std::set<utils::path::external_resource> files_to_close_;
 
     macro_cache macro_cache_;
 };

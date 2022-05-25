@@ -17,8 +17,8 @@
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::context;
 
-source_context::source_context(std::string source_name, processing::processing_kind initial)
-    : current_instruction(position(), std::move(source_name))
+source_context::source_context(utils::path::external_resource source_uri, processing::processing_kind initial)
+    : current_instruction(position(), std::move(source_uri))
     , proc_stack(1, initial)
 {}
 

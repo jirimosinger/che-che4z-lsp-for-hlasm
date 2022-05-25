@@ -20,6 +20,7 @@
 #include "diagnosable_impl.h"
 #include "file_manager.h"
 #include "processor_file_impl.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -49,15 +50,15 @@ public:
     processor_file_ptr get_processor_file(const file_uri&) override;
     void remove_file(const file_uri&) override;
 
-    file_ptr find(const std::string& key) const override;
-    processor_file_ptr find_processor_file(const std::string& key) override;
+    file_ptr find(const utils::path::external_resource& key) const override;
+    processor_file_ptr find_processor_file(const utils::path::external_resource& key) override;
 
-    list_directory_result list_directory_files(const std::string& path) override;
+    list_directory_result list_directory_files(const utils::path::external_resource& path) override;
 
-    void did_open_file(const std::string& document_uri, version_t version, std::string text) override;
+    void did_open_file(const file_uri& document_uri, version_t version, std::string text) override;
     void did_change_file(
-        const std::string& document_uri, version_t version, const document_change* changes, size_t ch_size) override;
-    void did_close_file(const std::string& document_uri) override;
+        const file_uri& document_uri, version_t version, const document_change* changes, size_t ch_size) override;
+    void did_close_file(const file_uri& document_uri) override;
 
     bool file_exists(const std::string& file_name) override;
     bool lib_file_exists(const std::string& lib_path, const std::string& file_name) override;
@@ -72,7 +73,9 @@ public:
 protected:
     std::unordered_map<unsigned long long, std::string> m_virtual_files;
     // m_virtual_files must outlive the files_
-    std::unordered_map<std::string, std::shared_ptr<file_impl>> files_;
+    std::
+        unordered_map<utils::path::external_resource, std::shared_ptr<file_impl>, utils::path::external_resource_hasher>
+            files_;
 
 private:
     processor_file_ptr change_into_processor_file_if_not_already_(std::shared_ptr<file_impl>& ret);

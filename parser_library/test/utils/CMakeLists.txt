@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Broadcom.
+# Copyright (c) 2022 Broadcom.
 # The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 #
 # This program and the accompanying materials are made
@@ -10,12 +10,6 @@
 # Contributors:
 #   Broadcom, Inc. - initial API and implementation
 
-add_library(hlasm_utils STATIC EXCLUDE_FROM_ALL)
-
-target_include_directories(hlasm_utils PUBLIC include)
-
-add_subdirectory(include)
-add_subdirectory(src)
-
-# link executable with libraries
-target_link_libraries(hlasm_utils network-uri)
+target_sources(library_test PRIVATE
+	external_resource_test.cpp
+)

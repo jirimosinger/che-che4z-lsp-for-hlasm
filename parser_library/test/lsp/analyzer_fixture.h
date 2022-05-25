@@ -24,7 +24,7 @@ namespace hlasm_plugin::parser_library {
 
 struct analyzer_fixture : public ::testing::Test
 {
-    const static inline std::string opencode_file_name = "source";
+    static const inline utils::path::external_resource opencode_file_name = "source";
     analyzer a;
     analyzer_fixture(const std::string& input,
         workspaces::parse_lib_provider& provider = workspaces::empty_parse_lib_provider::instance,

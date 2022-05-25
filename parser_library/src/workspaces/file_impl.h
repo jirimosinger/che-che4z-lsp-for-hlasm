@@ -18,6 +18,7 @@
 #include "diagnosable_impl.h"
 #include "file.h"
 #include "processor.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -38,7 +39,7 @@ public:
 
     void collect_diags() const override;
 
-    const file_uri& get_file_name() override;
+    const file_uri& get_file_uri() override;
     const std::string& get_text() override;
     version_t get_version() override;
     bool update_and_get_bad() override;
@@ -62,7 +63,7 @@ protected:
     const std::string& get_text_ref();
 
 private:
-    file_uri file_name_;
+    file_uri file_uri_;
     std::string text_;
     // Array of "pointers" to text_ where lines start.
     std::vector<size_t> lines_ind_;

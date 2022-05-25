@@ -46,3 +46,4 @@ target_include_directories(parser_library_generated PRIVATE
 	${GENERATED_FOLDER}/export
 )
 target_link_libraries(parser_library_generated ${ANTLR4_RUNTIME})
+target_link_libraries(parser_library_generated hlasm_utils)

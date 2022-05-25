@@ -16,18 +16,21 @@
 
 #include "../gtest_stringers.h"
 #include "files_parse_lib_provider.h"
+#include "utils/external_resource.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/processor_file_impl.h"
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 
 TEST(processor_file, empty_file_feature_provider)
 {
     std::string file_name = "filename";
+    external_resource file_res(file_name);
     file_manager_impl mngr;
-    mngr.did_open_file(file_name, 0, " LR 1,1");
-    auto file = mngr.add_processor_file(file_name);
+    mngr.did_open_file(file_res, 0, " LR 1,1");
+    auto file = mngr.add_processor_file(file_res);
 
     // Prior to parsing, it should return default values
 
@@ -45,19 +48,21 @@ TEST(processor_file, empty_file_feature_provider)
 TEST(processor_file, parse_macro)
 {
     std::string opencode_name = "filename";
+    external_resource opencode_res(opencode_name);
     std::string macro_name = "MAC";
+    external_resource macro_res(macro_name);
 
     file_manager_impl mngr;
     files_parse_lib_provider provider(mngr);
 
-    mngr.did_open_file(opencode_name, 0, " SAM31\n MAC");
-    auto opencode = mngr.add_processor_file(opencode_name);
+    mngr.did_open_file(opencode_res, 0, " SAM31\n MAC");
+    auto opencode = mngr.add_processor_file(opencode_res);
 
-    mngr.did_open_file(macro_name, 0, R"( MACRO
+    mngr.did_open_file(macro_res, 0, R"( MACRO
  MAC
  SAM31
  MEND)");
-    auto macro = mngr.add_processor_file(macro_name);
+    auto macro = mngr.add_processor_file(macro_res);
 
     opencode->parse(provider, {}, {}, nullptr);
 

@@ -34,6 +34,7 @@
 #include "message_consumer.h"
 #include "processor.h"
 #include "processor_group.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -68,11 +69,11 @@ public:
     // Creates just a dummy workspace with no libraries - no dependencies
     // between files.
     workspace(file_manager& file_manager, const lib_config& global_config, std::atomic<bool>* cancel = nullptr);
-    workspace(const ws_uri& uri,
+    workspace(const utils::path::external_resource& uri,
         file_manager& file_manager,
         const lib_config& global_config,
         std::atomic<bool>* cancel = nullptr);
-    workspace(const ws_uri& uri,
+    workspace(const utils::path::external_resource& uri,
         const std::string& name,
         file_manager& file_manager,
         const lib_config& global_config,
@@ -88,32 +89,35 @@ public:
 
     void add_proc_grp(processor_group pg);
     const processor_group& get_proc_grp(const proc_grp_id& proc_grp) const;
-    const processor_group& get_proc_grp_by_program(const std::string& program) const;
+    const processor_group& get_proc_grp_by_program(const utils::path::external_resource& uri) const;
     const processor_group& get_proc_grp_by_program(const program& program) const;
-    const program* get_program(const std::string& filename) const;
+    const program* get_program(const utils::path::external_resource& filename) const;
 
-    workspace_file_info parse_file(const std::string& file_uri);
+    workspace_file_info parse_file(const utils::path::external_resource& file_uri);
     void refresh_libraries();
-    workspace_file_info did_open_file(const std::string& file_uri);
-    void did_close_file(const std::string& file_uri);
-    void did_change_file(const std::string& document_uri, const document_change* changes, size_t ch_size);
-    void did_change_watched_files(const std::string& file_uri);
+    workspace_file_info did_open_file(const utils::path::external_resource& file_uri);
+    void did_close_file(const utils::path::external_resource& file_uri);
+    void did_change_file(
+        const utils::path::external_resource& document_uri, const document_change* changes, size_t ch_size);
+    void did_change_watched_files(const utils::path::external_resource& file_uri);
 
-    location definition(const std::string& document_uri, position pos) const override;
-    location_list references(const std::string& document_uri, position pos) const override;
-    lsp::hover_result hover(const std::string& document_uri, position pos) const override;
-    lsp::completion_list_s completion(const std::string& document_uri,
+    location definition(const utils::path::external_resource& document_uri, position pos) const override;
+    location_list references(const utils::path::external_resource& document_uri, position pos) const override;
+    lsp::hover_result hover(const utils::path::external_resource& document_uri, position pos) const override;
+    lsp::completion_list_s completion(const utils::path::external_resource& document_uri,
         position pos,
         char trigger_char,
         completion_trigger_kind trigger_kind) const override;
-    lsp::document_symbol_list_s document_symbol(const std::string& document_uri, long long limit) const override;
+    lsp::document_symbol_list_s document_symbol(
+        const utils::path::external_resource& document_uri, long long limit) const override;
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override;
-    bool has_library(const std::string& library, const std::string& program) const override;
-    std::optional<std::string> get_library(
-        const std::string& library, const std::string& program, std::string* uri) const override;
-    virtual asm_option get_asm_options(const std::string& file_name) const;
-    virtual preprocessor_options get_preprocessor_options(const std::string& file_name) const;
+    bool has_library(const std::string& library, const utils::path::external_resource& program) const override;
+    std::optional<std::string> get_library(const std::string& library,
+        const utils::path::external_resource& program,
+        std::optional<utils::path::external_resource>* uri) const override;
+    virtual asm_option get_asm_options(const utils::path::external_resource& file_uri) const;
+    virtual preprocessor_options get_preprocessor_options(const utils::path::external_resource& file_uri) const;
     const ws_uri& uri();
 
     void open();
@@ -121,7 +125,7 @@ public:
 
     void set_message_consumer(message_consumer* consumer);
 
-    processor_file_ptr get_processor_file(const std::string& filename);
+    processor_file_ptr get_processor_file(const utils::path::external_resource& file_uri);
 
     file_manager& get_file_manager();
 
@@ -133,7 +137,7 @@ private:
     std::atomic<bool>* cancel_;
 
     std::string name_;
-    ws_uri uri_;
+    utils::path::external_resource uri_;
     file_manager& file_manager_;
     file_manager_vfm fm_vfm_;
 
@@ -142,7 +146,6 @@ private:
     std::vector<std::pair<program, std::regex>> regex_pgm_conf_;
     processor_group implicit_proc_grp;
 
-    std::filesystem::path ws_path_;
     std::filesystem::path proc_grps_path_;
     std::filesystem::path pgm_conf_path_;
 
@@ -151,7 +154,7 @@ private:
     void find_and_add_libs(
         std::string root, const std::string& path_pattern, processor_group& prc_grp, const library_local_options& opts);
 
-    bool is_config_file(const std::string& file_uri) const;
+    bool is_config_file(const utils::path::external_resource& file_uri) const;
     workspace_file_info parse_config_file();
 
     bool load_and_process_config();
@@ -165,18 +168,19 @@ private:
     bool is_wildcard(const std::string& str);
 
     // files, that depend on others (e.g. open code files that use macros)
-    std::set<std::string, std::less<>> dependants_;
+    std::set<utils::path::external_resource> dependants_;
 
-    std::set<std::string, std::less<>> opened_files_;
+    std::set<utils::path::external_resource> opened_files_;
 
     diagnostic_container config_diags_;
 
-    void filter_and_close_dependencies_(const std::set<std::string>& dependencies, processor_file_ptr file);
-    bool is_dependency_(const std::string& file_uri);
+    void filter_and_close_dependencies_(
+        const std::set<utils::path::external_resource>& dependencies, processor_file_ptr file);
+    bool is_dependency_(const utils::path::external_resource& file_uri);
 
     bool program_id_match(const std::string& filename, const program_id& program) const;
 
-    std::vector<processor_file_ptr> find_related_opencodes(const std::string& document_uri) const;
+    std::vector<processor_file_ptr> find_related_opencodes(const utils::path::external_resource& document_uri) const;
     void delete_diags(processor_file_ptr file);
 
     void show_message(const std::string& message);
@@ -184,7 +188,8 @@ private:
     message_consumer* message_consumer_ = nullptr;
 
     // A map that holds true values for files that have diags suppressed and the user was already notified about it
-    std::unordered_map<std::string, bool> diag_suppress_notified_;
+    std::unordered_map<utils::path::external_resource, bool, utils::path::external_resource_hasher>
+        diag_suppress_notified_;
     const lib_config& global_config_;
     lib_config local_config_;
     lib_config get_config();

@@ -37,10 +37,11 @@ public:
     // Library data passes information whether COPY or macro is going to be parsed.
     virtual parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) = 0;
 
-    virtual bool has_library(const std::string& library, const std::string& program) const = 0;
+    virtual bool has_library(const std::string& library, const utils::path::external_resource& program) const = 0;
 
-    virtual std::optional<std::string> get_library(
-        const std::string& library, const std::string& program, std::string* file_uri) const = 0;
+    virtual std::optional<std::string> get_library(const std::string& library,
+        const utils::path::external_resource& program,
+        std::optional<utils::path::external_resource>* file_uri) const = 0;
 
 protected:
     ~parse_lib_provider() = default;
@@ -51,8 +52,10 @@ class empty_parse_lib_provider final : public parse_lib_provider
 {
 public:
     parse_result parse_library(const std::string&, analyzing_context, library_data) override { return false; };
-    bool has_library(const std::string&, const std::string&) const override { return false; };
-    std::optional<std::string> get_library(const std::string&, const std::string&, std::string*) const override
+    bool has_library(const std::string&, const utils::path::external_resource&) const override { return false; };
+    std::optional<std::string> get_library(const std::string&,
+        const utils::path::external_resource&,
+        std::optional<utils::path::external_resource>*) const override
     {
         return std::nullopt;
     }

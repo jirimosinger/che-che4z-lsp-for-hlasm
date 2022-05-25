@@ -76,13 +76,13 @@ public:
     // first variant is monostate as there is no storing of opencode statements in the code yet
     using owner_t = std::variant<std::monostate, context::macro_def_ptr, context::copy_member_ptr>;
 
-    std::string name;
+    utils::path::external_resource file;
     file_type type;
     owner_t owner;
     text_data_ref_t data;
 
 
-    explicit file_info(std::string name, text_data_ref_t text_data);
+    explicit file_info(utils::path::external_resource file, text_data_ref_t text_data);
     explicit file_info(context::macro_def_ptr owner, text_data_ref_t text_data);
     explicit file_info(context::copy_member_ptr owner, text_data_ref_t text_data);
 

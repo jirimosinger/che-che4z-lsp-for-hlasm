@@ -21,17 +21,18 @@
 
 #include "diagnosable.h"
 #include "protocol.h"
+#include "utils/external_resource.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
-using file_uri = std::string;
+using file_uri = utils::path::external_resource;
 
 // Interface that represents both file opened in LSP
 // as well as a file opened by parser library from the disk.
 class file : public virtual diagnosable
 {
 public:
-    virtual const file_uri& get_file_name() = 0;
+    virtual const file_uri& get_file_uri() = 0;
     // Gets contents of file either by loading from disk or from LSP.
     virtual const std::string& get_text() = 0;
     // Returns whether file is bad - bad file cannot be loaded from disk.

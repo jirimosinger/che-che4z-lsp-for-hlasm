@@ -22,8 +22,8 @@
 namespace hlasm_plugin::parser_library::workspaces {
 
 processor_file_impl::processor_file_impl(
-    std::string file_name, const file_manager& file_mngr, std::atomic<bool>* cancel)
-    : file_impl(std::move(file_name))
+    utils::path::external_resource file_uri, const file_manager& file_mngr, std::atomic<bool>* cancel)
+    : file_impl(std::move(file_uri))
     , cancel_(cancel)
     , macro_cache_(file_mngr, *this)
 {}
@@ -53,7 +53,7 @@ parse_result processor_file_impl::parse(
 
     last_analyzer_ = std::make_unique<analyzer>(get_text(),
         analyzer_options {
-            get_file_name(),
+            get_file_uri(),
             &lib_provider,
             std::move(asm_opts),
             get_lsp_editing() ? collect_highlighting_info::yes : collect_highlighting_info::no,
@@ -74,13 +74,13 @@ parse_result processor_file_impl::parse(
     {
         dependencies_.clear();
         for (auto& file : last_analyzer_->hlasm_ctx().get_visited_files())
-            if (file != get_file_name())
+            if (file != get_file_uri())
                 dependencies_.insert(file);
     }
 
     files_to_close_.clear();
     // files that used to be dependencies but are not anymore should be closed internally
-    for (auto& file : old_dep)
+    for (const auto& file : old_dep)
     {
         if (dependencies_.find(file) == dependencies_.end())
             files_to_close_.insert(file);
@@ -88,7 +88,6 @@ parse_result processor_file_impl::parse(
 
     return res;
 }
-
 
 parse_result processor_file_impl::parse_macro(
     parse_lib_provider& lib_provider, analyzing_context ctx, library_data data)
@@ -100,7 +99,7 @@ parse_result processor_file_impl::parse_macro(
 
     auto a = std::make_unique<analyzer>(get_text(),
         analyzer_options {
-            get_file_name(),
+            get_file_uri(),
             &lib_provider,
             std::move(ctx),
             data,
@@ -124,7 +123,7 @@ parse_result processor_file_impl::parse_no_lsp_update(
 {
     auto no_update_analyzer_ = std::make_unique<analyzer>(get_text(),
         analyzer_options {
-            get_file_name(),
+            get_file_uri(),
             &lib_provider,
             std::move(ctx),
             data,
@@ -134,7 +133,7 @@ parse_result processor_file_impl::parse_no_lsp_update(
     return true;
 }
 
-const std::set<std::string>& processor_file_impl::dependencies() { return dependencies_; }
+const std::set<utils::path::external_resource>& processor_file_impl::dependencies() { return dependencies_; }
 
 const semantics::lines_info& processor_file_impl::get_hl_info()
 {
@@ -149,17 +148,24 @@ namespace {
 class empty_feature_provider final : public lsp::feature_provider
 {
     // Inherited via feature_provider
-    location definition(const std::string& document_uri, position pos) const override
+    location definition(const utils::path::external_resource& document_uri, position pos) const override
     {
         return location(pos, document_uri);
     }
-    location_list references(const std::string&, position) const override { return location_list(); }
-    lsp::hover_result hover(const std::string&, position) const override { return lsp::hover_result(); }
-    lsp::completion_list_s completion(const std::string&, position, char, completion_trigger_kind) const override
+    location_list references(const utils::path::external_resource&, position) const override { return location_list(); }
+    lsp::hover_result hover(const utils::path::external_resource&, position) const override
+    {
+        return lsp::hover_result();
+    }
+    lsp::completion_list_s completion(
+        const utils::path::external_resource&, position, char, completion_trigger_kind) const override
     {
         return {};
     }
-    lsp::document_symbol_list_s document_symbol(const std::string&, long long) const override { return {}; }
+    lsp::document_symbol_list_s document_symbol(const utils::path::external_resource&, long long) const override
+    {
+        return {};
+    }
 };
 } // namespace
 
@@ -172,7 +178,7 @@ const lsp::feature_provider& processor_file_impl::get_lsp_feature_provider()
     return empty_res;
 }
 
-const std::set<std::string>& processor_file_impl::files_to_close() { return files_to_close_; }
+const std::set<utils::path::external_resource>& processor_file_impl::files_to_close() { return files_to_close_; }
 
 const performance_metrics& processor_file_impl::get_metrics()
 {
@@ -182,9 +188,9 @@ const performance_metrics& processor_file_impl::get_metrics()
     return metrics;
 }
 
-void processor_file_impl::erase_cache_of_opencode(const std::string& opencode_file_name)
+void processor_file_impl::erase_cache_of_opencode(const utils::path::external_resource& opencode_file_uri)
 {
-    macro_cache_.erase_cache_of_opencode(opencode_file_name);
+    macro_cache_.erase_cache_of_opencode(opencode_file_uri);
 }
 
 bool processor_file_impl::parse_inner(analyzer& new_analyzer)

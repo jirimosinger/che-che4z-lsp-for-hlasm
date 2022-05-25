@@ -23,6 +23,7 @@
 #include "empty_configs.h"
 #include "lib_config.h"
 #include "nlohmann/json.hpp"
+#include "utils/external_resource.h"
 #include "workspaces/file_impl.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/workspace.h"
@@ -30,6 +31,7 @@
 using namespace nlohmann;
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 
 std::string one_proc_grps = R"(
 {
@@ -39,13 +41,13 @@ std::string one_proc_grps = R"(
 }
 )";
 
+external_resource file_name = "a_file";
+
 TEST(diags_suppress, no_suppress)
 {
     file_manager_impl fm;
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
-
-    std::string file_name = "a_file";
 
     fm.did_open_file(file_name, 0, R"(
     LR 1,
@@ -76,8 +78,6 @@ TEST(diags_suppress, do_suppress)
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
 
-    std::string file_name = "a_file";
-
     fm.did_open_file(file_name, 0, R"(
     LR 1,
     LR 1,
@@ -101,7 +101,8 @@ TEST(diags_suppress, do_suppress)
     EXPECT_EQ(pfile->diags().size(), 0U);
 
     ASSERT_EQ(msg_consumer.messages.size(), 1U);
-    EXPECT_EQ(msg_consumer.messages[0].first, "Diagnostics suppressed from a_file, because there is no configuration.");
+    EXPECT_EQ(msg_consumer.messages[0].first,
+        "Diagnostics suppressed from " + file_name.get_uri() + ", because there is no configuration.");
     EXPECT_EQ(msg_consumer.messages[0].second, message_type::MT_INFO);
 }
 
@@ -110,8 +111,6 @@ TEST(diags_suppress, pgm_supress_limit_changed)
     file_manager_impl fm;
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
-
-    std::string file_name = "a_file";
 
     fm.did_open_file(file_name, 0, R"(
     LR 1,
@@ -153,8 +152,6 @@ TEST(diags_suppress, cancel_token)
     file_manager_impl fm;
     fm.did_open_file(pgm_conf_name, 0, empty_pgm_conf);
     fm.did_open_file(proc_grps_name, 0, one_proc_grps);
-
-    std::string file_name = "a_file";
 
     fm.did_open_file(file_name, 0, R"(
     LR 1,

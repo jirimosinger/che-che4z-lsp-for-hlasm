@@ -20,6 +20,7 @@
 
 #include "../common_testing.h"
 #include "file_with_text.h"
+#include "utils/external_resource.h"
 #include "utils/path.h"
 #include "utils/platform.h"
 #include "workspaces/file_impl.h"
@@ -28,6 +29,7 @@
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 using hlasm_plugin::utils::platform::is_windows;
 
 class workspace_instruction_sets_test : public diagnosable_impl, public testing::Test
@@ -101,6 +103,9 @@ std::string sam31_macro = R"( MACRO
 const char* sam31_macro_path = is_windows() ? "lib\\SAM31" : "lib/SAM31";
 std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
 
+external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json");
+external_resource source_res("source");
+
 enum class file_manager_opt_variant
 {
     optable_370,
@@ -111,12 +116,13 @@ class file_manager_opt : public file_manager_impl
 {
     std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
     {
+        // external_resource res(std::string("proc_grps.json"));
         switch (variant)
         {
             case file_manager_opt_variant::optable_370:
-                return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_optable_370, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optable_370, *this);
             case file_manager_opt_variant::optable_Z10:
-                return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_optable_Z10, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optable_Z10, *this);
         }
         throw std::logic_error("Not implemented");
     }
@@ -124,17 +130,19 @@ class file_manager_opt : public file_manager_impl
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
-        files_.emplace(hlasmplugin_folder + "proc_grps.json", generate_proc_grps_file(variant));
-        files_.emplace(hlasmplugin_folder + "pgm_conf.json",
-            std::make_unique<file_with_text>("pgm_conf.json", pgmconf_file, *this));
-        files_.emplace("source", std::make_unique<file_with_text>("source", source, *this));
-        files_.emplace(sam31_macro_path, std::make_unique<file_with_text>(sam31_macro_path, sam31_macro, *this));
+        external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
+        external_resource sam31_macro_res(sam31_macro_path);
+
+        files_.emplace(proc_grps_res, generate_proc_grps_file(variant));
+        files_.emplace(pgm_conf_res, std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this));
+        files_.emplace(source_res, std::make_unique<file_with_text>(source_res, source, *this));
+        files_.emplace(sam31_macro_res, std::make_unique<file_with_text>(sam31_macro_res, sam31_macro, *this));
     }
 
-    list_directory_result list_directory_files(const std::string& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
     {
         if (path == "lib/" || path == "lib\\")
-            return { { { "SAM31", "SAM31" } }, hlasm_plugin::utils::path::list_directory_rc::done };
+            return { { { "SAM31", sam31_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
 
         return { {}, hlasm_plugin::utils::path::list_directory_rc::not_exists };
     }
@@ -155,10 +163,10 @@ TEST_F(workspace_instruction_sets_test, changed_instr_set_370_Z10)
 {
     file_manager_opt file_manager(file_manager_opt_variant::optable_370);
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(file_manager, config);
     ws.open();
 
-    ws.did_open_file("source");
+    ws.did_open_file(source_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)0);
 
     // Change instruction set
@@ -172,10 +180,10 @@ TEST_F(workspace_instruction_sets_test, changed_instr_set_Z10_370)
 {
     file_manager_opt file_manager(file_manager_opt_variant::optable_Z10);
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(file_manager, config);
     ws.open();
 
-    ws.did_open_file("source");
+    ws.did_open_file(source_res);
     collect_and_get_diags_size(ws, file_manager);
     EXPECT_TRUE(matches_message_codes(diags(), { "E049" }));
 

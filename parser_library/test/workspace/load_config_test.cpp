@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "empty_configs.h"
+#include "utils/external_resource.h"
 #include "utils/platform.h"
 #include "workspaces/file_impl.h"
 #include "workspaces/file_manager_impl.h"
@@ -28,6 +29,7 @@
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
 using hlasm_plugin::utils::platform::is_windows;
+using namespace hlasm_plugin::utils::path;
 
 class file_proc_grps : public file_impl
 {
@@ -38,7 +40,7 @@ public:
 
     file_uri uri = "test_uri";
 
-    const file_uri& get_file_name() override { return uri; }
+    const file_uri& get_file_uri() override { return uri; }
 
     const std::string& get_text() override { return file; }
 
@@ -110,7 +112,7 @@ public:
 
     file_uri uri = "test_uri";
 
-    const file_uri& get_file_name() override { return uri; }
+    const file_uri& get_file_uri() override { return uri; }
 
     const std::string& get_text() override { return file; }
 
@@ -161,9 +163,9 @@ public:
 class file_manager_proc_grps_test : public file_manager_impl
 {
 public:
-    file_ptr add_file(const file_uri& uri) override
+    file_ptr add_file(const external_resource& resource) override
     {
-        if (uri.substr(uri.size() - 14) == "proc_grps.json")
+        if (resource.get_path().substr(resource.get_path().size() - 14) == "proc_grps.json")
             return proc_grps;
         else
             return pgm_conf;
@@ -174,16 +176,16 @@ public:
 
 
     // Inherited via file_manager
-    void did_open_file(const std::string&, version_t, std::string) override {}
-    void did_change_file(const std::string&, version_t, const document_change*, size_t) override {}
-    void did_close_file(const std::string&) override {}
+    void did_open_file(const external_resource&, version_t, std::string) override {}
+    void did_change_file(const external_resource&, version_t, const document_change*, size_t) override {}
+    void did_close_file(const external_resource&) override {}
 };
 
 TEST(workspace, load_config_synthetic)
 {
     file_manager_proc_grps_test file_manager;
     lib_config config;
-    workspace ws("test_proc_grps_uri", "test_proc_grps_name", file_manager, config);
+    workspace ws(external_resource("test_proc_grps_uri"), "test_proc_grps_name", file_manager, config);
 
     ws.open();
 
@@ -206,7 +208,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_path());
+        EXPECT_EQ(expected[i], libl->get_lib_uri().get_path());
     }
 
     auto& pg2 = ws.get_proc_grp("P2");
@@ -226,7 +228,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg2.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_path());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_path());
     }
 
 
@@ -239,7 +241,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg3.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected[i], libl->get_lib_path());
+        EXPECT_EQ(expected[i], libl->get_lib_uri().get_path());
     }
 
 
@@ -251,7 +253,7 @@ TEST(workspace, load_config_synthetic)
     {
         library_local* libl = dynamic_cast<library_local*>(pg4.libraries()[i].get());
         ASSERT_NE(libl, nullptr);
-        EXPECT_EQ(expected2[i], libl->get_lib_path());
+        EXPECT_EQ(expected2[i], libl->get_lib_uri().get_path());
     }
     // test of asm_options
     const auto& asm_options = ws.get_asm_options(is_windows() ? "test_proc_grps_uri\\pgm1" : "test_proc_grps_uri/pgm1");

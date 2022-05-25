@@ -68,10 +68,10 @@ class hlasm_context
     // stack of processed source files
     std::vector<source_context> source_stack_;
 
-    // path to the opencode
-    std::string opencode_file_name_;
+    // opencode URI
+    utils::path::external_resource opencode_file_uri_;
     // all files processes via macro or copy member invocation
-    std::set<std::string> visited_files_;
+    std::set<utils::path::external_resource> visited_files_;
 
     // Compiler options
     asm_option asm_options_;
@@ -103,15 +103,15 @@ class hlasm_context
     long long m_statements_remaining;
 
 public:
-    hlasm_context(std::string file_name = "",
+    hlasm_context(utils::path::external_resource file_uri = "",
         asm_option asm_opts = {},
         std::shared_ptr<id_storage> init_ids = std::make_shared<id_storage>());
     ~hlasm_context();
 
-    // gets name of file where is open-code located
-    const std::string& opencode_file_name() const;
+    // gets opencode file URI
+    const utils::path::external_resource& opencode_file_uri() const;
     // accesses visited files
-    const std::set<std::string>& get_visited_files();
+    const std::set<utils::path::external_resource>& get_visited_files();
 
     // gets current source
     const source_context& current_source() const;
@@ -128,7 +128,7 @@ public:
     // pushes new kind of statement processing
     void push_statement_processing(const processing::processing_kind kind);
     // pushes new kind of statement processing as well as new source
-    void push_statement_processing(const processing::processing_kind kind, std::string file_name);
+    void push_statement_processing(const processing::processing_kind kind, utils::path::external_resource file_uri);
     // pops statement processing
     void pop_statement_processing();
 
@@ -239,7 +239,7 @@ public:
     void leave_copy_member();
 
     // register preprocessor dependency
-    void add_preprocessor_dependency(const std::string& file);
+    void add_preprocessor_dependency(const utils::path::external_resource& file);
 
     // creates specified global set symbol
     template<typename T>

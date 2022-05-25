@@ -72,13 +72,13 @@ public:
         notify_diagnostics_consumers();
     }
 
-    void did_open_file(const std::string& document_uri, version_t version, std::string text)
+    void did_open_file(const utils::path::external_resource& document_uri, version_t version, std::string text)
     {
         file_manager_.did_open_file(document_uri, version, std::move(text));
         if (cancel_ && *cancel_)
             return;
 
-        workspaces::workspace& ws = ws_path_match(document_uri);
+        workspaces::workspace& ws = ws_path_match(document_uri.get_uri());
         auto metadata = ws.did_open_file(document_uri);
         if (cancel_ && *cancel_)
             return;
@@ -87,14 +87,16 @@ public:
         // only on open
         notify_performance_consumers(document_uri, metadata);
     }
-    void did_change_file(
-        const std::string& document_uri, version_t version, const document_change* changes, size_t ch_size)
+    void did_change_file(const utils::path::external_resource& document_uri,
+        version_t version,
+        const document_change* changes,
+        size_t ch_size)
     {
         file_manager_.did_change_file(document_uri, version, changes, ch_size);
         if (cancel_ && *cancel_)
             return;
 
-        workspaces::workspace& ws = ws_path_match(document_uri);
+        workspaces::workspace& ws = ws_path_match(document_uri.get_uri());
         ws.did_change_file(document_uri, changes, ch_size);
         if (cancel_ && *cancel_)
             return;
@@ -102,18 +104,18 @@ public:
         notify_diagnostics_consumers();
     }
 
-    void did_close_file(const std::string& document_uri)
+    void did_close_file(const utils::path::external_resource& document_uri)
     {
-        workspaces::workspace& ws = ws_path_match(document_uri);
+        workspaces::workspace& ws = ws_path_match(document_uri.get_uri());
         ws.did_close_file(document_uri);
         notify_diagnostics_consumers();
     }
 
-    void did_change_watched_files(std::vector<std::string> paths)
+    void did_change_watched_files(std::vector<utils::path::external_resource> paths)
     {
         for (const auto& path : paths)
         {
-            workspaces::workspace& ws = ws_path_match(path);
+            workspaces::workspace& ws = ws_path_match(path.get_uri());
             ws.did_change_watched_files(path);
         }
         notify_diagnostics_consumers();
@@ -153,6 +155,7 @@ public:
             definition_result = { pos, document_uri };
             return position_uri(definition_result);
         }
+
         definition_result = ws_path_match(document_uri).definition(document_uri, pos);
 
         return position_uri(definition_result);
@@ -215,9 +218,11 @@ public:
         if (cancel_ && *cancel_)
             return empty_tokens;
 
-        auto file = file_manager_.find(document_uri);
+        utils::path::external_resource res(document_uri);
+
+        auto file = file_manager_.find(res);
         if (dynamic_cast<workspaces::processor_file*>(file.get()) != nullptr)
-            return file_manager_.find_processor_file(document_uri)->get_hl_info();
+            return file_manager_.find_processor_file(res)->get_hl_info();
 
         return empty_tokens;
     }
@@ -267,13 +272,14 @@ private:
         }
     }
 
-    void notify_performance_consumers(const std::string& document_uri, workspace_file_info ws_file_info) const
+    void notify_performance_consumers(
+        const utils::path::external_resource& document_uri, workspace_file_info ws_file_info) const
     {
         auto file = file_manager_.find(document_uri);
         auto proc_file = dynamic_cast<workspaces::processor_file*>(file.get());
         if (proc_file)
         {
-            auto metrics = proc_file->get_metrics();
+            const auto& metrics = proc_file->get_metrics();
             for (auto consumer : parsing_metadata_consumers_)
             {
                 consumer->consume_parsing_metadata({ metrics, ws_file_info });

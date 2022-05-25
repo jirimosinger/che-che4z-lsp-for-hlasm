@@ -20,6 +20,7 @@
 #include "gtest/gtest.h"
 
 #include "file_with_text.h"
+#include "utils/external_resource.h"
 #include "utils/path.h"
 #include "utils/platform.h"
 #include "workspaces/file_impl.h"
@@ -28,6 +29,7 @@
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
+using namespace hlasm_plugin::utils::path;
 using hlasm_plugin::utils::platform::is_windows;
 
 class workspace_test : public diagnosable_impl, public testing::Test
@@ -42,7 +44,7 @@ public:
         return diags().size();
     }
 
-    bool match_strings(std::vector<std::string> set)
+    bool match_strings(std::vector<external_resource> set)
     {
         if (diags().size() != set.size())
             return false;
@@ -51,7 +53,7 @@ public:
             bool matched = false;
             for (const auto& str : set)
             {
-                if (diag.file_name == str)
+                if (diag.file_uri == str.get_uri())
                     matched = true;
             }
             if (!matched)
@@ -279,30 +281,38 @@ const char* faulty_macro_path = is_windows() ? "lib\\ERROR" : "lib/ERROR";
 const char* correct_macro_path = is_windows() ? "lib\\CORRECT" : "lib/CORRECT";
 std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
 
+external_resource empty_res = external_resource("");
+
+external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json");
+external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
+external_resource source1_res("source1");
+external_resource source2_res("source2");
+external_resource source3_res("source3");
+external_resource faulty_macro_res(faulty_macro_path);
+external_resource correct_macro_res(correct_macro_path);
+
 class file_manager_extended : public file_manager_impl
 {
 public:
     file_manager_extended()
     {
-        files_.emplace(hlasmplugin_folder + "proc_grps.json",
-            std::make_unique<file_with_text>("proc_grps.json", pgroups_file, *this));
-        files_.emplace(hlasmplugin_folder + "pgm_conf.json",
-            std::make_unique<file_with_text>("pgm_conf.json", pgmconf_file, *this));
-        files_.emplace("source1", std::make_unique<file_with_text>("source1", source_using_macro_file, *this));
-        files_.emplace("source2", std::make_unique<file_with_text>("source2", source_using_macro_file, *this));
-        files_.emplace("source3", std::make_unique<file_with_text>("source3", source_using_macro_file_no_error, *this));
+        files_.emplace(proc_grps_res, std::make_unique<file_with_text>(proc_grps_res, pgroups_file, *this));
+        files_.emplace(pgm_conf_res, std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this));
+        files_.emplace(source1_res, std::make_unique<file_with_text>(source1_res, source_using_macro_file, *this));
+        files_.emplace(source2_res, std::make_unique<file_with_text>(source2_res, source_using_macro_file, *this));
         files_.emplace(
-            faulty_macro_path, std::make_unique<file_with_text>(faulty_macro_path, faulty_macro_file, *this));
+            source3_res, std::make_unique<file_with_text>(source3_res, source_using_macro_file_no_error, *this));
+        files_.emplace(faulty_macro_res, std::make_unique<file_with_text>(faulty_macro_res, faulty_macro_file, *this));
         files_.emplace(
-            correct_macro_path, std::make_unique<file_with_text>(correct_macro_path, correct_macro_file, *this));
+            correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
     }
 
-    list_directory_result list_directory_files(const std::string&) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource&) override
     {
         if (insert_correct_macro)
-            return { { { "ERROR", "ERROR" }, { "CORRECT", "CORRECT" } },
+            return { { { "ERROR", faulty_macro_res }, { "CORRECT", correct_macro_res } },
                 hlasm_plugin::utils::path::list_directory_rc::done };
-        return { { { "ERROR", "ERROR" } }, hlasm_plugin::utils::path::list_directory_rc::done };
+        return { { { "ERROR", faulty_macro_res } }, hlasm_plugin::utils::path::list_directory_rc::done };
     }
 
     bool insert_correct_macro = true;
@@ -327,19 +337,18 @@ class file_manager_opt : public file_manager_impl
         {
             case file_manager_opt_variant::old_school:
             case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
-                return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_old_school, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_old_school, *this);
             case file_manager_opt_variant::default_to_required:
-                return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_default, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_default, *this);
             case file_manager_opt_variant::required:
-                return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_required, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_required, *this);
             case file_manager_opt_variant::optional:
-                return std::make_unique<file_with_text>("proc_grps.json", pgroups_file_optional, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optional, *this);
             case file_manager_opt_variant::invalid_assembler_options:
-                return std::make_unique<file_with_text>(
-                    "proc_grps.json", pgroups_file_invalid_assembler_options, *this);
+                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_invalid_assembler_options, *this);
             case file_manager_opt_variant::invalid_preprocessor_options:
                 return std::make_unique<file_with_text>(
-                    "proc_grps.json", pgroups_file_invalid_preprocessor_options, *this);
+                    proc_grps_res, pgroups_file_invalid_preprocessor_options, *this);
         }
         throw std::logic_error("Not implemented");
     }
@@ -349,26 +358,27 @@ class file_manager_opt : public file_manager_impl
         switch (variant)
         {
             case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
-                return std::make_unique<file_with_text>("pgm_conf.json", pgmconf_file_invalid_assembler_options, *this);
+                return std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file_invalid_assembler_options, *this);
             default:
-                return std::make_unique<file_with_text>("pgm_conf.json", pgmconf_file, *this);
+                return std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this);
         }
     }
 
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
-        files_.emplace(hlasmplugin_folder + "proc_grps.json", generate_proc_grps_file(variant));
-        files_.emplace(hlasmplugin_folder + "pgm_conf.json", generate_pgm_conf_file(variant));
-        files_.emplace("source1", std::make_unique<file_with_text>("source1", source_using_macro_file_no_error, *this));
+        files_.emplace(proc_grps_res, generate_proc_grps_file(variant));
+        files_.emplace(pgm_conf_res, generate_pgm_conf_file(variant));
         files_.emplace(
-            correct_macro_path, std::make_unique<file_with_text>(correct_macro_path, correct_macro_file, *this));
+            source1_res, std::make_unique<file_with_text>(source1_res, source_using_macro_file_no_error, *this));
+        files_.emplace(
+            correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
     }
 
-    list_directory_result list_directory_files(const std::string& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
     {
         if (path == "lib/" || path == "lib\\")
-            return { { { "CORRECT", "CORRECT" } }, hlasm_plugin::utils::path::list_directory_rc::done };
+            return { { { "CORRECT", correct_macro_res } }, hlasm_plugin::utils::path::list_directory_rc::done };
 
         return { {}, hlasm_plugin::utils::path::list_directory_rc::not_exists };
     }
@@ -379,40 +389,41 @@ TEST_F(workspace_test, did_close_file)
 {
     lib_config config;
     file_manager_extended file_manager;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(empty_res, "workspace_name", file_manager, config);
+
     ws.open();
     // 3 files are open
     //	- open codes source1 and source2 with syntax errors using macro ERROR
     //	- macro file lib/ERROR with syntax error
     // on first reparse, there should be 3 diagnostics from sources and lib/ERROR file
-    ws.did_open_file("source1");
-    ws.did_open_file("source2");
+    ws.did_open_file(source1_res);
+    ws.did_open_file(source2_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)3);
-    EXPECT_TRUE(match_strings({ faulty_macro_path, "source2", "source1" }));
+    EXPECT_TRUE(match_strings({ faulty_macro_res, source2_res, source1_res }));
 
     // when we close source1, only its diagnostics should disappear
     // macro's and source2's diagnostics should stay as it is still open
-    ws.did_close_file("source1");
+    ws.did_close_file(source1_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)2);
-    EXPECT_TRUE(match_strings({ faulty_macro_path, "source2" }));
+    EXPECT_TRUE(match_strings({ faulty_macro_res, source2_res }));
 
     // even though we close the ERROR macro, its diagnostics will still be there as it is a dependency of source2
-    ws.did_close_file(faulty_macro_path);
+    ws.did_close_file(faulty_macro_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)2);
-    EXPECT_TRUE(match_strings({ faulty_macro_path, "source2" }));
+    EXPECT_TRUE(match_strings({ faulty_macro_res, source2_res }));
 
     // if we remove the line using ERROR macro in the source2. its diagnostics will be removed as it is no longer a
     // dependency of source2
     std::vector<document_change> changes;
     std::string new_text = "";
     changes.push_back(document_change({ { 0, 0 }, { 0, 6 } }, new_text.c_str(), new_text.size()));
-    file_manager.did_change_file("source2", 1, changes.data(), changes.size());
-    ws.did_change_file("source2", changes.data(), changes.size());
+    file_manager.did_change_file(source2_res, 1, changes.data(), changes.size());
+    ws.did_change_file(source2_res, changes.data(), changes.size());
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)1);
-    EXPECT_TRUE(match_strings({ "source2" }));
+    EXPECT_TRUE(match_strings({ source2_res }));
 
     // finally if we close the last source2 file, its diagnostics will disappear as well
-    ws.did_close_file("source2");
+    ws.did_close_file(source2_res);
     ASSERT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)0);
 }
 
@@ -420,26 +431,26 @@ TEST_F(workspace_test, did_change_watched_files)
 {
     file_manager_extended file_manager;
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(empty_res, "workspace_name", file_manager, config);
     ws.open();
 
     // no diagnostics with no syntax errors
-    ws.did_open_file("source3");
+    ws.did_open_file(source3_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)0);
 
     // remove the macro, there should still be 1 diagnostic E049 that the ERROR was not found
     file_manager.insert_correct_macro = false;
-    ws.did_change_watched_files(correct_macro_path);
+    ws.did_change_watched_files(correct_macro_res);
     ASSERT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)1);
     EXPECT_STREQ(diags()[0].code.c_str(), "E049");
 
     // put it back and make some change in the source file, the diagnostic will disappear
     file_manager.insert_correct_macro = true;
-    ws.did_change_watched_files(correct_macro_path);
+    ws.did_change_watched_files(correct_macro_res);
     std::vector<document_change> changes;
     std::string new_text = "";
     changes.push_back(document_change({ { 0, 0 }, { 0, 0 } }, new_text.c_str(), new_text.size()));
-    ws.did_change_file("source3", changes.data(), changes.size());
+    ws.did_change_file(source3_res, changes.data(), changes.size());
     ASSERT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)0);
 }
 
@@ -451,10 +462,10 @@ TEST_F(workspace_test, missing_library_required)
     {
         file_manager_opt file_manager(type);
         lib_config config;
-        workspace ws("", "workspace_name", file_manager, config);
+        workspace ws(empty_res, "workspace_name", file_manager, config);
         ws.open();
 
-        ws.did_open_file("source1");
+        ws.did_open_file(source1_res);
         EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
         EXPECT_TRUE(std::any_of(diags().begin(), diags().end(), [](const auto& d) { return d.code == "L0002"; }));
     }
@@ -464,10 +475,10 @@ TEST_F(workspace_test, missing_library_optional)
 {
     file_manager_opt file_manager(file_manager_opt_variant::optional);
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(empty_res, "workspace_name", file_manager, config);
     ws.open();
 
-    ws.did_open_file("source1");
+    ws.did_open_file(source1_res);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)0);
 }
 
@@ -475,7 +486,7 @@ TEST_F(workspace_test, invalid_assembler_options)
 {
     file_manager_opt file_manager(file_manager_opt_variant::invalid_assembler_options);
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(empty_res, "workspace_name", file_manager, config);
     ws.open();
 
     EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
@@ -486,7 +497,7 @@ TEST_F(workspace_test, invalid_assembler_options_in_pgm_conf)
 {
     file_manager_opt file_manager(file_manager_opt_variant::invalid_assembler_options_in_pgm_conf);
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(empty_res, "workspace_name", file_manager, config);
     ws.open();
 
     EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
@@ -497,7 +508,7 @@ TEST_F(workspace_test, invalid_preprocessor_options)
 {
     file_manager_opt file_manager(file_manager_opt_variant::invalid_preprocessor_options);
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(empty_res, "workspace_name", file_manager, config);
     ws.open();
 
     EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
@@ -511,7 +522,7 @@ public:
         : file_manager_opt(file_manager_opt_variant::old_school)
     {}
 
-    list_directory_result list_directory_files(const std::string& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
     {
         if (path == "lib/" || path == "lib\\")
             return { {}, hlasm_plugin::utils::path::list_directory_rc::other_failure };
@@ -524,10 +535,10 @@ TEST_F(workspace_test, library_list_failure)
 {
     file_manager_list_dir_failed file_manager;
     lib_config config;
-    workspace ws("", "workspace_name", file_manager, config);
+    workspace ws(empty_res, "workspace_name", file_manager, config);
     ws.open();
 
-    ws.did_open_file("source1");
+    ws.did_open_file(source1_res);
     EXPECT_GE(collect_and_get_diags_size(ws, file_manager), (size_t)1);
     EXPECT_TRUE(std::any_of(diags().begin(), diags().end(), [](const auto& d) { return d.code == "L0001"; }));
 }

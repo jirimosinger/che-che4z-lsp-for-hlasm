@@ -309,7 +309,7 @@ void lsp_analyzer::add_var_def(const semantics::variable_symbol* var, context::S
 
 void lsp_analyzer::add_copy_operand(context::id_index name, const range& operand_range)
 {
-    // find ORD occurence of COPY_OP
+    // find ORD occurrence of COPY_OP
     lsp::symbol_occurence occ(lsp::occurence_kind::ORD, name, operand_range);
     auto ord_sym = std::find(stmt_occurences_.begin(), stmt_occurences_.end(), occ);
 
