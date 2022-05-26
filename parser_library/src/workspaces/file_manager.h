@@ -25,9 +25,9 @@
 #include "diagnosable.h"
 #include "file.h"
 #include "processor.h"
-#include "utils/resource_location.h"
 #include "utils/general_hashers.h"
 #include "utils/list_directory_rc.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 

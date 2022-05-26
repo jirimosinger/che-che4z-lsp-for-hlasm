@@ -22,8 +22,8 @@
 
 #include "dap/dap_server.h"
 #include "feature.h"
-#include "utils/resource_location.h"
 #include "utils/path.h"
+#include "utils/resource_location.h"
 #include "workspace_manager.h"
 
 using namespace hlasm_plugin;

@@ -19,8 +19,8 @@
 #include "gtest/gtest.h"
 
 #include "empty_configs.h"
-#include "utils/resource_location.h"
 #include "utils/platform.h"
+#include "utils/resource_location.h"
 #include "workspaces/file_impl.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/library_local.h"

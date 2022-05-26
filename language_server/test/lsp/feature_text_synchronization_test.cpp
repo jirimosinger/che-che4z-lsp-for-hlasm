@@ -20,8 +20,8 @@
 #include "../response_provider_mock.h"
 #include "../ws_mngr_mock.h"
 #include "lsp/feature_text_synchronization.h"
-#include "utils/resource_location.h"
 #include "utils/platform.h"
+#include "utils/resource_location.h"
 
 const std::string txt_file_uri =
     hlasm_plugin::utils::platform::is_windows() ? R"(file:///c%3A/test/one/blah.txt)" : R"(file:///home/user/somefile)";

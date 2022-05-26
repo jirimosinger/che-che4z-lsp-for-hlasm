@@ -14,8 +14,8 @@
 
 #include "gtest/gtest.h"
 
-#include "utils/resource_location.h"
 #include "utils/platform.h"
+#include "utils/resource_location.h"
 
 using namespace hlasm_plugin;
 using namespace hlasm_plugin::utils::platform;

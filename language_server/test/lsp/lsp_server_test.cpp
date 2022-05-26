@@ -244,3 +244,17 @@ TEST(lsp_server, request_error_no_message)
 
     s.message_received(request_response);
 }
+
+TEST(lsp_server_test, non_compliant_uri)
+{
+    test::ws_mngr_mock ws_mngr;
+    ::testing::NiceMock<send_message_provider_mock> smpm;
+    lsp::server s(ws_mngr);
+    s.set_send_message_provider(&smpm);
+
+    EXPECT_CALL(
+        ws_mngr, did_open_file(::testing::StrEq("user_storage:/user/storage/layout"), 4, ::testing::StrEq("sad"), 3));
+
+    s.message_received(
+        R"({"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"user_storage:/user/storage/layout","languageId":"plaintext","version":4,"text":"sad"}}})"_json);
+}
