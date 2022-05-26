@@ -55,7 +55,7 @@ void adjust_extensions_vector(std::vector<std::string>& extensions, bool extensi
 } // namespace
 
 library_local::library_local(
-    file_manager& file_manager, utils::path::external_resource lib_uri, library_local_options options)
+    file_manager& file_manager, utils::path::resource_location lib_uri, library_local_options options)
     : file_manager_(file_manager)
     , lib_uri_(std::move(lib_uri))
     , extensions_(std::move(options.extensions))
@@ -87,7 +87,7 @@ void library_local::refresh()
     load_files();
 }
 
-const utils::path::external_resource& library_local::get_lib_uri() const { return lib_uri_; }
+const utils::path::resource_location& library_local::get_lib_uri() const { return lib_uri_; }
 
 std::shared_ptr<processor> library_local::find_file(const std::string& file_name)
 {

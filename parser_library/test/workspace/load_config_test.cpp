@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "empty_configs.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "utils/platform.h"
 #include "workspaces/file_impl.h"
 #include "workspaces/file_manager_impl.h"
@@ -163,7 +163,7 @@ public:
 class file_manager_proc_grps_test : public file_manager_impl
 {
 public:
-    file_ptr add_file(const external_resource& resource) override
+    file_ptr add_file(const resource_location& resource) override
     {
         if (resource.get_path().substr(resource.get_path().size() - 14) == "proc_grps.json")
             return proc_grps;
@@ -176,16 +176,16 @@ public:
 
 
     // Inherited via file_manager
-    void did_open_file(const external_resource&, version_t, std::string) override {}
-    void did_change_file(const external_resource&, version_t, const document_change*, size_t) override {}
-    void did_close_file(const external_resource&) override {}
+    void did_open_file(const resource_location&, version_t, std::string) override {}
+    void did_change_file(const resource_location&, version_t, const document_change*, size_t) override {}
+    void did_close_file(const resource_location&) override {}
 };
 
 TEST(workspace, load_config_synthetic)
 {
     file_manager_proc_grps_test file_manager;
     lib_config config;
-    workspace ws(external_resource("test_proc_grps_uri"), "test_proc_grps_name", file_manager, config);
+    workspace ws(resource_location("test_proc_grps_uri"), "test_proc_grps_name", file_manager, config);
 
     ws.open();
 

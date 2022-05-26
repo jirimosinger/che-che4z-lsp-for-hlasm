@@ -12,7 +12,7 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 #include <filesystem>
 #include <regex>
@@ -21,7 +21,6 @@
 
 #include "utils/path.h"
 #include "utils/platform.h"
-
 
 namespace hlasm_plugin::utils::path {
 namespace {
@@ -117,26 +116,26 @@ std::string path_to_uri(std::string_view path)
     return uri;
 }
 
-external_resource::external_resource(std::string uri)
+resource_location::resource_location(std::string uri)
     : m_uri(std::move(uri))
 {}
 
-external_resource::external_resource(std::string_view uri)
-    : external_resource(std::string(uri))
+resource_location::resource_location(std::string_view uri)
+    : resource_location(std::string(uri))
 {}
 
-external_resource::external_resource(const char* uri)
-    : external_resource(std::string(uri))
+resource_location::resource_location(const char* uri)
+    : resource_location(std::string(uri))
 {}
 
-const std::string& external_resource::get_uri() const { return m_uri; }
+const std::string& resource_location::get_uri() const { return m_uri; }
 
-std::string external_resource::get_path() const { return m_uri.size() != 0 ? uri_to_path(m_uri) : m_uri; }
+std::string resource_location::get_path() const { return m_uri.size() != 0 ? uri_to_path(m_uri) : m_uri; }
 
-bool external_resource::operator==(const external_resource& r) const { return m_uri == r.m_uri; }
-bool external_resource::operator<(const external_resource& r) const { return m_uri < r.m_uri; }
+bool resource_location::operator==(const resource_location& r) const { return m_uri == r.m_uri; }
+bool resource_location::operator<(const resource_location& r) const { return m_uri < r.m_uri; }
 
-std::size_t external_resource_hasher::operator()(const external_resource& r) const
+std::size_t resource_location_hasher::operator()(const resource_location& r) const
 {
     return std::hash<std::string> {}(r.get_uri());
 }

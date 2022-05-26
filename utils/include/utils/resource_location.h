@@ -12,8 +12,8 @@
  *   Broadcom, Inc. - initial API and implementation
  */
 
-#ifndef HLASMPLUGIN_UTILS_URI_H
-#define HLASMPLUGIN_UTILS_URI_H
+#ifndef HLASMPLUGIN_UTILS_RESOURCE_LOCATION_H
+#define HLASMPLUGIN_UTILS_RESOURCE_LOCATION_H
 
 #include <optional>
 #include <string>
@@ -26,29 +26,29 @@ std::string uri_to_path(const std::string& uri);
 // Converts from filesystem path to URI
 std::string path_to_uri(std::string_view path);
 
-class external_resource
+class resource_location
 {
 public:
-    external_resource() = default;
-    external_resource(std::string uri);
-    external_resource(std::string_view uri);
-    external_resource(const char* uri);
-    external_resource(const external_resource&) = default;
-    external_resource& operator=(const external_resource&) = default;
+    resource_location() = default;
+    resource_location(std::string uri);
+    resource_location(std::string_view uri);
+    resource_location(const char* uri);
+    resource_location(const resource_location&) = default;
+    resource_location& operator=(const resource_location&) = default;
 
     const std::string& get_uri() const;
     std::string get_path() const;
 
-    bool operator==(const external_resource& r) const;
-    bool operator<(const external_resource& r) const;
+    bool operator==(const resource_location& r) const;
+    bool operator<(const resource_location& r) const;
 
 private:
     std::string m_uri;
 };
 
-struct external_resource_hasher
+struct resource_location_hasher
 {
-    std::size_t operator()(const external_resource& r) const;
+    std::size_t operator()(const resource_location& r) const;
 };
 
 } // namespace hlasm_plugin::utils::path

@@ -24,7 +24,7 @@ namespace hlasm_plugin::parser_library::processing {
 struct copy_start_data
 {
     context::id_index member_name;
-    utils::path::external_resource member_uri;
+    utils::path::resource_location member_uri;
 };
 
 // result of copy_processor

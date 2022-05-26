@@ -31,7 +31,7 @@ namespace hlasm_plugin::parser_library::processing {
 processing_manager::processing_manager(std::unique_ptr<opencode_provider> base_provider,
     analyzing_context ctx,
     workspaces::library_data data,
-    utils::path::external_resource file_uri,
+    utils::path::resource_location file_uri,
     const std::string& file_text,
     workspaces::parse_lib_provider& lib_provider,
     statement_fields_parser& parser)
@@ -236,7 +236,7 @@ void processing_manager::finish_copy_member(copy_processing_result result)
 void processing_manager::finish_opencode() { lsp_analyzer_.opencode_finished(); }
 
 void processing_manager::start_macro_definition(
-    macrodef_start_data start, std::optional<utils::path::external_resource> file_uri)
+    macrodef_start_data start, std::optional<utils::path::resource_location> file_uri)
 {
     if (file_uri)
         hlasm_ctx_.push_statement_processing(processing_kind::MACRO, std::move(*file_uri));

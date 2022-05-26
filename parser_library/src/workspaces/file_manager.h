@@ -25,7 +25,7 @@
 #include "diagnosable.h"
 #include "file.h"
 #include "processor.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "utils/general_hashers.h"
 #include "utils/list_directory_rc.h"
 
@@ -34,7 +34,7 @@ namespace hlasm_plugin::parser_library::workspaces {
 using file_ptr = std::shared_ptr<file>;
 using processor_file_ptr = std::shared_ptr<processor_file>;
 using list_directory_result = std::pair<
-    std::unordered_map<std::string, utils::path::external_resource, utils::hashers::string_hasher, std::equal_to<>>,
+    std::unordered_map<std::string, utils::path::resource_location, utils::hashers::string_hasher, std::equal_to<>>,
     utils::path::list_directory_rc>;
 
 // Wraps an associative array of file names and files.
@@ -62,7 +62,7 @@ public:
     virtual processor_file_ptr find_processor_file(const file_uri& key) = 0;
 
     // Returns list of all files in a directory. Returns associative array with pairs file path - file name.
-    virtual list_directory_result list_directory_files(const utils::path::external_resource& path) = 0;
+    virtual list_directory_result list_directory_files(const utils::path::resource_location& path) = 0;
 
     virtual bool file_exists(const std::string& file_name) = 0;
     virtual bool lib_file_exists(const std::string& lib_path, const std::string& file_name) = 0;

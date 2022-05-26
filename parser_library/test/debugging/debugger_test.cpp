@@ -24,7 +24,7 @@
 #include "debugger.h"
 #include "debugging/debug_types.h"
 #include "protocol.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/workspace.h"
 
@@ -44,7 +44,7 @@ TEST(debugger, stopped_on_entry)
     debugger d;
     d.set_event_consumer(&m);
     std::string file_name = "test_workspace\\test";
-    external_resource file_res(file_name);
+    resource_location file_res(file_name);
 
     file_manager.did_open_file(file_res, 0, "   LR 1,2");
     d.launch(file_name.c_str(), ws, true);
@@ -81,7 +81,7 @@ TEST(debugger, disconnect)
     debugger d;
     d.set_event_consumer(&m);
     std::string file_name = "test_workspace\\test";
-    external_resource file_res(file_name);
+    resource_location file_res(file_name);
 
     file_manager.did_open_file(file_res, 0, "   LR 1,2");
     d.launch(file_name.c_str(), ws, true);
@@ -291,7 +291,7 @@ void step_into(debugger& d,
     std::vector<debugging::stack_frame>& exp_stack_frames,
     size_t line,
     std::string name,
-    external_resource source)
+    resource_location source)
 {
     uint32_t next_frame_id = exp_stack_frames.empty() ? 0 : exp_stack_frames[0].id + 1;
 
@@ -328,11 +328,11 @@ public:
 
         return false;
     }
-    asm_option get_asm_options(const hlasm_plugin::utils::path::external_resource&) const override
+    asm_option get_asm_options(const hlasm_plugin::utils::path::resource_location&) const override
     {
         return { "SEVEN", "" };
     }
-    preprocessor_options get_preprocessor_options(const hlasm_plugin::utils::path::external_resource&) const override
+    preprocessor_options get_preprocessor_options(const hlasm_plugin::utils::path::resource_location&) const override
     {
         return {};
     }
@@ -358,13 +358,13 @@ TEST(debugger, test)
         LR 1,1
 )";
     std::string copy1_filename = "COPY1";
-    external_resource copy1_file_res(copy1_filename);
+    resource_location copy1_file_res(copy1_filename);
     std::string copy1_source = R"(
         COPY COPY2
 )";
 
     std::string copy2_filename = "COPY2";
-    external_resource copy2_file_res(copy2_filename);
+    resource_location copy2_file_res(copy2_filename);
     std::string copy2_source = R"(
 
         ANOP
@@ -380,7 +380,7 @@ TEST(debugger, test)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
@@ -469,7 +469,7 @@ TEST(debugger, sysstmt)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
@@ -518,7 +518,7 @@ A  MAC_IN ()
 )";
 
     std::string copy1_filename = "COPY1";
-    external_resource copy1_file_res(copy1_filename);
+    resource_location copy1_file_res(copy1_filename);
     std::string copy1_source = R"(
            LR 1,1
 )";
@@ -531,7 +531,7 @@ A  MAC_IN ()
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);
@@ -697,7 +697,7 @@ TEST(debugger, positional_parameters)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
 
@@ -818,7 +818,7 @@ TEST(debugger, arrays)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
 
@@ -874,7 +874,7 @@ B EQU A
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
 
@@ -920,7 +920,7 @@ TEST(debugger, ainsert)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
 
@@ -955,7 +955,7 @@ TEST(debugger, concurrent_next_and_file_change)
     COPY COPY1
 )";
     std::string copy1_filename = "COPY1";
-    external_resource copy1_file_res(copy1_filename);
+    resource_location copy1_file_res(copy1_filename);
     std::string copy1_source = R"(
         LR 1,1
         LR 1,1
@@ -974,7 +974,7 @@ TEST(debugger, concurrent_next_and_file_change)
     debugger d;
     d.set_event_consumer(&m);
     std::string filename = "ws\\test";
-    external_resource file_res(filename);
+    resource_location file_res(filename);
 
     file_manager.did_open_file(file_res, 0, open_code);
     d.launch(filename, lib_provider, true, &lib_provider);

@@ -34,7 +34,7 @@ using json = nlohmann::json;
 
 namespace hlasm_plugin::parser_library::workspaces {
 
-workspace::workspace(const utils::path::external_resource& uri,
+workspace::workspace(const utils::path::resource_location& uri,
     const std::string& name,
     file_manager& file_manager,
     const lib_config& global_config,
@@ -52,7 +52,7 @@ workspace::workspace(const utils::path::external_resource& uri,
     pgm_conf_path_ = utils::path::join(hlasm_folder, FILENAME_PGM_CONF);
 }
 
-workspace::workspace(const utils::path::external_resource& uri,
+workspace::workspace(const utils::path::resource_location& uri,
     file_manager& file_manager,
     const lib_config& global_config,
     std::atomic<bool>* cancel)
@@ -85,7 +85,7 @@ bool workspace::program_id_match(const std::string& filename, const program_id& 
 }
 
 std::vector<processor_file_ptr> workspace::find_related_opencodes(
-    const utils::path::external_resource& document_uri) const
+    const utils::path::resource_location& document_uri) const
 {
     std::vector<processor_file_ptr> opencodes;
 
@@ -132,7 +132,7 @@ void workspace::show_message(const std::string& message)
 
 lib_config workspace::get_config() { return local_config_.fill_missing_settings(global_config_); }
 
-const processor_group& workspace::get_proc_grp_by_program(const utils::path::external_resource& uri) const
+const processor_group& workspace::get_proc_grp_by_program(const utils::path::resource_location& uri) const
 {
     const auto* pgm = get_program(uri);
     if (pgm)
@@ -144,7 +144,7 @@ const processor_group& workspace::get_proc_grp_by_program(const program& pgm) co
     return proc_grps_.at(pgm.pgroup);
 }
 
-const program* workspace::get_program(const utils::path::external_resource& filename) const
+const program* workspace::get_program(const utils::path::resource_location& filename) const
 {
     assert(opened_);
 
@@ -166,7 +166,7 @@ const program* workspace::get_program(const utils::path::external_resource& file
 
 const ws_uri& workspace::uri() const { return uri_.get_uri(); }
 
-bool workspace::is_config_file(const utils::path::external_resource& file_uri) const
+bool workspace::is_config_file(const utils::path::resource_location& file_uri) const
 {
     std::filesystem::path file_path(file_uri.get_path());
 
@@ -198,7 +198,7 @@ workspace_file_info workspace::parse_config_file()
     return ws_file_info;
 }
 
-workspace_file_info workspace::parse_file(const utils::path::external_resource& file_uri)
+workspace_file_info workspace::parse_file(const utils::path::resource_location& file_uri)
 {
     workspace_file_info ws_file_info;
 
@@ -272,7 +272,7 @@ void workspace::refresh_libraries()
     }
 }
 
-workspace_file_info workspace::did_open_file(const utils::path::external_resource& file_uri)
+workspace_file_info workspace::did_open_file(const utils::path::resource_location& file_uri)
 {
     if (!is_config_file(file_uri))
         opened_files_.emplace(file_uri);
@@ -280,7 +280,7 @@ workspace_file_info workspace::did_open_file(const utils::path::external_resourc
     return parse_file(file_uri);
 }
 
-void workspace::did_close_file(const utils::path::external_resource& file_uri)
+void workspace::did_close_file(const utils::path::resource_location& file_uri)
 {
     diag_suppress_notified_[file_uri] = false;
 
@@ -317,18 +317,18 @@ void workspace::did_close_file(const utils::path::external_resource& file_uri)
     file_manager_.remove_file(file_uri);
 }
 
-void workspace::did_change_file(const utils::path::external_resource& file_uri, const document_change*, size_t)
+void workspace::did_change_file(const utils::path::resource_location& file_uri, const document_change*, size_t)
 {
     parse_file(file_uri);
 }
 
-void workspace::did_change_watched_files(const utils::path::external_resource& file_uri)
+void workspace::did_change_watched_files(const utils::path::resource_location& file_uri)
 {
     refresh_libraries();
     parse_file(file_uri);
 }
 
-location workspace::definition(const utils::path::external_resource& document_uri, const position pos) const
+location workspace::definition(const utils::path::resource_location& document_uri, const position pos) const
 {
     auto opencodes = find_related_opencodes(document_uri);
     if (opencodes.empty())
@@ -337,7 +337,7 @@ location workspace::definition(const utils::path::external_resource& document_ur
     return opencodes.back()->get_lsp_feature_provider().definition(document_uri, pos);
 }
 
-location_list workspace::references(const utils::path::external_resource& document_uri, const position pos) const
+location_list workspace::references(const utils::path::resource_location& document_uri, const position pos) const
 {
     auto opencodes = find_related_opencodes(document_uri);
     if (opencodes.empty())
@@ -346,7 +346,7 @@ location_list workspace::references(const utils::path::external_resource& docume
     return opencodes.back()->get_lsp_feature_provider().references(document_uri, pos);
 }
 
-lsp::hover_result workspace::hover(const utils::path::external_resource& document_uri, const position pos) const
+lsp::hover_result workspace::hover(const utils::path::resource_location& document_uri, const position pos) const
 {
     auto opencodes = find_related_opencodes(document_uri);
     if (opencodes.empty())
@@ -355,7 +355,7 @@ lsp::hover_result workspace::hover(const utils::path::external_resource& documen
     return opencodes.back()->get_lsp_feature_provider().hover(document_uri, pos);
 }
 
-lsp::completion_list_s workspace::completion(const utils::path::external_resource& document_uri,
+lsp::completion_list_s workspace::completion(const utils::path::resource_location& document_uri,
     const position pos,
     const char trigger_char,
     completion_trigger_kind trigger_kind) const
@@ -368,7 +368,7 @@ lsp::completion_list_s workspace::completion(const utils::path::external_resourc
 }
 
 lsp::document_symbol_list_s workspace::document_symbol(
-    const utils::path::external_resource& document_uri, long long limit) const
+    const utils::path::resource_location& document_uri, long long limit) const
 {
     auto opencodes = find_related_opencodes(document_uri);
     if (opencodes.empty())
@@ -693,9 +693,9 @@ bool workspace::is_wildcard(const std::string& str)
 }
 
 void workspace::filter_and_close_dependencies_(
-    const std::set<utils::path::external_resource>& dependencies, processor_file_ptr file)
+    const std::set<utils::path::resource_location>& dependencies, processor_file_ptr file)
 {
-    std::set<utils::path::external_resource> filtered;
+    std::set<utils::path::resource_location> filtered;
     // filters out externally open files
     for (const auto& dependency : dependencies)
     {
@@ -725,7 +725,7 @@ void workspace::filter_and_close_dependencies_(
     }
 }
 
-bool workspace::is_dependency_(const utils::path::external_resource& file_uri)
+bool workspace::is_dependency_(const utils::path::resource_location& file_uri)
 {
     for (const auto& dependant : dependants_)
     {
@@ -754,7 +754,7 @@ parse_result workspace::parse_library(const std::string& library, analyzing_cont
     return false;
 }
 
-bool workspace::has_library(const std::string& library, const utils::path::external_resource& program) const
+bool workspace::has_library(const std::string& library, const utils::path::resource_location& program) const
 {
     auto& proc_grp = get_proc_grp_by_program(program);
     for (auto&& lib : proc_grp.libraries())
@@ -768,8 +768,8 @@ bool workspace::has_library(const std::string& library, const utils::path::exter
 }
 
 std::optional<std::string> workspace::get_library(const std::string& library,
-    const utils::path::external_resource& program,
-    std::optional<utils::path::external_resource>* uri) const
+    const utils::path::resource_location& program,
+    std::optional<utils::path::resource_location>* uri) const
 {
     auto& proc_grp = get_proc_grp_by_program(program);
     for (auto&& lib : proc_grp.libraries())
@@ -790,7 +790,7 @@ std::optional<std::string> workspace::get_library(const std::string& library,
     return std::nullopt;
 }
 
-asm_option workspace::get_asm_options(const utils::path::external_resource& file_uri) const
+asm_option workspace::get_asm_options(const utils::path::resource_location& file_uri) const
 {
     asm_option result;
 
@@ -808,14 +808,14 @@ asm_option workspace::get_asm_options(const utils::path::external_resource& file
     return result;
 }
 
-preprocessor_options workspace::get_preprocessor_options(const utils::path::external_resource& file_uri) const
+preprocessor_options workspace::get_preprocessor_options(const utils::path::resource_location& file_uri) const
 {
     auto& proc_grp = get_proc_grp_by_program(file_uri);
 
     return proc_grp.preprocessor();
 }
 
-processor_file_ptr workspace::get_processor_file(const utils::path::external_resource& file_uri)
+processor_file_ptr workspace::get_processor_file(const utils::path::resource_location& file_uri)
 {
     return get_file_manager().get_processor_file(file_uri);
 }

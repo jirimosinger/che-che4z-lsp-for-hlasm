@@ -26,7 +26,7 @@ bool operator<(const line_range& lhs, const line_range& rhs)
     return std::tie(lhs.begin, lhs.end) < std::tie(rhs.begin, rhs.end);
 }
 
-file_info::file_info(utils::path::external_resource file, text_data_ref_t text_data)
+file_info::file_info(utils::path::resource_location file, text_data_ref_t text_data)
     : file(std::move(file))
     , type(file_type::OPENCODE)
     , data(std::move(text_data))

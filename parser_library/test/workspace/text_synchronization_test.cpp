@@ -14,7 +14,7 @@
 
 #include "gtest/gtest.h"
 
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "workspaces/file_impl.h"
 
 using namespace hlasm_plugin::parser_library::workspaces;

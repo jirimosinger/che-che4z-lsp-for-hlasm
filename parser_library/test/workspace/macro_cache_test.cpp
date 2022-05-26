@@ -21,7 +21,7 @@
 #include "analyzer.h"
 #include "file_with_text.h"
 #include "files_parse_lib_provider.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/processor_file_impl.h"
 #include "workspaces/workspace.h"
@@ -36,7 +36,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 {
     const static inline size_t lib_prefix_length = 4;
 
-    std::unordered_map<external_resource, std::shared_ptr<file_with_text>, external_resource_hasher> files_by_fname_;
+    std::unordered_map<resource_location, std::shared_ptr<file_with_text>, resource_location_hasher> files_by_fname_;
     std::unordered_map<std::string, std::pair<std::shared_ptr<file_with_text>, macro_cache>> files_by_library_;
 
     std::shared_ptr<context::hlasm_context> hlasm_ctx;
@@ -61,7 +61,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
     }
 
 
-    file_ptr find(const external_resource& key) const override
+    file_ptr find(const resource_location& key) const override
     {
         auto it = files_by_fname_.find(key);
         return it == files_by_fname_.end() ? nullptr : it->second;
@@ -88,12 +88,12 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
         return true;
     }
 
-    bool has_library(const std::string& library, const external_resource&) const override
+    bool has_library(const std::string& library, const resource_location&) const override
     {
         return files_by_library_.count(library) > 0;
     };
     std::optional<std::string> get_library(
-        const std::string& library, const external_resource&, std::optional<external_resource>*) const override
+        const std::string& library, const resource_location&, std::optional<resource_location>*) const override
     {
         auto it = files_by_library_.find(library);
         if (it == files_by_library_.end())
@@ -308,7 +308,7 @@ MAC OPSYN AREAD
 
 namespace {
 std::optional<diagnostic_s> find_diag_with_filename(
-    const std::vector<diagnostic_s>& diags, const external_resource& file)
+    const std::vector<diagnostic_s>& diags, const resource_location& file)
 {
     auto macro_diag =
         std::find_if(diags.begin(), diags.end(), [&](const diagnostic_s& d) { return d.file_uri == file.get_uri(); });
@@ -322,7 +322,7 @@ std::optional<diagnostic_s> find_diag_with_filename(
 
 TEST(macro_cache_test, overwrite_by_inline)
 {
-    external_resource opencode_file_res = "opencode";
+    resource_location opencode_file_res = "opencode";
     std::string opencode_text =
         R"(
        MAC
@@ -334,7 +334,7 @@ TEST(macro_cache_test, overwrite_by_inline)
        
        MAC
 )";
-    external_resource macro_file_res = "MAC";
+    resource_location macro_file_res = "MAC";
     std::string macro_text =
         R"( MACRO
        MAC

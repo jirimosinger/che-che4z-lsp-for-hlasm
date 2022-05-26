@@ -19,7 +19,7 @@
 #include "document_symbol_item.h"
 #include "location.h"
 #include "protocol.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::parser_library::lsp {
 
@@ -27,15 +27,15 @@ using hover_result = std::string;
 
 struct feature_provider
 {
-    virtual location definition(const utils::path::external_resource& document, position pos) const = 0;
-    virtual location_list references(const utils::path::external_resource& document, position pos) const = 0;
-    virtual hover_result hover(const utils::path::external_resource& document, position pos) const = 0;
-    virtual completion_list_s completion(const utils::path::external_resource& document,
+    virtual location definition(const utils::path::resource_location& document, position pos) const = 0;
+    virtual location_list references(const utils::path::resource_location& document, position pos) const = 0;
+    virtual hover_result hover(const utils::path::resource_location& document, position pos) const = 0;
+    virtual completion_list_s completion(const utils::path::resource_location& document,
         position pos,
         char trigger_char,
         completion_trigger_kind trigger_kind) const = 0;
     virtual document_symbol_list_s document_symbol(
-        const utils::path::external_resource& document, long long limit) const = 0;
+        const utils::path::resource_location& document, long long limit) const = 0;
 
 protected:
     ~feature_provider() = default;

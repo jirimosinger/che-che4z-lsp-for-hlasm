@@ -23,7 +23,7 @@
 #include "empty_configs.h"
 #include "lib_config.h"
 #include "nlohmann/json.hpp"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "workspaces/file_impl.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/workspace.h"
@@ -41,7 +41,7 @@ std::string one_proc_grps = R"(
 }
 )";
 
-external_resource file_name = "a_file";
+resource_location file_name = "a_file";
 
 TEST(diags_suppress, no_suppress)
 {

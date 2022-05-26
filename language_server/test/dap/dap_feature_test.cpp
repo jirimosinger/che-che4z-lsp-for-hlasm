@@ -22,7 +22,7 @@
 
 #include "dap/dap_server.h"
 #include "feature.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "utils/path.h"
 #include "workspace_manager.h"
 

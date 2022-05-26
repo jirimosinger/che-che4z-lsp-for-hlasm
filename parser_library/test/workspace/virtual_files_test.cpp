@@ -20,7 +20,7 @@
 #include "../common_testing.h"
 #include "diagnosable_impl.h"
 #include "preprocessor_options.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "virtual_file_monitor.h"
 #include "workspace_manager.h"
 #include "workspaces/file_manager_impl.h"
@@ -51,7 +51,7 @@ public:
     MOCK_METHOD(processor_file_ptr, find_processor_file, (const file_uri& key), (override));
     MOCK_METHOD(list_directory_result,
         list_directory_files,
-        (const hlasm_plugin::utils::path::external_resource& path),
+        (const hlasm_plugin::utils::path::resource_location& path),
         (override));
     MOCK_METHOD(bool, file_exists, (const std::string& file_name), (override));
     MOCK_METHOD(bool, lib_file_exists, (const std::string& lib_path, const std::string& file_name), (override));

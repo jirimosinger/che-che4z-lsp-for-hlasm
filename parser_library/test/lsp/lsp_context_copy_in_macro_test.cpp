@@ -24,7 +24,7 @@ using namespace hlasm_plugin::utils::path;
 struct lsp_context_copy_in_macro : public ::testing::Test
 {
     const static inline std::string opencode_file_name = "source";
-    const static inline external_resource opencode_file_res = opencode_file_name;
+    const static inline resource_location opencode_file_res = opencode_file_name;
     const static inline std::string opencode =
         R"(
        MAC 1
@@ -36,7 +36,7 @@ struct lsp_context_copy_in_macro : public ::testing::Test
        COPY NOTEXIST
 )";
     const static inline std::string macro_file_name = "MAC";
-    const static inline external_resource macro_file_res = macro_file_name;
+    const static inline resource_location macro_file_res = macro_file_name;
     const static inline std::string macro =
         R"( MACRO
        MAC &PARAM
@@ -48,7 +48,7 @@ SYM    LR &VAR,1
        MEND
 )";
     const static inline std::string copyfile_file_name = "COPYFILE";
-    const static inline external_resource copyfile_file_res = copyfile_file_name;
+    const static inline resource_location copyfile_file_res = copyfile_file_name;
     const static inline std::string copyfile =
         R"(
        

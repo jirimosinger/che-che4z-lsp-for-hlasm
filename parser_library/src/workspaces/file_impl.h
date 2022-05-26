@@ -18,7 +18,7 @@
 #include "diagnosable_impl.h"
 #include "file.h"
 #include "processor.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 

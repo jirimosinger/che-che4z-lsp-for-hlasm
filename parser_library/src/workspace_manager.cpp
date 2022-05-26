@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "workspace_manager_impl.h"
 #include "workspaces/file_manager_impl.h"
 #include "workspaces/workspace.h"
@@ -60,7 +60,7 @@ void workspace_manager::remove_workspace(const char* uri) { impl_->remove_worksp
 
 void workspace_manager::did_change_watched_files(const char** paths, size_t size)
 {
-    std::vector<utils::path::external_resource> paths_s;
+    std::vector<utils::path::resource_location> paths_s;
     for (size_t i = 0; i < size; ++i)
     {
         paths_s.push_back(paths[i]);

@@ -18,7 +18,7 @@
 #include <stack>
 
 #include "../feature.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::language_server::lsp {
 

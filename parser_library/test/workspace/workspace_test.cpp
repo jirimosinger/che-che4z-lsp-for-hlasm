@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 
 #include "file_with_text.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "utils/path.h"
 #include "utils/platform.h"
 #include "workspaces/file_impl.h"
@@ -44,7 +44,7 @@ public:
         return diags().size();
     }
 
-    bool match_strings(std::vector<external_resource> set)
+    bool match_strings(std::vector<resource_location> set)
     {
         if (diags().size() != set.size())
             return false;
@@ -281,15 +281,15 @@ const char* faulty_macro_path = is_windows() ? "lib\\ERROR" : "lib/ERROR";
 const char* correct_macro_path = is_windows() ? "lib\\CORRECT" : "lib/CORRECT";
 std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
 
-external_resource empty_res = external_resource("");
+resource_location empty_res = resource_location("");
 
-external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json");
-external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
-external_resource source1_res("source1");
-external_resource source2_res("source2");
-external_resource source3_res("source3");
-external_resource faulty_macro_res(faulty_macro_path);
-external_resource correct_macro_res(correct_macro_path);
+resource_location proc_grps_res(hlasmplugin_folder + "proc_grps.json");
+resource_location pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
+resource_location source1_res("source1");
+resource_location source2_res("source2");
+resource_location source3_res("source3");
+resource_location faulty_macro_res(faulty_macro_path);
+resource_location correct_macro_res(correct_macro_path);
 
 class file_manager_extended : public file_manager_impl
 {
@@ -307,7 +307,7 @@ public:
             correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
     }
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource&) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location&) override
     {
         if (insert_correct_macro)
             return { { { "ERROR", faulty_macro_res }, { "CORRECT", correct_macro_res } },
@@ -375,7 +375,7 @@ public:
             correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
     }
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& path) override
     {
         if (path == "lib/" || path == "lib\\")
             return { { { "CORRECT", correct_macro_res } }, hlasm_plugin::utils::path::list_directory_rc::done };
@@ -522,7 +522,7 @@ public:
         : file_manager_opt(file_manager_opt_variant::old_school)
     {}
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& path) override
     {
         if (path == "lib/" || path == "lib\\")
             return { {}, hlasm_plugin::utils::path::list_directory_rc::other_failure };

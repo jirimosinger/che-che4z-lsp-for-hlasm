@@ -20,7 +20,7 @@
 #include "diagnosable_impl.h"
 #include "file_manager.h"
 #include "processor_file_impl.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
@@ -50,10 +50,10 @@ public:
     processor_file_ptr get_processor_file(const file_uri&) override;
     void remove_file(const file_uri&) override;
 
-    file_ptr find(const utils::path::external_resource& key) const override;
-    processor_file_ptr find_processor_file(const utils::path::external_resource& key) override;
+    file_ptr find(const utils::path::resource_location& key) const override;
+    processor_file_ptr find_processor_file(const utils::path::resource_location& key) override;
 
-    list_directory_result list_directory_files(const utils::path::external_resource& path) override;
+    list_directory_result list_directory_files(const utils::path::resource_location& path) override;
 
     void did_open_file(const file_uri& document_uri, version_t version, std::string text) override;
     void did_change_file(
@@ -74,7 +74,7 @@ protected:
     std::unordered_map<unsigned long long, std::string> m_virtual_files;
     // m_virtual_files must outlive the files_
     std::
-        unordered_map<utils::path::external_resource, std::shared_ptr<file_impl>, utils::path::external_resource_hasher>
+        unordered_map<utils::path::resource_location, std::shared_ptr<file_impl>, utils::path::resource_location_hasher>
             files_;
 
 private:

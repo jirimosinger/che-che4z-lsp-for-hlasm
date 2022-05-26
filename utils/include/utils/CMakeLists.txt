@@ -11,7 +11,7 @@
 #   Broadcom, Inc. - initial API and implementation
 
 target_sources(hlasm_utils PUBLIC
-	external_resource.h
+	resource_location.h
 	general_hashers.h
 	list_directory_rc.h
 	path.h

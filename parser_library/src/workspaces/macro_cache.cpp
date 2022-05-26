@@ -189,7 +189,7 @@ void macro_cache::save_macro(const macro_cache_key& key, const analyzer& analyze
         cache_data.cached_member = analyzer.context().hlasm_ctx->get_copy_member(key.data.library_member);
 }
 
-void macro_cache::erase_cache_of_opencode(const utils::path::external_resource& opencode_file_uri)
+void macro_cache::erase_cache_of_opencode(const utils::path::resource_location& opencode_file_uri)
 {
     auto it = cache_.begin();
     while (it != cache_.end())

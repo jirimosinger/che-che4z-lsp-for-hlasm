@@ -19,20 +19,20 @@
 #include <vector>
 
 #include "range.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::parser_library {
 
 struct location
 {
     location() = default;
-    location(position pos, utils::path::external_resource file)
+    location(position pos, utils::path::resource_location file)
         : pos(pos)
         , file(std::move(file))
     {}
     bool operator==(const location& oth) const { return pos == oth.pos && file == oth.file; }
     position pos;
-    utils::path::external_resource file;
+    utils::path::resource_location file;
 };
 
 using location_list = std::vector<location>;

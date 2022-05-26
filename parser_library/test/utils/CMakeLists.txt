@@ -11,5 +11,5 @@
 #   Broadcom, Inc. - initial API and implementation
 
 target_sources(library_test PRIVATE
-	external_resource_test.cpp
+	resource_location_test.cpp
 )

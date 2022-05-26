@@ -24,7 +24,7 @@
 #include "feature_workspace_folders.h"
 #include "lib_config.h"
 #include "parsing_metadata_serialization.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::language_server::lsp {
 

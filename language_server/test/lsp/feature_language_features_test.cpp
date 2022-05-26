@@ -20,7 +20,7 @@
 #include "../response_provider_mock.h"
 #include "../ws_mngr_mock.h"
 #include "lsp/feature_language_features.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "utils/platform.h"
 
 using hlasm_plugin::utils::platform::is_windows;

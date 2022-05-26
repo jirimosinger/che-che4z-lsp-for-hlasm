@@ -20,7 +20,7 @@
 
 #include "../common_testing.h"
 #include "file_with_text.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 #include "utils/path.h"
 #include "utils/platform.h"
 #include "workspaces/file_impl.h"
@@ -103,8 +103,8 @@ std::string sam31_macro = R"( MACRO
 const char* sam31_macro_path = is_windows() ? "lib\\SAM31" : "lib/SAM31";
 std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
 
-external_resource proc_grps_res(hlasmplugin_folder + "proc_grps.json");
-external_resource source_res("source");
+resource_location proc_grps_res(hlasmplugin_folder + "proc_grps.json");
+resource_location source_res("source");
 
 enum class file_manager_opt_variant
 {
@@ -116,7 +116,6 @@ class file_manager_opt : public file_manager_impl
 {
     std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
     {
-        // external_resource res(std::string("proc_grps.json"));
         switch (variant)
         {
             case file_manager_opt_variant::optable_370:
@@ -130,8 +129,8 @@ class file_manager_opt : public file_manager_impl
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
-        external_resource pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
-        external_resource sam31_macro_res(sam31_macro_path);
+        resource_location pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
+        resource_location sam31_macro_res(sam31_macro_path);
 
         files_.emplace(proc_grps_res, generate_proc_grps_file(variant));
         files_.emplace(pgm_conf_res, std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this));
@@ -139,7 +138,7 @@ public:
         files_.emplace(sam31_macro_res, std::make_unique<file_with_text>(sam31_macro_res, sam31_macro, *this));
     }
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::external_resource& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& path) override
     {
         if (path == "lib/" || path == "lib\\")
             return { { { "SAM31", sam31_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };

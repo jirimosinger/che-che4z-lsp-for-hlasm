@@ -366,7 +366,7 @@ bool hlasm_context::is_opcode(id_index symbol) const
 }
 
 hlasm_context::hlasm_context(
-    utils::path::external_resource file_uri, asm_option asm_options, std::shared_ptr<id_storage> init_ids)
+    utils::path::resource_location file_uri, asm_option asm_options, std::shared_ptr<id_storage> init_ids)
     : ids_(std::move(init_ids))
     , opencode_file_uri_(file_uri)
     , asm_options_(std::move(asm_options))
@@ -439,7 +439,7 @@ void hlasm_context::push_statement_processing(const processing::processing_kind 
 }
 
 void hlasm_context::push_statement_processing(
-    const processing::processing_kind kind, utils::path::external_resource file_uri)
+    const processing::processing_kind kind, utils::path::resource_location file_uri)
 {
     source_stack_.emplace_back(std::move(file_uri), kind);
 }
@@ -883,9 +883,9 @@ macro_invo_ptr hlasm_context::this_macro() const
     return macro_invo_ptr();
 }
 
-const utils::path::external_resource& hlasm_context::opencode_file_uri() const { return opencode_file_uri_; }
+const utils::path::resource_location& hlasm_context::opencode_file_uri() const { return opencode_file_uri_; }
 
-const std::set<utils::path::external_resource>& hlasm_context::get_visited_files() const { return visited_files_; }
+const std::set<utils::path::resource_location>& hlasm_context::get_visited_files() const { return visited_files_; }
 
 copy_member_ptr hlasm_context::add_copy_member(
     id_index member, statement_block definition, location definition_location)
@@ -927,7 +927,7 @@ const hlasm_context::copy_member_storage& hlasm_context::copy_members() { return
 
 void hlasm_context::leave_copy_member() { source_stack_.back().copy_stack.pop_back(); }
 
-void hlasm_context::add_preprocessor_dependency(const utils::path::external_resource& file)
+void hlasm_context::add_preprocessor_dependency(const utils::path::resource_location& file)
 {
     visited_files_.emplace(file);
 }

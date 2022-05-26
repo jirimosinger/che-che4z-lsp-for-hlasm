@@ -157,18 +157,18 @@ mock_parse_lib_provider create_copy_mock()
         { "COPYEMPTY", content_COPYEMPTY } };
 }
 
-external_resource start("start");
-external_resource copybm("COPYBM");
-external_resource copyd("COPYD");
-external_resource copyjf("COPYJF");
-external_resource copyl("COPYL");
-external_resource copynd1("COPYND1");
-external_resource copynd2("COPYND2");
-external_resource copyr("COPYR");
+resource_location start("start");
+resource_location copybm("COPYBM");
+resource_location copyd("COPYD");
+resource_location copyjf("COPYJF");
+resource_location copyl("COPYL");
+resource_location copynd1("COPYND1");
+resource_location copynd2("COPYND2");
+resource_location copyr("COPYR");
 
 void check_diag(const hlasm_plugin::parser_library::diagnostic_s& diag,
     size_t expected_line,
-    const external_resource& expected_file)
+    const resource_location& expected_file)
 {
     EXPECT_EQ(diag.diag_range.start.line, expected_line);
     EXPECT_EQ(diag.file_uri, expected_file.get_uri());
@@ -176,7 +176,7 @@ void check_diag(const hlasm_plugin::parser_library::diagnostic_s& diag,
 
 void check_related_diag(const hlasm_plugin::parser_library::diagnostic_related_info_s& diag,
     size_t expected_line,
-    const external_resource& expected_file)
+    const resource_location& expected_file)
 {
     EXPECT_EQ(diag.location.rang.start.line, expected_line);
     EXPECT_EQ(diag.location.uri, expected_file.get_uri());

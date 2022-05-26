@@ -75,7 +75,7 @@ analyzer::analyzer(const std::string& text, analyzer_options opts)
                 *this,
                 opts.get_preprocessor(
                     [libs = &opts.get_lib_provider(), program = opts.file_uri, &ctx = ctx_](std::string_view library) {
-                        std::optional<utils::path::external_resource> uri;
+                        std::optional<utils::path::resource_location> uri;
 
                         auto result = libs->get_library(std::string(library), program, &uri);
 

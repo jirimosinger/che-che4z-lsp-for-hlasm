@@ -16,7 +16,7 @@
 
 #include "../logger.h"
 #include "protocol.h"
-#include "utils/external_resource.h"
+#include "utils/resource_location.h"
 
 namespace hlasm_plugin::language_server::lsp {
 
@@ -92,7 +92,7 @@ void feature_text_synchronization::on_did_change(const json&, const json& params
 
         ++i;
     }
-    ws_mngr_.did_change_file(doc_uri.c_str(), version, std::to_address(changes.begin()), changes.size());
+    ws_mngr_.did_change_file(doc_uri.c_str(), version, &*changes.begin(), changes.size());
 }
 
 void feature_text_synchronization::on_did_close(const json&, const json& params)
