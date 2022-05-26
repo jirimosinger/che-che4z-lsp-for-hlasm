@@ -117,11 +117,11 @@ void workspace::delete_diags(processor_file_ptr file)
             dep_file->diags().clear();
     }
 
-    auto notified_found = diag_suppress_notified_.emplace(file->get_file_uri(), false);
-    if (!notified_found.first->second)
+    auto [notified_found, _] = diag_suppress_notified_.try_emplace(file->get_file_uri(), false);
+    if (!notified_found->second)
         show_message(
             "Diagnostics suppressed from " + file->get_file_uri().get_uri() + ", because there is no configuration.");
-    notified_found.first->second = true;
+    notified_found->second = true;
 }
 
 void workspace::show_message(const std::string& message)
@@ -164,7 +164,7 @@ const program* workspace::get_program(const utils::path::external_resource& file
     return nullptr;
 }
 
-const ws_uri& workspace::uri() { return uri_.get_uri(); }
+const ws_uri& workspace::uri() const { return uri_.get_uri(); }
 
 bool workspace::is_config_file(const utils::path::external_resource& file_uri) const
 {
@@ -712,7 +712,7 @@ void workspace::filter_and_close_dependencies_(
             continue;
         for (auto& dependency : fdependant->dependencies())
         {
-            if (fdependant->get_file_uri() != file->get_file_uri() && filtered.find(dependency) != filtered.end())
+            if (fdependant->get_file_uri() != file->get_file_uri() && filtered.contains(dependency))
                 filtered.erase(dependency);
         }
     }

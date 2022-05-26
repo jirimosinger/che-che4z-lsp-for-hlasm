@@ -885,7 +885,7 @@ macro_invo_ptr hlasm_context::this_macro() const
 
 const utils::path::external_resource& hlasm_context::opencode_file_uri() const { return opencode_file_uri_; }
 
-const std::set<utils::path::external_resource>& hlasm_context::get_visited_files() { return visited_files_; }
+const std::set<utils::path::external_resource>& hlasm_context::get_visited_files() const { return visited_files_; }
 
 copy_member_ptr hlasm_context::add_copy_member(
     id_index member, statement_block definition, location definition_location)

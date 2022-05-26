@@ -118,7 +118,7 @@ public:
         std::optional<utils::path::external_resource>* uri) const override;
     virtual asm_option get_asm_options(const utils::path::external_resource& file_uri) const;
     virtual preprocessor_options get_preprocessor_options(const utils::path::external_resource& file_uri) const;
-    const ws_uri& uri();
+    const ws_uri& uri() const;
 
     void open();
     void close();

@@ -129,10 +129,6 @@ external_resource::external_resource(const char* uri)
     : external_resource(std::string(uri))
 {}
 
-external_resource::external_resource(const external_resource& r)
-    : m_uri(r.m_uri)
-{}
-
 const std::string& external_resource::get_uri() const { return m_uri; }
 
 std::string external_resource::get_path() const { return m_uri.size() != 0 ? uri_to_path(m_uri) : m_uri; }

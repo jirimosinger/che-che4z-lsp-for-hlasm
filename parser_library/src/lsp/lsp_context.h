@@ -90,7 +90,7 @@ private:
         std::optional<range> r,
         long long& limit) const;
     const std::vector<std::pair<symbol_occurence, std::vector<context::id_index>>>&
-    copy_occurences( // todo rename to copy_occurrences
+    copy_occurences(
         const utils::path::external_resource& document_uri,
         document_symbol_cache& cache) const;
     void modify_with_copy(document_symbol_list_s& modified,

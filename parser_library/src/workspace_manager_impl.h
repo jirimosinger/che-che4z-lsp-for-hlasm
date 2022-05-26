@@ -111,7 +111,7 @@ public:
         notify_diagnostics_consumers();
     }
 
-    void did_change_watched_files(std::vector<utils::path::external_resource> paths)
+    void did_change_watched_files(const std::vector<utils::path::external_resource>& paths)
     {
         for (const auto& path : paths)
         {

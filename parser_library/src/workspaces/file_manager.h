@@ -26,14 +26,16 @@
 #include "file.h"
 #include "processor.h"
 #include "utils/external_resource.h"
+#include "utils/general_hashers.h"
 #include "utils/list_directory_rc.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
 
 using file_ptr = std::shared_ptr<file>;
 using processor_file_ptr = std::shared_ptr<processor_file>;
-using list_directory_result =
-    std::pair<std::unordered_map<std::string, utils::path::external_resource>, utils::path::list_directory_rc>;
+using list_directory_result = std::pair<
+    std::unordered_map<std::string, utils::path::external_resource, utils::hashers::string_hasher, std::equal_to<>>,
+    utils::path::list_directory_rc>;
 
 // Wraps an associative array of file names and files.
 // Implements LSP text synchronization methods.

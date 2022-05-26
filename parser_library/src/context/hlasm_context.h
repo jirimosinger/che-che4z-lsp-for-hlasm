@@ -111,7 +111,7 @@ public:
     // gets opencode file URI
     const utils::path::external_resource& opencode_file_uri() const;
     // accesses visited files
-    const std::set<utils::path::external_resource>& get_visited_files();
+    const std::set<utils::path::external_resource>& get_visited_files() const;
 
     // gets current source
     const source_context& current_source() const;
