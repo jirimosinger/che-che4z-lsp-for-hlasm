@@ -39,6 +39,13 @@ export async function showDocument(workspace_file: string) {
     await vscode.window.showTextDocument(document);
 }
 
+export async function closeAllEditors() {
+    while (vscode.window.activeTextEditor !== undefined) {
+        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+        sleep(500);
+    }
+}
+
 export function moveCursor(editor: vscode.TextEditor, position: vscode.Position) {
     editor.selection = new vscode.Selection(position, position);
 }
@@ -47,8 +54,7 @@ export async function toggleBreakpoints(file: string, lines: Array<integer>) {
     await showDocument(file);
     await sleep(1000);
 
-    for (const line of lines)
-    {
+    for (const line of lines) {
         moveCursor(get_editor(file), new vscode.Position(line, 0));
         await vscode.commands.executeCommand('editor.debug.action.toggleBreakpoint');
     }
@@ -56,8 +62,13 @@ export async function toggleBreakpoints(file: string, lines: Array<integer>) {
     await sleep(1000);
 }
 
-export async function debugStartSession(): Promise<vscode.DebugSession>
-{
+export async function removeAllBreakpoints() {
+
+    await vscode.commands.executeCommand('workbench.debug.viewlet.action.removeAllBreakpoints');
+    await sleep(1000);
+}
+
+export async function debugStartSession(): Promise<vscode.DebugSession> {
     const session_started_event = new Promise<vscode.DebugSession>((resolve) => {
         // when the debug session starts
         const disposable = vscode.debug.onDidStartDebugSession((session) => {
@@ -75,8 +86,7 @@ export async function debugStartSession(): Promise<vscode.DebugSession>
     return session;
 }
 
-export async function debugContinue()
-{
+export async function debugContinue() {
     await vscode.commands.executeCommand('workbench.action.debug.continue');
     await sleep(1000);
 }
