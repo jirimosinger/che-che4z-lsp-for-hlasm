@@ -480,7 +480,7 @@ processing_stack_t hlasm_context::processing_stack() const
             id_storage::empty_id);
         for (const auto& member : source_stack_[i].copy_stack)
         {
-            location loc(member.current_statement_position(), member.definition_location()->file);
+            location loc(member.current_statement_position(), *member.definition_location());
             res.emplace_back(std::move(loc), scope_stack_.front(), file_processing_type::COPY, member.name());
         }
 
@@ -511,7 +511,7 @@ location hlasm_context::current_statement_location() const
         {
             const auto& member = source_stack_.back().copy_stack.back();
 
-            return location(member.current_statement_position(), member.definition_location()->file);
+            return location(member.current_statement_position(), *member.definition_location());
         }
         else
             return source_stack_.back().current_instruction;
@@ -873,7 +873,7 @@ macro_invo_ptr hlasm_context::enter_macro(id_index name, macro_data_ptr label_pa
     add_system_vars_to_scope(new_scope);
     add_global_system_vars(new_scope);
 
-    visited_files_.insert(macro_def->definition_location.file);
+    visited_files_.insert(macro_def->definition_location);
 
     ++SYSNDX_;
 
@@ -899,14 +899,14 @@ copy_member_ptr hlasm_context::add_copy_member(
     auto& copydef = copy_members_[member];
     if (!copydef)
         copydef = std::make_shared<copy_member>(member, std::move(definition), definition_location);
-    visited_files_.insert(std::move(definition_location.file));
+    visited_files_.insert(std::move(definition_location));
 
     return copydef;
 }
 
 void hlasm_context::add_copy_member(copy_member_ptr member)
 {
-    visited_files_.insert(member->definition_location.file);
+    visited_files_.insert(member->definition_location);
     copy_members_[member->name] = std::move(member);
 }
 

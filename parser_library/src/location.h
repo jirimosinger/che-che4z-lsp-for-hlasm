@@ -23,16 +23,15 @@
 
 namespace hlasm_plugin::parser_library {
 
-struct location
+struct location : public utils::path::resource_location
 {
     location() = default;
     location(position pos, utils::path::resource_location file)
-        : pos(pos)
-        , file(std::move(file))
+        : utils::path::resource_location(std::move(file))
+        , pos(pos)
     {}
-    bool operator==(const location& oth) const { return pos == oth.pos && file == oth.file; }
+    bool operator==(const location& oth) const { return pos == oth.pos && get_uri() == oth.get_uri(); }
     position pos;
-    utils::path::resource_location file;
 };
 
 using location_list = std::vector<location>;

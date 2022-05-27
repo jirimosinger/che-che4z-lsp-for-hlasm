@@ -15,6 +15,7 @@
 #include "gtest/gtest.h"
 
 #include "analyzer_fixture.h"
+#include "lsp_context_test_helper.h"
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::lsp;
@@ -45,8 +46,7 @@ TEST_F(lsp_context_ord_symbol, document_symbol)
 TEST_F(lsp_context_ord_symbol, definition)
 {
     location res = a.context().lsp_ctx->definition(opencode_file, { 1, 5 });
-    EXPECT_EQ(res.file, opencode_file);
-    EXPECT_EQ(res.pos, position(2, 0));
+    check_location_with_position(res, opencode_file, 2, 0);
 }
 
 TEST_F(lsp_context_ord_symbol, references)
@@ -54,10 +54,8 @@ TEST_F(lsp_context_ord_symbol, references)
     auto res = a.context().lsp_ctx->references(opencode_file, { 2, 0 });
     ASSERT_EQ(res.size(), 2U);
 
-    EXPECT_EQ(res[0].file, opencode_file);
-    EXPECT_EQ(res[0].pos, position(1, 4));
-    EXPECT_EQ(res[1].file, opencode_file);
-    EXPECT_EQ(res[1].pos, position(2, 0));
+    check_location_with_position(res[0], opencode_file, 1, 4);
+    check_location_with_position(res[1], opencode_file, 2, 0);
 }
 
 TEST(hover, abs_symbol)

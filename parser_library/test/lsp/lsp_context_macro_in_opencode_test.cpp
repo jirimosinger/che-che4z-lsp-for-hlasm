@@ -15,6 +15,7 @@
 #include "gtest/gtest.h"
 
 #include "analyzer_fixture.h"
+#include "lsp_context_test_helper.h"
 
 
 using namespace hlasm_plugin::parser_library;
@@ -46,8 +47,7 @@ LAB    MAC 1,KEY_PAR=1
 TEST_F(lsp_context_macro_in_opencode, definition_macro)
 {
     location res = a.context().lsp_ctx->definition(opencode_file, { 7, 8 });
-    EXPECT_EQ(res.file, opencode_file);
-    EXPECT_EQ(res.pos, position(2, 7));
+    check_location_with_position(res, opencode_file, 2, 7);
 }
 
 TEST_F(lsp_context_macro_in_opencode, references_macro)
@@ -55,10 +55,8 @@ TEST_F(lsp_context_macro_in_opencode, references_macro)
     auto res = a.context().lsp_ctx->references(opencode_file, { 7, 8 });
     ASSERT_EQ(res.size(), 2U);
 
-    EXPECT_EQ(res[0].file, opencode_file);
-    EXPECT_EQ(res[0].pos, position(2, 7));
-    EXPECT_EQ(res[1].file, opencode_file);
-    EXPECT_EQ(res[1].pos, position(7, 7));
+    check_location_with_position(res[0], opencode_file, 2, 7);
+    check_location_with_position(res[1], opencode_file, 7, 7);
 }
 
 TEST_F(lsp_context_macro_in_opencode, hover_macro)
@@ -76,8 +74,7 @@ TEST_F(lsp_context_macro_in_opencode, hover_macro)
 TEST_F(lsp_context_macro_in_opencode, definition_macro_param_positional)
 {
     location res = a.context().lsp_ctx->definition(opencode_file, { 3, 11 });
-    EXPECT_EQ(res.file, opencode_file);
-    EXPECT_EQ(res.pos, position(2, 11));
+    check_location_with_position(res, opencode_file, 2, 11);
 }
 
 TEST_F(lsp_context_macro_in_opencode, references_macro_param_positional)
@@ -85,10 +82,8 @@ TEST_F(lsp_context_macro_in_opencode, references_macro_param_positional)
     auto res = a.context().lsp_ctx->references(opencode_file, { 3, 11 });
     ASSERT_EQ(res.size(), 2U);
 
-    EXPECT_EQ(res[0].file, opencode_file);
-    EXPECT_EQ(res[0].pos, position(2, 11));
-    EXPECT_EQ(res[1].file, opencode_file);
-    EXPECT_EQ(res[1].pos, position(3, 10));
+    check_location_with_position(res[0], opencode_file, 2, 11);
+    check_location_with_position(res[1], opencode_file, 3, 10);
 }
 
 TEST_F(lsp_context_macro_in_opencode, hover_macro_param)
@@ -102,8 +97,7 @@ TEST_F(lsp_context_macro_in_opencode, hover_macro_param)
 TEST_F(lsp_context_macro_in_opencode, definition_macro_param_keyword)
 {
     location res = a.context().lsp_ctx->definition(opencode_file, { 3, 20 });
-    EXPECT_EQ(res.file, opencode_file);
-    EXPECT_EQ(res.pos, position(2, 20));
+    check_location_with_position(res, opencode_file, 2, 20);
 }
 
 TEST_F(lsp_context_macro_in_opencode, references_macro_param_keyword)
@@ -111,17 +105,14 @@ TEST_F(lsp_context_macro_in_opencode, references_macro_param_keyword)
     auto res = a.context().lsp_ctx->references(opencode_file, { 3, 20 });
     ASSERT_EQ(res.size(), 2U);
 
-    EXPECT_EQ(res[0].file, opencode_file);
-    EXPECT_EQ(res[0].pos, position(2, 20));
-    EXPECT_EQ(res[1].file, opencode_file);
-    EXPECT_EQ(res[1].pos, position(3, 19));
+    check_location_with_position(res[0], opencode_file, 2, 20);
+    check_location_with_position(res[1], opencode_file, 3, 19);
 }
 
 TEST_F(lsp_context_macro_in_opencode, definition_macro_param_label)
 {
     location res = a.context().lsp_ctx->definition(opencode_file, { 3, 1 });
-    EXPECT_EQ(res.file, opencode_file);
-    EXPECT_EQ(res.pos, position(2, 0));
+    check_location_with_position(res, opencode_file, 2, 0);
 }
 
 TEST_F(lsp_context_macro_in_opencode, references_macro_param_label)
@@ -129,17 +120,14 @@ TEST_F(lsp_context_macro_in_opencode, references_macro_param_label)
     auto res = a.context().lsp_ctx->references(opencode_file, { 3, 1 });
     ASSERT_EQ(res.size(), 2U);
 
-    EXPECT_EQ(res[0].file, opencode_file);
-    EXPECT_EQ(res[0].pos, position(2, 0));
-    EXPECT_EQ(res[1].file, opencode_file);
-    EXPECT_EQ(res[1].pos, position(3, 0));
+    check_location_with_position(res[0], opencode_file, 2, 0);
+    check_location_with_position(res[1], opencode_file, 3, 0);
 }
 
 TEST_F(lsp_context_macro_in_opencode, definition_local_var_same_name)
 {
     location res = a.context().lsp_ctx->definition(opencode_file, { 10, 5 });
-    EXPECT_EQ(res.file, opencode_file);
-    EXPECT_EQ(res.pos, position(9, 6));
+    check_location_with_position(res, opencode_file, 9, 6);
 }
 
 TEST_F(lsp_context_macro_in_opencode, references_local_var_same_name)
@@ -147,10 +135,8 @@ TEST_F(lsp_context_macro_in_opencode, references_local_var_same_name)
     auto res = a.context().lsp_ctx->references(opencode_file, { 10, 5 });
     ASSERT_EQ(res.size(), 2U);
 
-    EXPECT_EQ(res[0].file, opencode_file);
-    EXPECT_EQ(res[0].pos, position(9, 6));
-    EXPECT_EQ(res[1].file, opencode_file);
-    EXPECT_EQ(res[1].pos, position(10, 4));
+    check_location_with_position(res[0], opencode_file, 9, 6);
+    check_location_with_position(res[1], opencode_file, 10, 4);
 }
 
 

@@ -153,7 +153,7 @@ std::string lsp_context::find_macro_copy_id(const context::processing_stack_t& s
 {
     assert(i != 0);
     assert(i < stack.size());
-    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.file.get_uri()
+    return stack[i].member_name == context::id_storage::empty_id ? stack[i].proc_location.get_uri()
                                                                  : *stack[i].member_name;
 }
 
@@ -164,7 +164,7 @@ void lsp_context::document_symbol_macro(document_symbol_list_s& result,
     document_symbol_cache& cache) const
 {
     auto m = std::find_if(m_macros.begin(), m_macros.end(), [&document_loc](const auto& mac) {
-        return mac.first->definition_location.file == document_loc;
+        return mac.first->definition_location == document_loc;
     });
     if (m == m_macros.end())
         return;
@@ -317,7 +317,7 @@ bool do_not_need_nodes(
     const auto size = sym.size() < sect_sym.size() ? sym.size() : sect_sym.size();
     while (i < size)
     {
-        if (sym[i].proc_location.file != sect_sym[i].proc_location.file
+        if (sym[i].proc_location != sect_sym[i].proc_location
             || sym[i].proc_location.pos != sect_sym[i].proc_location.pos)
         {
             if (i + 1 == sym.size())
@@ -526,9 +526,9 @@ document_symbol_list_s lsp_context::document_symbol(
         default:
             std::unordered_map<std::string_view, utils::path::resource_location> name_to_location;
             for (const auto& [def, info] : m_macros)
-                name_to_location.insert_or_assign(*def->id, info->definition_location.file);
+                name_to_location.insert_or_assign(*def->id, info->definition_location);
             for (const auto& [def, info] : m_hlasm_ctx->copy_members())
-                name_to_location.insert_or_assign(*info->name, info->definition_location.file);
+                name_to_location.insert_or_assign(*info->name, info->definition_location);
 
             document_symbol_opencode_ord_symbol(result, limit);
             document_symbol_opencode_var_seq_symbol_aux(result, name_to_location, limit, cache);
@@ -616,7 +616,7 @@ location lsp_context::definition(const utils::path::resource_location& document_
         return { pos, document_loc };
 
     if (auto def = find_definition_location(*occ, macro_scope))
-        return { def->pos, def->file };
+        return { def->pos, def.value() };
     return { pos, document_loc };
 }
 
@@ -777,7 +777,7 @@ bool is_comment(std::string_view line) { return line.substr(0, 1) == "*" || line
 std::string lsp_context::get_macro_documentation(const macro_info& m) const
 {
     // Get file, where the macro is defined
-    auto it = m_files.find(m.definition_location.file);
+    auto it = m_files.find(m.definition_location);
     if (it == m_files.end())
         return "";
     const text_data_ref_t& text = it->second->data;
@@ -912,8 +912,8 @@ std::optional<location> lsp_context::find_definition_location(
             if (sym != var_syms.end())
             {
                 if (macro_scope_i)
-                    return location(sym->def_position,
-                        macro_scope_i->macro_definition->copy_nests[sym->def_location].back().loc.file);
+                    return location(
+                        sym->def_position, macro_scope_i->macro_definition->copy_nests[sym->def_location].back().loc);
                 return location(sym->def_position, sym->file);
             }
             break;

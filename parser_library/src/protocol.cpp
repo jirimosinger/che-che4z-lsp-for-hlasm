@@ -66,7 +66,7 @@ position_uri::position_uri(const location& item)
     : item_(item)
 {}
 position position_uri::pos() const { return item_.pos; }
-std::string_view position_uri::file_uri() const { return item_.file.get_uri(); }
+std::string_view position_uri::file_uri() const { return item_.get_uri(); }
 
 position_uri sequence_item_get(const sequence<position_uri, const location*>* self, size_t index)
 {
