@@ -94,7 +94,7 @@ std::vector<processor_file_ptr> workspace::find_related_opencodes(
         auto f = file_manager_.find_processor_file(dep);
         if (!f)
             continue;
-        if (f->dependencies().find(document_loc) != f->dependencies().end())
+        if (f->dependencies().contains(document_loc))
             opencodes.push_back(std::move(f));
     }
 

@@ -79,8 +79,7 @@ processor_file_ptr file_manager_impl::get_processor_file(const file_location& fi
 void file_manager_impl::remove_file(const file_location& file)
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.find(file);
-    if (ret == files_.end())
+    if (!files_.contains(file))
         return;
 
     // close the file internally
@@ -134,9 +133,9 @@ void file_manager_impl::prepare_file_for_change_(std::shared_ptr<file_impl>& fil
 void file_manager_impl::did_open_file(const file_location& document_loc, version_t version, std::string text)
 {
     std::lock_guard guard(files_mutex);
-    auto ret = files_.emplace(document_loc, std::make_shared<file_impl>(document_loc));
-    prepare_file_for_change_(ret.first->second);
-    ret.first->second->did_open(std::move(text), version);
+    auto [ret, _] = files_.try_emplace(document_loc, std::make_shared<file_impl>(document_loc));
+    prepare_file_for_change_(ret->second);
+    ret->second->did_open(std::move(text), version);
 }
 
 void file_manager_impl::did_change_file(

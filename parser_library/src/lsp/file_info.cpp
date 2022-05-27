@@ -33,14 +33,14 @@ file_info::file_info(utils::path::resource_location location, text_data_ref_t te
 {}
 
 file_info::file_info(context::macro_def_ptr owner, text_data_ref_t text_data)
-    : location(owner->definition_location)
+    : location(owner->definition_location.get_uri())
     , type(file_type::MACRO)
     , owner(std::move(owner))
     , data(std::move(text_data))
 {}
 
 file_info::file_info(context::copy_member_ptr owner, text_data_ref_t text_data)
-    : location(owner->definition_location)
+    : location(owner->definition_location.get_uri())
     , type(file_type::COPY)
     , owner(std::move(owner))
     , data(std::move(text_data))

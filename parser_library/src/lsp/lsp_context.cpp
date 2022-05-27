@@ -616,7 +616,7 @@ location lsp_context::definition(const utils::path::resource_location& document_
         return { pos, document_loc };
 
     if (auto def = find_definition_location(*occ, macro_scope))
-        return { def->pos, def.value() };
+        return { def->pos, def->get_uri() };
     return { pos, document_loc };
 }
 
@@ -913,7 +913,7 @@ std::optional<location> lsp_context::find_definition_location(
             {
                 if (macro_scope_i)
                     return location(
-                        sym->def_position, macro_scope_i->macro_definition->copy_nests[sym->def_location].back().loc);
+                        sym->def_position, macro_scope_i->macro_definition->copy_nests[sym->def_location].back().loc.get_uri());
                 return location(sym->def_position, sym->file);
             }
             break;

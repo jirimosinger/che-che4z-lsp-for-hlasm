@@ -480,7 +480,7 @@ processing_stack_t hlasm_context::processing_stack() const
             id_storage::empty_id);
         for (const auto& member : source_stack_[i].copy_stack)
         {
-            location loc(member.current_statement_position(), *member.definition_location());
+            location loc(member.current_statement_position(), member.definition_location()->get_uri());
             res.emplace_back(std::move(loc), scope_stack_.front(), file_processing_type::COPY, member.name());
         }
 
@@ -511,7 +511,7 @@ location hlasm_context::current_statement_location() const
         {
             const auto& member = source_stack_.back().copy_stack.back();
 
-            return location(member.current_statement_position(), *member.definition_location());
+            return location(member.current_statement_position(), member.definition_location()->get_uri());
         }
         else
             return source_stack_.back().current_instruction;

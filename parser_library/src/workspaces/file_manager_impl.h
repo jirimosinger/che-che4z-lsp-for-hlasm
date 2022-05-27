@@ -69,7 +69,7 @@ public:
     void remove_virtual_file(unsigned long long id) override;
     std::string get_virtual_file(unsigned long long id) const override;
 
-protected:
+private:
     std::unordered_map<unsigned long long, std::string> m_virtual_files;
     // m_virtual_files must outlive the files_
     std::

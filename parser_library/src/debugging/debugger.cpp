@@ -193,7 +193,7 @@ public:
         auto stack = ctx_->processing_stack();
         const auto stack_depth = stack.size();
 
-        for (const auto& bp : breakpoints(stack.back().proc_location))
+        for (const auto& bp : breakpoints(stack.back().proc_location.get_uri()))
         {
             if (bp.line >= stmt_range.start.line && bp.line <= stmt_range.end.line)
                 breakpoint_hit = true;
