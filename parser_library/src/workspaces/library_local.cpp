@@ -55,9 +55,9 @@ void adjust_extensions_vector(std::vector<std::string>& extensions, bool extensi
 } // namespace
 
 library_local::library_local(
-    file_manager& file_manager, utils::path::resource_location lib_uri, library_local_options options)
+    file_manager& file_manager, utils::path::resource_location lib_loc, library_local_options options)
     : file_manager_(file_manager)
-    , lib_uri_(std::move(lib_uri))
+    , lib_loc_(std::move(lib_loc))
     , extensions_(std::move(options.extensions))
     , optional_(options.optional_library)
     , extensions_from_deprecated_source(options.extensions_from_deprecated_source)
@@ -68,7 +68,7 @@ library_local::library_local(
 
 library_local::library_local(library_local&& l) noexcept
     : file_manager_(l.file_manager_)
-    , lib_uri_(std::move(l.lib_uri_))
+    , lib_loc_(std::move(l.lib_loc_))
     , files_(std::move(l.files_))
     , extensions_(std::move(l.extensions_))
     , files_loaded_(l.files_loaded_)
@@ -87,7 +87,7 @@ void library_local::refresh()
     load_files();
 }
 
-const utils::path::resource_location& library_local::get_lib_uri() const { return lib_uri_; }
+const utils::path::resource_location& library_local::get_location() const { return lib_loc_; }
 
 std::shared_ptr<processor> library_local::find_file(const std::string& file_name)
 {
@@ -102,7 +102,7 @@ std::shared_ptr<processor> library_local::find_file(const std::string& file_name
 
 void library_local::load_files()
 {
-    auto [files_list, rc] = file_manager_.list_directory_files(lib_uri_);
+    auto [files_list, rc] = file_manager_.list_directory_files(lib_loc_);
     files_.clear();
     diags().clear();
 
@@ -112,13 +112,13 @@ void library_local::load_files()
             break;
         case hlasm_plugin::utils::path::list_directory_rc::not_exists:
             if (!optional_)
-                add_diagnostic(diagnostic_s::error_L0002(lib_uri_.get_uri()));
+                add_diagnostic(diagnostic_s::error_L0002(lib_loc_.get_uri()));
             break;
         case hlasm_plugin::utils::path::list_directory_rc::not_a_directory:
-            add_diagnostic(diagnostic_s::error_L0002(lib_uri_.get_uri()));
+            add_diagnostic(diagnostic_s::error_L0002(lib_loc_.get_uri()));
             break;
         case hlasm_plugin::utils::path::list_directory_rc::other_failure:
-            add_diagnostic(diagnostic_s::error_L0001(lib_uri_.get_uri()));
+            add_diagnostic(diagnostic_s::error_L0001(lib_loc_.get_uri()));
             break;
     }
 
@@ -146,7 +146,7 @@ void library_local::load_files()
             // TODO: the stored value is a full path, yet we try to interpret it as a relative one later on
             if (!inserted)
                 add_diagnostic(
-                    diagnostic_s::warning_L0004(lib_uri_.get_uri(), context::to_upper_copy(std::string(filename))));
+                    diagnostic_s::warning_L0004(lib_loc_.get_uri(), context::to_upper_copy(std::string(filename))));
 
             if (extension.size())
                 extension_removed = true;
@@ -154,7 +154,7 @@ void library_local::load_files()
         }
     }
     if (extension_removed && extensions_from_deprecated_source)
-        add_diagnostic(diagnostic_s::warning_L0003(lib_uri_.get_uri()));
+        add_diagnostic(diagnostic_s::warning_L0003(lib_loc_.get_uri()));
 
     files_loaded_ = true;
 }

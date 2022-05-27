@@ -35,7 +35,7 @@ R1 EQU 1
 
 TEST_F(lsp_context_ord_symbol, document_symbol)
 {
-    document_symbol_list_s outline = a.context().lsp_ctx->document_symbol(opencode_file_name, 1000);
+    document_symbol_list_s outline = a.context().lsp_ctx->document_symbol(opencode_file, 1000);
     std::string R1 = "R1";
     document_symbol_list_s expected = { document_symbol_item_s {
         R1, document_symbol_kind::EQU, range { { 2, 0 }, { 2, 0 } } } };
@@ -44,19 +44,19 @@ TEST_F(lsp_context_ord_symbol, document_symbol)
 
 TEST_F(lsp_context_ord_symbol, definition)
 {
-    location res = a.context().lsp_ctx->definition(opencode_file_name, { 1, 5 });
-    EXPECT_EQ(res.file, opencode_file_name);
+    location res = a.context().lsp_ctx->definition(opencode_file, { 1, 5 });
+    EXPECT_EQ(res.file, opencode_file);
     EXPECT_EQ(res.pos, position(2, 0));
 }
 
 TEST_F(lsp_context_ord_symbol, references)
 {
-    auto res = a.context().lsp_ctx->references(opencode_file_name, { 2, 0 });
+    auto res = a.context().lsp_ctx->references(opencode_file, { 2, 0 });
     ASSERT_EQ(res.size(), 2U);
 
-    EXPECT_EQ(res[0].file, opencode_file_name);
+    EXPECT_EQ(res[0].file, opencode_file);
     EXPECT_EQ(res[0].pos, position(1, 4));
-    EXPECT_EQ(res[1].file, opencode_file_name);
+    EXPECT_EQ(res[1].file, opencode_file);
     EXPECT_EQ(res[1].pos, position(2, 0));
 }
 

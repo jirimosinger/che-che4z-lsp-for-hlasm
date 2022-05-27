@@ -36,7 +36,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
 {
     const static inline size_t lib_prefix_length = 4;
 
-    std::unordered_map<resource_location, std::shared_ptr<file_with_text>, resource_location_hasher> files_by_fname_;
+    std::unordered_map<resource_location, std::shared_ptr<file_with_text>, resource_location_hasher> files_by_location_;
     std::unordered_map<std::string, std::pair<std::shared_ptr<file_with_text>, macro_cache>> files_by_library_;
 
     std::shared_ptr<context::hlasm_context> hlasm_ctx;
@@ -48,7 +48,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
         auto [it, succ] = files_by_library_.emplace(file_name.substr(lib_prefix_length),
             std::pair<std::shared_ptr<file_with_text>, macro_cache>(
                 std::piecewise_construct, std::forward_as_tuple(file), std::forward_as_tuple(*this, *file)));
-        files_by_fname_.emplace(std::move(file_name), file);
+        files_by_location_.emplace(std::move(file_name), file);
 
         return it->second;
     }
@@ -56,15 +56,15 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
     auto add_opencode(std::string file_name, std::string text)
     {
         auto file = std::make_shared<file_with_text>(file_name, text, *this);
-        files_by_fname_.emplace(std::move(file_name), file);
+        files_by_location_.emplace(std::move(file_name), file);
         return file;
     }
 
 
     file_ptr find(const resource_location& key) const override
     {
-        auto it = files_by_fname_.find(key);
-        return it == files_by_fname_.end() ? nullptr : it->second;
+        auto it = files_by_location_.find(key);
+        return it == files_by_location_.end() ? nullptr : it->second;
     };
 
     std::pair<processor_file_ptr, macro_cache*> get_proc_file_from_library(const std::string& library)
@@ -80,7 +80,7 @@ struct file_manager_cache_test_mock : public file_manager_impl, public parse_lib
         const std::string& library, analyzing_context ctx, const workspaces::library_data data) override
     {
         auto [m, cache] = get_proc_file_from_library(library);
-        auto a = std::make_unique<analyzer>(m->get_text(), analyzer_options { m->get_file_uri(), ctx, this, data });
+        auto a = std::make_unique<analyzer>(m->get_text(), analyzer_options { m->get_location(), ctx, this, data });
         a->analyze();
         auto key = macro_cache_key::create_from_context(*ctx.hlasm_ctx, data);
         cache->save_macro(key, *a);
@@ -322,7 +322,7 @@ std::optional<diagnostic_s> find_diag_with_filename(
 
 TEST(macro_cache_test, overwrite_by_inline)
 {
-    resource_location opencode_file_res = "opencode";
+    resource_location opencode_file_loc = "opencode";
     std::string opencode_text =
         R"(
        MAC
@@ -334,7 +334,7 @@ TEST(macro_cache_test, overwrite_by_inline)
        
        MAC
 )";
-    resource_location macro_file_res = "MAC";
+    resource_location macro_file_loc = "MAC";
     std::string macro_text =
         R"( MACRO
        MAC
@@ -345,24 +345,24 @@ TEST(macro_cache_test, overwrite_by_inline)
     file_manager_impl file_mngr;
     files_parse_lib_provider lib_provider(file_mngr);
 
-    file_mngr.did_open_file(opencode_file_res, 0, opencode_text);
-    file_mngr.did_open_file(macro_file_res, 0, macro_text);
-    auto opencode = file_mngr.add_processor_file(opencode_file_res);
+    file_mngr.did_open_file(opencode_file_loc, 0, opencode_text);
+    file_mngr.did_open_file(macro_file_loc, 0, macro_text);
+    auto opencode = file_mngr.add_processor_file(opencode_file_loc);
 
     opencode->parse(lib_provider, {}, {}, nullptr);
     opencode->collect_diags();
 
     EXPECT_EQ(opencode->diags().size(), 2U);
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_res));
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_res));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_loc));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_loc));
 
     opencode->diags().clear();
 
     opencode->parse(lib_provider, {}, {}, nullptr);
     opencode->collect_diags();
     EXPECT_EQ(opencode->diags().size(), 2U);
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_res));
-    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_res));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), macro_file_loc));
+    EXPECT_TRUE(find_diag_with_filename(opencode->diags(), opencode_file_loc));
 }
 
 TEST(macro_cache_test, inline_depends_on_copy)

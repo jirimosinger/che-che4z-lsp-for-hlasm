@@ -34,29 +34,29 @@ using json = nlohmann::json;
 
 namespace hlasm_plugin::parser_library::workspaces {
 
-workspace::workspace(const utils::path::resource_location& uri,
+workspace::workspace(const utils::path::resource_location& location,
     const std::string& name,
     file_manager& file_manager,
     const lib_config& global_config,
     std::atomic<bool>* cancel)
     : cancel_(cancel)
     , name_(name)
-    , uri_(uri)
+    , location_(location)
     , file_manager_(file_manager)
     , fm_vfm_(file_manager_)
     , implicit_proc_grp("pg_implicit", {}, {})
     , global_config_(global_config)
 {
-    auto hlasm_folder = utils::path::join(uri_.get_path(), HLASM_PLUGIN_FOLDER);
+    auto hlasm_folder = utils::path::join(location_.get_path(), HLASM_PLUGIN_FOLDER);
     proc_grps_path_ = utils::path::join(hlasm_folder, FILENAME_PROC_GRPS);
     pgm_conf_path_ = utils::path::join(hlasm_folder, FILENAME_PGM_CONF);
 }
 
-workspace::workspace(const utils::path::resource_location& uri,
+workspace::workspace(const utils::path::resource_location& location,
     file_manager& file_manager,
     const lib_config& global_config,
     std::atomic<bool>* cancel)
-    : workspace(uri, uri.get_uri(), file_manager, global_config, cancel)
+    : workspace(location, location.get_uri(), file_manager, global_config, cancel)
 {}
 
 workspace::workspace(file_manager& file_manager, const lib_config& global_config, std::atomic<bool>* cancel)
@@ -85,7 +85,7 @@ bool workspace::program_id_match(const std::string& filename, const program_id& 
 }
 
 std::vector<processor_file_ptr> workspace::find_related_opencodes(
-    const utils::path::resource_location& document_uri) const
+    const utils::path::resource_location& document_loc) const
 {
     std::vector<processor_file_ptr> opencodes;
 
@@ -94,14 +94,14 @@ std::vector<processor_file_ptr> workspace::find_related_opencodes(
         auto f = file_manager_.find_processor_file(dep);
         if (!f)
             continue;
-        if (f->dependencies().find(document_uri) != f->dependencies().end())
+        if (f->dependencies().find(document_loc) != f->dependencies().end())
             opencodes.push_back(std::move(f));
     }
 
     if (opencodes.size())
         return opencodes;
 
-    if (auto f = file_manager_.find_processor_file(document_uri))
+    if (auto f = file_manager_.find_processor_file(document_loc))
         return { f };
     return {};
 }
@@ -117,10 +117,10 @@ void workspace::delete_diags(processor_file_ptr file)
             dep_file->diags().clear();
     }
 
-    auto [notified_found, _] = diag_suppress_notified_.try_emplace(file->get_file_uri(), false);
+    auto [notified_found, _] = diag_suppress_notified_.try_emplace(file->get_location(), false);
     if (!notified_found->second)
         show_message(
-            "Diagnostics suppressed from " + file->get_file_uri().get_uri() + ", because there is no configuration.");
+            "Diagnostics suppressed from " + file->get_location().get_uri() + ", because there is no configuration.");
     notified_found->second = true;
 }
 
@@ -132,9 +132,9 @@ void workspace::show_message(const std::string& message)
 
 lib_config workspace::get_config() { return local_config_.fill_missing_settings(global_config_); }
 
-const processor_group& workspace::get_proc_grp_by_program(const utils::path::resource_location& uri) const
+const processor_group& workspace::get_proc_grp_by_program(const utils::path::resource_location& file_location) const
 {
-    const auto* pgm = get_program(uri);
+    const auto* pgm = get_program(file_location);
     if (pgm)
         return proc_grps_.at(pgm->pgroup);
     return implicit_proc_grp;
@@ -144,12 +144,13 @@ const processor_group& workspace::get_proc_grp_by_program(const program& pgm) co
     return proc_grps_.at(pgm.pgroup);
 }
 
-const program* workspace::get_program(const utils::path::resource_location& filename) const
+const program* workspace::get_program(const utils::path::resource_location& file_location) const
 {
     assert(opened_);
 
     std::string file =
-        utils::path::lexically_normal(utils::path::lexically_relative(filename.get_path(), uri_.get_path())).string();
+        utils::path::lexically_normal(utils::path::lexically_relative(file_location.get_path(), location_.get_path()))
+            .string();
 
     // direct match
     auto program = exact_pgm_conf_.find(file);
@@ -164,11 +165,11 @@ const program* workspace::get_program(const utils::path::resource_location& file
     return nullptr;
 }
 
-const ws_uri& workspace::uri() const { return uri_.get_uri(); }
+const ws_uri& workspace::uri() const { return location_.get_uri(); }
 
-bool workspace::is_config_file(const utils::path::resource_location& file_uri) const
+bool workspace::is_config_file(const utils::path::resource_location& file_location) const
 {
-    std::filesystem::path file_path(file_uri.get_path());
+    std::filesystem::path file_path(file_location.get_path());
 
     return utils::path::equal(file_path, proc_grps_path_) || utils::path::equal(file_path, pgm_conf_path_);
 }
@@ -198,12 +199,12 @@ workspace_file_info workspace::parse_config_file()
     return ws_file_info;
 }
 
-workspace_file_info workspace::parse_file(const utils::path::resource_location& file_uri)
+workspace_file_info workspace::parse_file(const utils::path::resource_location& file_location)
 {
     workspace_file_info ws_file_info;
 
     // TODO: add support for hlasm to vscode (auto detection??) and do the decision based on languageid
-    if (is_config_file(file_uri))
+    if (is_config_file(file_location))
     {
         return parse_config_file();
     }
@@ -211,14 +212,14 @@ workspace_file_info workspace::parse_file(const utils::path::resource_location& 
     // TODO: what about removing files??? what if depentands_ points to not existing file?
     std::vector<processor_file_ptr> files_to_parse;
 
-    for (const auto& fname : dependants_)
+    for (const auto& dep : dependants_)
     {
-        auto f = file_manager_.find_processor_file(fname);
+        auto f = file_manager_.find_processor_file(dep);
         if (!f)
             continue;
-        for (auto& name : f->dependencies())
+        for (auto& dep_location : f->dependencies())
         {
-            if (name == file_uri)
+            if (dep_location == file_location)
             {
                 files_to_parse.push_back(f);
                 break;
@@ -228,21 +229,21 @@ workspace_file_info workspace::parse_file(const utils::path::resource_location& 
 
     if (files_to_parse.empty())
     {
-        if (auto f = file_manager_.find_processor_file(file_uri); f)
+        if (auto f = file_manager_.find_processor_file(file_location); f)
             files_to_parse.push_back(f);
     }
 
     for (const auto& f : files_to_parse)
     {
-        f->parse(*this, get_asm_options(f->get_file_uri()), get_preprocessor_options(f->get_file_uri()), &fm_vfm_);
+        f->parse(*this, get_asm_options(f->get_location()), get_preprocessor_options(f->get_location()), &fm_vfm_);
         if (!f->dependencies().empty())
-            dependants_.insert(f->get_file_uri());
+            dependants_.insert(f->get_location());
 
         // if there is no processor group assigned to the program, delete diagnostics that may have been created
         if (cancel_ && cancel_->load()) // skip, if parsing was cancelled using the cancellation token
             continue;
 
-        const processor_group& grp = get_proc_grp_by_program(f->get_file_uri());
+        const processor_group& grp = get_proc_grp_by_program(f->get_location());
         f->collect_diags();
         ws_file_info.processor_group_found = &grp != &implicit_proc_grp;
         if (&grp == &implicit_proc_grp && (int64_t)f->diags().size() > get_config().diag_supress_limit)
@@ -251,7 +252,7 @@ workspace_file_info workspace::parse_file(const utils::path::resource_location& 
             delete_diags(f);
         }
         else
-            diag_suppress_notified_[f->get_file_uri()] = false;
+            diag_suppress_notified_[f->get_location()] = false;
     }
 
     // second check after all dependants are there to close all files that used to be dependencies
@@ -272,30 +273,30 @@ void workspace::refresh_libraries()
     }
 }
 
-workspace_file_info workspace::did_open_file(const utils::path::resource_location& file_uri)
+workspace_file_info workspace::did_open_file(const utils::path::resource_location& file_location)
 {
-    if (!is_config_file(file_uri))
-        opened_files_.emplace(file_uri);
+    if (!is_config_file(file_location))
+        opened_files_.emplace(file_location);
 
-    return parse_file(file_uri);
+    return parse_file(file_location);
 }
 
-void workspace::did_close_file(const utils::path::resource_location& file_uri)
+void workspace::did_close_file(const utils::path::resource_location& file_location)
 {
-    diag_suppress_notified_[file_uri] = false;
+    diag_suppress_notified_[file_location] = false;
 
-    opened_files_.erase(file_uri);
+    opened_files_.erase(file_location);
 
     // first check whether the file is a dependency
     // if so, simply close it, no other action is needed
-    if (is_dependency_(file_uri))
+    if (is_dependency_(file_location))
     {
-        file_manager_.did_close_file(file_uri);
+        file_manager_.did_close_file(file_location);
         return;
     }
 
     // find if the file is a dependant
-    auto fname = dependants_.find(file_uri);
+    auto fname = dependants_.find(file_location);
     if (fname != dependants_.end())
     {
         auto file = file_manager_.find_processor_file(*fname);
@@ -306,75 +307,75 @@ void workspace::did_close_file(const utils::path::resource_location& file_uri)
         {
             auto proc_file = file_manager_.get_processor_file(dep);
             if (proc_file)
-                proc_file->erase_cache_of_opencode(file_uri);
+                proc_file->erase_cache_of_opencode(file_location);
         }
         // remove it from dependants
         dependants_.erase(fname);
     }
 
     // close the file itself
-    file_manager_.did_close_file(file_uri);
-    file_manager_.remove_file(file_uri);
+    file_manager_.did_close_file(file_location);
+    file_manager_.remove_file(file_location);
 }
 
-void workspace::did_change_file(const utils::path::resource_location& file_uri, const document_change*, size_t)
+void workspace::did_change_file(const utils::path::resource_location& file_location, const document_change*, size_t)
 {
-    parse_file(file_uri);
+    parse_file(file_location);
 }
 
-void workspace::did_change_watched_files(const utils::path::resource_location& file_uri)
+void workspace::did_change_watched_files(const utils::path::resource_location& file_location)
 {
     refresh_libraries();
-    parse_file(file_uri);
+    parse_file(file_location);
 }
 
-location workspace::definition(const utils::path::resource_location& document_uri, const position pos) const
+location workspace::definition(const utils::path::resource_location& document_loc, const position pos) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(document_loc);
     if (opencodes.empty())
-        return { pos, document_uri };
+        return { pos, document_loc };
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().definition(document_uri, pos);
+    return opencodes.back()->get_lsp_feature_provider().definition(document_loc, pos);
 }
 
-location_list workspace::references(const utils::path::resource_location& document_uri, const position pos) const
+location_list workspace::references(const utils::path::resource_location& document_loc, const position pos) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
-    if (opencodes.empty())
-        return {};
-    // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().references(document_uri, pos);
-}
-
-lsp::hover_result workspace::hover(const utils::path::resource_location& document_uri, const position pos) const
-{
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(document_loc);
     if (opencodes.empty())
         return {};
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().hover(document_uri, pos);
+    return opencodes.back()->get_lsp_feature_provider().references(document_loc, pos);
 }
 
-lsp::completion_list_s workspace::completion(const utils::path::resource_location& document_uri,
+lsp::hover_result workspace::hover(const utils::path::resource_location& document_loc, const position pos) const
+{
+    auto opencodes = find_related_opencodes(document_loc);
+    if (opencodes.empty())
+        return {};
+    // for now take last opencode
+    return opencodes.back()->get_lsp_feature_provider().hover(document_loc, pos);
+}
+
+lsp::completion_list_s workspace::completion(const utils::path::resource_location& document_loc,
     const position pos,
     const char trigger_char,
     completion_trigger_kind trigger_kind) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(document_loc);
     if (opencodes.empty())
         return {};
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().completion(document_uri, pos, trigger_char, trigger_kind);
+    return opencodes.back()->get_lsp_feature_provider().completion(document_loc, pos, trigger_char, trigger_kind);
 }
 
 lsp::document_symbol_list_s workspace::document_symbol(
-    const utils::path::resource_location& document_uri, long long limit) const
+    const utils::path::resource_location& document_loc, long long limit) const
 {
-    auto opencodes = find_related_opencodes(document_uri);
+    auto opencodes = find_related_opencodes(document_loc);
     if (opencodes.empty())
         return {};
     // for now take last opencode
-    return opencodes.back()->get_lsp_feature_provider().document_symbol(document_uri, limit);
+    return opencodes.back()->get_lsp_feature_provider().document_symbol(document_loc, limit);
 }
 
 void workspace::open() { load_and_process_config(); }
@@ -536,7 +537,7 @@ void workspace::find_and_add_libs(
 // open config files and parse them
 bool workspace::load_and_process_config()
 {
-    std::filesystem::path ws_path(uri_.get_path());
+    std::filesystem::path ws_path(location_.get_path());
 
     config_diags_.clear();
 
@@ -624,7 +625,7 @@ bool workspace::load_and_process_config()
         }
         else
         {
-            config_diags_.push_back(diagnostic_s::error_W0004(pgm_conf_file->get_file_uri().get_uri(), name_));
+            config_diags_.push_back(diagnostic_s::error_W0004(pgm_conf_file->get_location().get_uri(), name_));
         }
     }
 
@@ -633,7 +634,7 @@ bool workspace::load_and_process_config()
 bool workspace::load_config(
     config::proc_grps& proc_groups, config::pgm_conf& pgm_config, file_ptr& proc_grps_file, file_ptr& pgm_conf_file)
 {
-    std::filesystem::path hlasm_base = utils::path::join(uri_.get_path(), HLASM_PLUGIN_FOLDER);
+    std::filesystem::path hlasm_base = utils::path::join(location_.get_path(), HLASM_PLUGIN_FOLDER);
 
     // proc_grps.json parse
     proc_grps_file = file_manager_.add_file(utils::path::join(hlasm_base, FILENAME_PROC_GRPS).string());
@@ -649,15 +650,15 @@ bool workspace::load_config(
         {
             if (!pg.asm_options.valid())
                 config_diags_.push_back(
-                    diagnostic_s::error_W0005(proc_grps_file->get_file_uri().get_uri(), pg.name, "processor group"));
+                    diagnostic_s::error_W0005(proc_grps_file->get_location().get_uri(), pg.name, "processor group"));
             if (!pg.preprocessor.valid())
-                config_diags_.push_back(diagnostic_s::error_W0006(proc_grps_file->get_file_uri().get_uri(), pg.name));
+                config_diags_.push_back(diagnostic_s::error_W0006(proc_grps_file->get_location().get_uri(), pg.name));
         }
     }
     catch (const nlohmann::json::exception&)
     {
         // could not load proc_grps
-        config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_file_uri().get_uri(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0002(proc_grps_file->get_location().get_uri(), name_));
         return false;
     }
 
@@ -674,14 +675,14 @@ bool workspace::load_config(
         {
             if (!pgm.opts.valid())
                 config_diags_.push_back(
-                    diagnostic_s::error_W0005(pgm_conf_file->get_file_uri().get_uri(), pgm.program, "program"));
+                    diagnostic_s::error_W0005(pgm_conf_file->get_location().get_uri(), pgm.program, "program"));
         }
         exact_pgm_conf_.clear();
         regex_pgm_conf_.clear();
     }
     catch (const nlohmann::json::exception&)
     {
-        config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_file_uri().get_uri(), name_));
+        config_diags_.push_back(diagnostic_s::error_W0003(pgm_conf_file->get_location().get_uri(), name_));
         return false;
     }
 
@@ -712,7 +713,7 @@ void workspace::filter_and_close_dependencies_(
             continue;
         for (auto& dependency : fdependant->dependencies())
         {
-            if (fdependant->get_file_uri() != file->get_file_uri() && filtered.contains(dependency))
+            if (fdependant->get_location() != file->get_location() && filtered.contains(dependency))
                 filtered.erase(dependency);
         }
     }
@@ -725,7 +726,7 @@ void workspace::filter_and_close_dependencies_(
     }
 }
 
-bool workspace::is_dependency_(const utils::path::resource_location& file_uri)
+bool workspace::is_dependency_(const utils::path::resource_location& file_location)
 {
     for (const auto& dependant : dependants_)
     {
@@ -734,7 +735,7 @@ bool workspace::is_dependency_(const utils::path::resource_location& file_uri)
             continue;
         for (auto& dependency : fdependant->dependencies())
         {
-            if (dependency == file_uri)
+            if (dependency == file_location)
                 return true;
         }
     }
@@ -743,7 +744,7 @@ bool workspace::is_dependency_(const utils::path::resource_location& file_uri)
 
 parse_result workspace::parse_library(const std::string& library, analyzing_context ctx, library_data data)
 {
-    auto& proc_grp = get_proc_grp_by_program(ctx.hlasm_ctx->opencode_file_uri());
+    auto& proc_grp = get_proc_grp_by_program(ctx.hlasm_ctx->opencode_location());
     for (auto&& lib : proc_grp.libraries())
     {
         std::shared_ptr<processor> found = lib->find_file(library);
@@ -769,7 +770,7 @@ bool workspace::has_library(const std::string& library, const utils::path::resou
 
 std::optional<std::string> workspace::get_library(const std::string& library,
     const utils::path::resource_location& program,
-    std::optional<utils::path::resource_location>* uri) const
+    std::optional<utils::path::resource_location>* location) const
 {
     auto& proc_grp = get_proc_grp_by_program(program);
     for (auto&& lib : proc_grp.libraries())
@@ -782,19 +783,19 @@ std::optional<std::string> workspace::get_library(const std::string& library,
         if (!f) // for now
             return std::nullopt;
 
-        if (uri)
-            *uri = f->get_file_uri();
+        if (location)
+            *location = f->get_location();
 
         return f->get_text();
     }
     return std::nullopt;
 }
 
-asm_option workspace::get_asm_options(const utils::path::resource_location& file_uri) const
+asm_option workspace::get_asm_options(const utils::path::resource_location& file_location) const
 {
     asm_option result;
 
-    auto pgm = get_program(file_uri);
+    auto pgm = get_program(file_location);
     if (pgm)
     {
         get_proc_grp_by_program(*pgm).update_asm_options(result);
@@ -808,16 +809,16 @@ asm_option workspace::get_asm_options(const utils::path::resource_location& file
     return result;
 }
 
-preprocessor_options workspace::get_preprocessor_options(const utils::path::resource_location& file_uri) const
+preprocessor_options workspace::get_preprocessor_options(const utils::path::resource_location& file_location) const
 {
-    auto& proc_grp = get_proc_grp_by_program(file_uri);
+    auto& proc_grp = get_proc_grp_by_program(file_location);
 
     return proc_grp.preprocessor();
 }
 
-processor_file_ptr workspace::get_processor_file(const utils::path::resource_location& file_uri)
+processor_file_ptr workspace::get_processor_file(const utils::path::resource_location& file_location)
 {
-    return get_file_manager().get_processor_file(file_uri);
+    return get_file_manager().get_processor_file(file_location);
 }
 
 } // namespace hlasm_plugin::parser_library::workspaces

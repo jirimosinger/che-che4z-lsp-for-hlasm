@@ -68,8 +68,8 @@ class hlasm_context
     // stack of processed source files
     std::vector<source_context> source_stack_;
 
-    // opencode URI
-    utils::path::resource_location opencode_file_uri_;
+    // opencode file location
+    utils::path::resource_location opencode_file_location_;
     // all files processes via macro or copy member invocation
     std::set<utils::path::resource_location> visited_files_;
 
@@ -103,13 +103,13 @@ class hlasm_context
     long long m_statements_remaining;
 
 public:
-    hlasm_context(utils::path::resource_location file_uri = "",
+    hlasm_context(utils::path::resource_location file_loc = "",
         asm_option asm_opts = {},
         std::shared_ptr<id_storage> init_ids = std::make_shared<id_storage>());
     ~hlasm_context();
 
-    // gets opencode file URI
-    const utils::path::resource_location& opencode_file_uri() const;
+    // gets opencode file location
+    const utils::path::resource_location& opencode_location() const;
     // accesses visited files
     const std::set<utils::path::resource_location>& get_visited_files() const;
 
@@ -128,7 +128,7 @@ public:
     // pushes new kind of statement processing
     void push_statement_processing(const processing::processing_kind kind);
     // pushes new kind of statement processing as well as new source
-    void push_statement_processing(const processing::processing_kind kind, utils::path::resource_location file_uri);
+    void push_statement_processing(const processing::processing_kind kind, utils::path::resource_location file_loc);
     // pops statement processing
     void pop_statement_processing();
 
@@ -239,7 +239,7 @@ public:
     void leave_copy_member();
 
     // register preprocessor dependency
-    void add_preprocessor_dependency(const utils::path::resource_location& file);
+    void add_preprocessor_dependency(const utils::path::resource_location& file_loc);
 
     // creates specified global set symbol
     template<typename T>

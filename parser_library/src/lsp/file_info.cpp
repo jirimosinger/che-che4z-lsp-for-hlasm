@@ -26,21 +26,21 @@ bool operator<(const line_range& lhs, const line_range& rhs)
     return std::tie(lhs.begin, lhs.end) < std::tie(rhs.begin, rhs.end);
 }
 
-file_info::file_info(utils::path::resource_location file, text_data_ref_t text_data)
-    : file(std::move(file))
+file_info::file_info(utils::path::resource_location location, text_data_ref_t text_data)
+    : location(std::move(location))
     , type(file_type::OPENCODE)
     , data(std::move(text_data))
 {}
 
 file_info::file_info(context::macro_def_ptr owner, text_data_ref_t text_data)
-    : file(owner->definition_location.file)
+    : location(owner->definition_location.file)
     , type(file_type::MACRO)
     , owner(std::move(owner))
     , data(std::move(text_data))
 {}
 
 file_info::file_info(context::copy_member_ptr owner, text_data_ref_t text_data)
-    : file(owner->definition_location.file)
+    : location(owner->definition_location.file)
     , type(file_type::COPY)
     , owner(std::move(owner))
     , data(std::move(text_data))

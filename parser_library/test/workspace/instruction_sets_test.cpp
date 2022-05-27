@@ -103,8 +103,8 @@ std::string sam31_macro = R"( MACRO
 const char* sam31_macro_path = is_windows() ? "lib\\SAM31" : "lib/SAM31";
 std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
 
-resource_location proc_grps_res(hlasmplugin_folder + "proc_grps.json");
-resource_location source_res("source");
+resource_location proc_grps_loc(hlasmplugin_folder + "proc_grps.json");
+resource_location source_loc("source");
 
 enum class file_manager_opt_variant
 {
@@ -129,18 +129,18 @@ class file_manager_opt : public file_manager_impl
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
-        resource_location pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
-        resource_location sam31_macro_res(sam31_macro_path);
+        resource_location pgm_conf_loc(hlasmplugin_folder + "pgm_conf.json");
+        resource_location sam31_macro_loc(sam31_macro_path);
 
-        did_open_file(proc_grps_res, 1, get_proc_grp(variant));
-        did_open_file(pgm_conf_res, 1, pgmconf_file);
-        did_open_file(source_res, 1, source);
-        did_open_file(sam31_macro_res, 1, sam31_macro);
+        did_open_file(proc_grps_loc, 1, get_proc_grp(variant));
+        did_open_file(pgm_conf_loc, 1, pgmconf_file);
+        did_open_file(source_loc, 1, source);
+        did_open_file(sam31_macro_loc, 1, sam31_macro);
     }
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& path) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& location) override
     {
-        if (path == "lib/" || path == "lib\\")
+        if (location == "lib/" || location == "lib\\")
             return { { { "SAM31", sam31_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
 
         return { {}, hlasm_plugin::utils::path::list_directory_rc::not_exists };
@@ -165,7 +165,7 @@ TEST_F(workspace_instruction_sets_test, changed_instr_set_370_Z10)
     workspace ws(file_manager, config);
     ws.open();
 
-    ws.did_open_file(source_res);
+    ws.did_open_file(source_loc);
     EXPECT_EQ(collect_and_get_diags_size(ws, file_manager), (size_t)0);
 
     // Change instruction set
@@ -182,7 +182,7 @@ TEST_F(workspace_instruction_sets_test, changed_instr_set_Z10_370)
     workspace ws(file_manager, config);
     ws.open();
 
-    ws.did_open_file(source_res);
+    ws.did_open_file(source_loc);
     collect_and_get_diags_size(ws, file_manager);
     EXPECT_TRUE(matches_message_codes(diags(), { "E049" }));
 

@@ -56,7 +56,7 @@ public:
     virtual const lsp::feature_provider& get_lsp_feature_provider() = 0;
     virtual const std::set<utils::path::resource_location>& files_to_close() = 0;
     virtual const performance_metrics& get_metrics() = 0;
-    virtual void erase_cache_of_opencode(const utils::path::resource_location& opencode_file_uri) = 0;
+    virtual void erase_cache_of_opencode(const utils::path::resource_location& opencode_file_location) = 0;
 
 protected:
     ~processor_file() = default;

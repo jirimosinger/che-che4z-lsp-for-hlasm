@@ -132,7 +132,7 @@ public:
     {
         // TODO: check if already running???
         auto open_code = workspace.get_processor_file(source);
-        opencode_source_uri_ = open_code->get_file_uri().get_uri();
+        opencode_source_uri_ = open_code->get_location().get_uri();
         stop_on_next_stmt_ = stop_on_entry;
 
         thread_ = std::thread([this, open_code = std::move(open_code), &workspace, lib_provider]() {
@@ -145,10 +145,10 @@ public:
 
             analyzer a(open_code->get_text(),
                 analyzer_options {
-                    open_code->get_file_uri(),
+                    open_code->get_location(),
                     lib_provider ? lib_provider : &debug_provider,
-                    workspace.get_asm_options(open_code->get_file_uri()),
-                    workspace.get_preprocessor_options(open_code->get_file_uri()),
+                    workspace.get_asm_options(open_code->get_location()),
+                    workspace.get_preprocessor_options(open_code->get_location()),
                     &vfm,
                 });
 

@@ -41,7 +41,7 @@ public:
 
     virtual std::optional<std::string> get_library(const std::string& library,
         const utils::path::resource_location& program,
-        std::optional<utils::path::resource_location>* file_uri) const = 0;
+        std::optional<utils::path::resource_location>* file_loc) const = 0;
 
 protected:
     ~parse_lib_provider() = default;

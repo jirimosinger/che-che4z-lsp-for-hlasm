@@ -31,7 +31,7 @@ namespace hlasm_plugin::parser_library::processing {
 processing_manager::processing_manager(std::unique_ptr<opencode_provider> base_provider,
     analyzing_context ctx,
     workspaces::library_data data,
-    utils::path::resource_location file_uri,
+    utils::path::resource_location file_loc,
     const std::string& file_text,
     workspaces::parse_lib_provider& lib_provider,
     statement_fields_parser& parser)
@@ -51,10 +51,10 @@ processing_manager::processing_manager(std::unique_ptr<opencode_provider> base_p
                 std::make_unique<ordinary_processor>(ctx_, *this, lib_provider, *this, parser, opencode_prov_));
             break;
         case processing_kind::COPY:
-            start_copy_member(copy_start_data { data.library_member, std::move(file_uri) });
+            start_copy_member(copy_start_data { data.library_member, std::move(file_loc) });
             break;
         case processing_kind::MACRO:
-            start_macro_definition(macrodef_start_data(data.library_member), std::move(file_uri));
+            start_macro_definition(macrodef_start_data(data.library_member), std::move(file_loc));
             break;
         default:
             break;
@@ -220,7 +220,7 @@ void processing_manager::finish_lookahead(lookahead_processing_result result)
 
 void processing_manager::start_copy_member(copy_start_data start)
 {
-    hlasm_ctx_.push_statement_processing(processing_kind::COPY, std::move(start.member_uri));
+    hlasm_ctx_.push_statement_processing(processing_kind::COPY, std::move(start.member_loc));
     procs_.emplace_back(std::make_unique<copy_processor>(ctx_, *this, std::move(start)));
 }
 
@@ -236,10 +236,10 @@ void processing_manager::finish_copy_member(copy_processing_result result)
 void processing_manager::finish_opencode() { lsp_analyzer_.opencode_finished(); }
 
 void processing_manager::start_macro_definition(
-    macrodef_start_data start, std::optional<utils::path::resource_location> file_uri)
+    macrodef_start_data start, std::optional<utils::path::resource_location> file_loc)
 {
-    if (file_uri)
-        hlasm_ctx_.push_statement_processing(processing_kind::MACRO, std::move(*file_uri));
+    if (file_loc)
+        hlasm_ctx_.push_statement_processing(processing_kind::MACRO, std::move(*file_loc));
     else
         hlasm_ctx_.push_statement_processing(processing_kind::MACRO);
 

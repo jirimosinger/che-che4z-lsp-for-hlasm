@@ -27,10 +27,10 @@ using namespace hlasm_plugin::utils::path;
 TEST(processor_file, empty_file_feature_provider)
 {
     std::string file_name = "filename";
-    resource_location file_res(file_name);
+    resource_location file_loc(file_name);
     file_manager_impl mngr;
-    mngr.did_open_file(file_res, 0, " LR 1,1");
-    auto file = mngr.add_processor_file(file_res);
+    mngr.did_open_file(file_loc, 0, " LR 1,1");
+    auto file = mngr.add_processor_file(file_loc);
 
     // Prior to parsing, it should return default values
 
@@ -48,21 +48,21 @@ TEST(processor_file, empty_file_feature_provider)
 TEST(processor_file, parse_macro)
 {
     std::string opencode_name = "filename";
-    resource_location opencode_res(opencode_name);
+    resource_location opencode_loc(opencode_name);
     std::string macro_name = "MAC";
-    resource_location macro_res(macro_name);
+    resource_location macro_loc(macro_name);
 
     file_manager_impl mngr;
     files_parse_lib_provider provider(mngr);
 
-    mngr.did_open_file(opencode_res, 0, " SAM31\n MAC");
-    auto opencode = mngr.add_processor_file(opencode_res);
+    mngr.did_open_file(opencode_loc, 0, " SAM31\n MAC");
+    auto opencode = mngr.add_processor_file(opencode_loc);
 
-    mngr.did_open_file(macro_res, 0, R"( MACRO
+    mngr.did_open_file(macro_loc, 0, R"( MACRO
  MAC
  SAM31
  MEND)");
-    auto macro = mngr.add_processor_file(macro_res);
+    auto macro = mngr.add_processor_file(macro_loc);
 
     opencode->parse(provider, {}, {}, nullptr);
 

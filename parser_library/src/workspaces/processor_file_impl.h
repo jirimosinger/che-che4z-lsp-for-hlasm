@@ -32,7 +32,7 @@ class processor_file_impl : public virtual file_impl, public virtual processor_f
 {
 public:
     processor_file_impl(
-        utils::path::resource_location file_uri, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
+        utils::path::resource_location file_loc, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
     processor_file_impl(file_impl&&, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
     processor_file_impl(const file_impl& file, const file_manager& file_mngr, std::atomic<bool>* cancel = nullptr);
     void collect_diags() const override;
@@ -52,7 +52,7 @@ public:
     const std::set<utils::path::resource_location>& files_to_close() override;
     const performance_metrics& get_metrics() override;
 
-    void erase_cache_of_opencode(const utils::path::resource_location& opencode_file_uri) override;
+    void erase_cache_of_opencode(const utils::path::resource_location& opencode_file_location) override;
 
 private:
     std::unique_ptr<analyzer> last_analyzer_ = nullptr;
