@@ -65,19 +65,17 @@ public:
 
     virtual ~file_manager_impl() = default;
 
-
     void put_virtual_file(unsigned long long id, std::string_view text) override;
     void remove_virtual_file(unsigned long long id) override;
     std::string get_virtual_file(unsigned long long id) const override;
 
-protected:
+private:
     std::unordered_map<unsigned long long, std::string> m_virtual_files;
     // m_virtual_files must outlive the files_
     std::
         unordered_map<utils::path::resource_location, std::shared_ptr<file_impl>, utils::path::resource_location_hasher>
             files_;
 
-private:
     processor_file_ptr change_into_processor_file_if_not_already_(std::shared_ptr<file_impl>& ret);
     void prepare_file_for_change_(std::shared_ptr<file_impl>& file);
 };

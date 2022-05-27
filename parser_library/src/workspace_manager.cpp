@@ -65,7 +65,7 @@ void workspace_manager::did_change_watched_files(const char** paths, size_t size
     {
         paths_s.push_back(paths[i]);
     }
-    impl_->did_change_watched_files(std::move(paths_s));
+    impl_->did_change_watched_files(paths_s);
 }
 
 void workspace_manager::did_open_file(const char* document_uri, version_t version, const char* text, size_t text_size)

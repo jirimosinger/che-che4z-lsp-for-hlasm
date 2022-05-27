@@ -296,15 +296,13 @@ class file_manager_extended : public file_manager_impl
 public:
     file_manager_extended()
     {
-        files_.emplace(proc_grps_res, std::make_unique<file_with_text>(proc_grps_res, pgroups_file, *this));
-        files_.emplace(pgm_conf_res, std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this));
-        files_.emplace(source1_res, std::make_unique<file_with_text>(source1_res, source_using_macro_file, *this));
-        files_.emplace(source2_res, std::make_unique<file_with_text>(source2_res, source_using_macro_file, *this));
-        files_.emplace(
-            source3_res, std::make_unique<file_with_text>(source3_res, source_using_macro_file_no_error, *this));
-        files_.emplace(faulty_macro_res, std::make_unique<file_with_text>(faulty_macro_res, faulty_macro_file, *this));
-        files_.emplace(
-            correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
+        did_open_file(proc_grps_res, 1, pgroups_file);
+        did_open_file(pgm_conf_res, 1, pgmconf_file);
+        did_open_file(source1_res, 1, source_using_macro_file);
+        did_open_file(source2_res, 1, source_using_macro_file);
+        did_open_file(source3_res, 1, source_using_macro_file_no_error);
+        did_open_file(faulty_macro_res, 1, faulty_macro_file);
+        did_open_file(correct_macro_res, 1, correct_macro_file);
     }
 
     list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location&) override
@@ -331,48 +329,45 @@ enum class file_manager_opt_variant
 
 class file_manager_opt : public file_manager_impl
 {
-    std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
+    std::string generate_proc_grps_file(file_manager_opt_variant variant)
     {
         switch (variant)
         {
             case file_manager_opt_variant::old_school:
             case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
-                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_old_school, *this);
+                return pgroups_file_old_school;
             case file_manager_opt_variant::default_to_required:
-                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_default, *this);
+                return pgroups_file_default;
             case file_manager_opt_variant::required:
-                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_required, *this);
+                return pgroups_file_required;
             case file_manager_opt_variant::optional:
-                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optional, *this);
+                return pgroups_file_optional;
             case file_manager_opt_variant::invalid_assembler_options:
-                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_invalid_assembler_options, *this);
+                return pgroups_file_invalid_assembler_options;
             case file_manager_opt_variant::invalid_preprocessor_options:
-                return std::make_unique<file_with_text>(
-                    proc_grps_res, pgroups_file_invalid_preprocessor_options, *this);
+                return pgroups_file_invalid_preprocessor_options;
         }
         throw std::logic_error("Not implemented");
     }
 
-    std::unique_ptr<file_with_text> generate_pgm_conf_file(file_manager_opt_variant variant)
+    std::string generate_pgm_conf_file(file_manager_opt_variant variant)
     {
         switch (variant)
         {
             case file_manager_opt_variant::invalid_assembler_options_in_pgm_conf:
-                return std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file_invalid_assembler_options, *this);
+                return pgmconf_file_invalid_assembler_options;
             default:
-                return std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this);
+                return pgmconf_file;
         }
     }
 
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
-        files_.emplace(proc_grps_res, generate_proc_grps_file(variant));
-        files_.emplace(pgm_conf_res, generate_pgm_conf_file(variant));
-        files_.emplace(
-            source1_res, std::make_unique<file_with_text>(source1_res, source_using_macro_file_no_error, *this));
-        files_.emplace(
-            correct_macro_res, std::make_unique<file_with_text>(correct_macro_res, correct_macro_file, *this));
+        did_open_file(proc_grps_res, 1, generate_proc_grps_file(variant));
+        did_open_file(pgm_conf_res, 1, generate_pgm_conf_file(variant));
+        did_open_file(source1_res, 1, source_using_macro_file_no_error);
+        did_open_file(correct_macro_res, 1, correct_macro_file);
     }
 
     list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& path) override

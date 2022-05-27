@@ -114,14 +114,14 @@ enum class file_manager_opt_variant
 
 class file_manager_opt : public file_manager_impl
 {
-    std::unique_ptr<file_with_text> generate_proc_grps_file(file_manager_opt_variant variant)
+    std::string get_proc_grp(file_manager_opt_variant variant)
     {
         switch (variant)
         {
             case file_manager_opt_variant::optable_370:
-                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optable_370, *this);
+                return pgroups_file_optable_370;
             case file_manager_opt_variant::optable_Z10:
-                return std::make_unique<file_with_text>(proc_grps_res, pgroups_file_optable_Z10, *this);
+                return pgroups_file_optable_Z10;
         }
         throw std::logic_error("Not implemented");
     }
@@ -132,10 +132,10 @@ public:
         resource_location pgm_conf_res(hlasmplugin_folder + "pgm_conf.json");
         resource_location sam31_macro_res(sam31_macro_path);
 
-        files_.emplace(proc_grps_res, generate_proc_grps_file(variant));
-        files_.emplace(pgm_conf_res, std::make_unique<file_with_text>(pgm_conf_res, pgmconf_file, *this));
-        files_.emplace(source_res, std::make_unique<file_with_text>(source_res, source, *this));
-        files_.emplace(sam31_macro_res, std::make_unique<file_with_text>(sam31_macro_res, sam31_macro, *this));
+        did_open_file(proc_grps_res, 1, get_proc_grp(variant));
+        did_open_file(pgm_conf_res, 1, pgmconf_file);
+        did_open_file(source_res, 1, source);
+        did_open_file(sam31_macro_res, 1, sam31_macro);
     }
 
     list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& path) override
