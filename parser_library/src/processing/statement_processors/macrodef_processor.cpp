@@ -466,8 +466,9 @@ void macrodef_processor::process_sequence_symbol(const semantics::label_si& labe
         {
             auto& sym = result_.sequence_symbols[seq.name];
             if (!sym)
-                sym = std::make_unique<context::macro_sequence_symbol>(
-                    seq.name, location(label.field_range.start, hlasm_ctx.current_statement_location().get_uri()), curr_line_);
+                sym = std::make_unique<context::macro_sequence_symbol>(seq.name,
+                    location(label.field_range.start, hlasm_ctx.current_statement_location().get_uri()),
+                    curr_line_);
         }
     }
 }

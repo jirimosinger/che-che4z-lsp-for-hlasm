@@ -912,8 +912,8 @@ std::optional<location> lsp_context::find_definition_location(
             if (sym != var_syms.end())
             {
                 if (macro_scope_i)
-                    return location(
-                        sym->def_position, macro_scope_i->macro_definition->copy_nests[sym->def_location].back().loc.get_uri());
+                    return location(sym->def_position,
+                        macro_scope_i->macro_definition->copy_nests[sym->def_location].back().loc.get_uri());
                 return location(sym->def_position, sym->file);
             }
             break;
