@@ -33,8 +33,12 @@ public:
     resource_location(std::string uri);
     resource_location(std::string_view uri);
     resource_location(const char* uri);
+
     resource_location(const resource_location&) = default;
     resource_location& operator=(const resource_location&) = default;
+
+    resource_location(resource_location&&) = default;
+    resource_location& operator=(resource_location&&) = default;
 
     const std::string& get_uri() const;
     std::string get_path() const;
