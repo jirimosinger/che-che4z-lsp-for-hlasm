@@ -17,6 +17,7 @@
 
 #include <optional>
 #include <string>
+
 #include "resource_location.h"
 
 namespace hlasm_plugin::utils::resource {
