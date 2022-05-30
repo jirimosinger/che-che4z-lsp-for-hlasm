@@ -32,13 +32,13 @@ struct files_parse_lib_provider : public workspaces::parse_lib_provider
             return false;
         return macro->parse_macro(*this, std::move(ctx), std::move(data));
     }
-    virtual bool has_library(const std::string& library, const utils::path::resource_location&) const override
+    virtual bool has_library(const std::string& library, const utils::resource::resource_location&) const override
     {
         return file_mngr->find(library) != nullptr;
     }
     virtual std::optional<std::string> get_library(const std::string& library,
-        const utils::path::resource_location&,
-        std::optional<utils::path::resource_location>*) const override
+        const utils::resource::resource_location&,
+        std::optional<utils::resource::resource_location>*) const override
     {
         auto macro = file_mngr->add_processor_file(library);
         if (!macro)

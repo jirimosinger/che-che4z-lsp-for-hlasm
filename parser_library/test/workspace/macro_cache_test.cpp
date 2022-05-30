@@ -28,7 +28,7 @@
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 
 namespace {
 

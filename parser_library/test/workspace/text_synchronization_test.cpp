@@ -18,7 +18,7 @@
 #include "workspaces/file_impl.h"
 
 using namespace hlasm_plugin::parser_library::workspaces;
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 
 TEST(file, text_synchronization_rn)
 {

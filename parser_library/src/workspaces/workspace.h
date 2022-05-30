@@ -69,11 +69,11 @@ public:
     // Creates just a dummy workspace with no libraries - no dependencies
     // between files.
     workspace(file_manager& file_manager, const lib_config& global_config, std::atomic<bool>* cancel = nullptr);
-    workspace(const utils::path::resource_location& location,
+    workspace(const utils::resource::resource_location& location,
         file_manager& file_manager,
         const lib_config& global_config,
         std::atomic<bool>* cancel = nullptr);
-    workspace(const utils::path::resource_location& location,
+    workspace(const utils::resource::resource_location& location,
         const std::string& name,
         file_manager& file_manager,
         const lib_config& global_config,
@@ -89,35 +89,36 @@ public:
 
     void add_proc_grp(processor_group pg);
     const processor_group& get_proc_grp(const proc_grp_id& proc_grp) const;
-    const processor_group& get_proc_grp_by_program(const utils::path::resource_location& file_location) const;
+    const processor_group& get_proc_grp_by_program(const utils::resource::resource_location& file_location) const;
     const processor_group& get_proc_grp_by_program(const program& program) const;
-    const program* get_program(const utils::path::resource_location& file_location) const;
+    const program* get_program(const utils::resource::resource_location& file_location) const;
 
-    workspace_file_info parse_file(const utils::path::resource_location& file_location);
+    workspace_file_info parse_file(const utils::resource::resource_location& file_location);
     void refresh_libraries();
-    workspace_file_info did_open_file(const utils::path::resource_location& file_location);
-    void did_close_file(const utils::path::resource_location& file_location);
+    workspace_file_info did_open_file(const utils::resource::resource_location& file_location);
+    void did_close_file(const utils::resource::resource_location& file_location);
     void did_change_file(
-        const utils::path::resource_location& file_location, const document_change* changes, size_t ch_size);
-    void did_change_watched_files(const utils::path::resource_location& file_location);
+        const utils::resource::resource_location& file_location, const document_change* changes, size_t ch_size);
+    void did_change_watched_files(const utils::resource::resource_location& file_location);
 
-    location definition(const utils::path::resource_location& document_loc, position pos) const override;
-    location_list references(const utils::path::resource_location& document_loc, position pos) const override;
-    lsp::hover_result hover(const utils::path::resource_location& document_loc, position pos) const override;
-    lsp::completion_list_s completion(const utils::path::resource_location& document_loc,
+    location definition(const utils::resource::resource_location& document_loc, position pos) const override;
+    location_list references(const utils::resource::resource_location& document_loc, position pos) const override;
+    lsp::hover_result hover(const utils::resource::resource_location& document_loc, position pos) const override;
+    lsp::completion_list_s completion(const utils::resource::resource_location& document_loc,
         position pos,
         char trigger_char,
         completion_trigger_kind trigger_kind) const override;
     lsp::document_symbol_list_s document_symbol(
-        const utils::path::resource_location& document_loc, long long limit) const override;
+        const utils::resource::resource_location& document_loc, long long limit) const override;
 
     parse_result parse_library(const std::string& library, analyzing_context ctx, library_data data) override;
-    bool has_library(const std::string& library, const utils::path::resource_location& program) const override;
+    bool has_library(const std::string& library, const utils::resource::resource_location& program) const override;
     std::optional<std::string> get_library(const std::string& library,
-        const utils::path::resource_location& program,
-        std::optional<utils::path::resource_location>* location) const override;
-    virtual asm_option get_asm_options(const utils::path::resource_location& file_location) const;
-    virtual preprocessor_options get_preprocessor_options(const utils::path::resource_location& file_location) const;
+        const utils::resource::resource_location& program,
+        std::optional<utils::resource::resource_location>* location) const override;
+    virtual asm_option get_asm_options(const utils::resource::resource_location& file_location) const;
+    virtual preprocessor_options get_preprocessor_options(
+        const utils::resource::resource_location& file_location) const;
     const ws_uri& uri() const;
 
     void open();
@@ -125,7 +126,7 @@ public:
 
     void set_message_consumer(message_consumer* consumer);
 
-    processor_file_ptr get_processor_file(const utils::path::resource_location& file_location);
+    processor_file_ptr get_processor_file(const utils::resource::resource_location& file_location);
 
     file_manager& get_file_manager();
 
@@ -137,7 +138,7 @@ private:
     std::atomic<bool>* cancel_;
 
     std::string name_;
-    utils::path::resource_location location_;
+    utils::resource::resource_location location_;
     file_manager& file_manager_;
     file_manager_vfm fm_vfm_;
 
@@ -146,15 +147,15 @@ private:
     std::vector<std::pair<program, std::regex>> regex_pgm_conf_;
     processor_group implicit_proc_grp;
 
-    std::filesystem::path proc_grps_path_;
-    std::filesystem::path pgm_conf_path_;
+    utils::resource::resource_location proc_grps_loc_;
+    utils::resource::resource_location pgm_conf_loc_;
 
     bool opened_ = false;
 
     void find_and_add_libs(
         std::string root, const std::string& path_pattern, processor_group& prc_grp, const library_local_options& opts);
 
-    bool is_config_file(const utils::path::resource_location& file_location) const;
+    bool is_config_file(const utils::resource::resource_location& file_location) const;
     workspace_file_info parse_config_file();
 
     bool load_and_process_config();
@@ -168,19 +169,20 @@ private:
     bool is_wildcard(const std::string& str);
 
     // files, that depend on others (e.g. open code files that use macros)
-    std::set<utils::path::resource_location> dependants_;
+    std::set<utils::resource::resource_location> dependants_;
 
-    std::set<utils::path::resource_location> opened_files_;
+    std::set<utils::resource::resource_location> opened_files_;
 
     diagnostic_container config_diags_;
 
     void filter_and_close_dependencies_(
-        const std::set<utils::path::resource_location>& dependencies, processor_file_ptr file);
-    bool is_dependency_(const utils::path::resource_location& file_location);
+        const std::set<utils::resource::resource_location>& dependencies, processor_file_ptr file);
+    bool is_dependency_(const utils::resource::resource_location& file_location);
 
     bool program_id_match(const std::string& filename, const program_id& program) const;
 
-    std::vector<processor_file_ptr> find_related_opencodes(const utils::path::resource_location& document_loc) const;
+    std::vector<processor_file_ptr> find_related_opencodes(
+        const utils::resource::resource_location& document_loc) const;
     void delete_diags(processor_file_ptr file);
 
     void show_message(const std::string& message);
@@ -188,7 +190,7 @@ private:
     message_consumer* message_consumer_ = nullptr;
 
     // A map that holds true values for files that have diags suppressed and the user was already notified about it
-    std::unordered_map<utils::path::resource_location, bool, utils::path::resource_location_hasher>
+    std::unordered_map<utils::resource::resource_location, bool, utils::resource::resource_location_hasher>
         diag_suppress_notified_;
     const lib_config& global_config_;
     lib_config local_config_;

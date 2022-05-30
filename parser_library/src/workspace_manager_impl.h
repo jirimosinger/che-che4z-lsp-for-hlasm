@@ -72,7 +72,7 @@ public:
         notify_diagnostics_consumers();
     }
 
-    void did_open_file(const utils::path::resource_location& document_loc, version_t version, std::string text)
+    void did_open_file(const utils::resource::resource_location& document_loc, version_t version, std::string text)
     {
         file_manager_.did_open_file(document_loc, version, std::move(text));
         if (cancel_ && *cancel_)
@@ -87,7 +87,7 @@ public:
         // only on open
         notify_performance_consumers(document_loc, metadata);
     }
-    void did_change_file(const utils::path::resource_location& document_loc,
+    void did_change_file(const utils::resource::resource_location& document_loc,
         version_t version,
         const document_change* changes,
         size_t ch_size)
@@ -104,14 +104,14 @@ public:
         notify_diagnostics_consumers();
     }
 
-    void did_close_file(const utils::path::resource_location& document_loc)
+    void did_close_file(const utils::resource::resource_location& document_loc)
     {
         workspaces::workspace& ws = ws_path_match(document_loc.get_uri());
         ws.did_close_file(document_loc);
         notify_diagnostics_consumers();
     }
 
-    void did_change_watched_files(const std::vector<utils::path::resource_location>& paths)
+    void did_change_watched_files(const std::vector<utils::resource::resource_location>& paths)
     {
         for (const auto& path : paths)
         {
@@ -218,7 +218,7 @@ public:
         if (cancel_ && *cancel_)
             return empty_tokens;
 
-        utils::path::resource_location doc(document_uri);
+        utils::resource::resource_location doc(document_uri);
 
         auto file = file_manager_.find(doc);
         if (dynamic_cast<workspaces::processor_file*>(file.get()) != nullptr)
@@ -273,7 +273,7 @@ private:
     }
 
     void notify_performance_consumers(
-        const utils::path::resource_location& document_uri, workspace_file_info ws_file_info) const
+        const utils::resource::resource_location& document_uri, workspace_file_info ws_file_info) const
     {
         auto file = file_manager_.find(document_uri);
         auto proc_file = dynamic_cast<workspaces::processor_file*>(file.get());

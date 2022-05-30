@@ -60,7 +60,7 @@ void workspace_manager::remove_workspace(const char* uri) { impl_->remove_worksp
 
 void workspace_manager::did_change_watched_files(const char** paths, size_t size)
 {
-    std::vector<utils::path::resource_location> paths_s;
+    std::vector<utils::resource::resource_location> paths_s;
     for (size_t i = 0; i < size; ++i)
     {
         paths_s.push_back(paths[i]);

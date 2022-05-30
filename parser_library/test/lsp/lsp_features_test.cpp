@@ -22,7 +22,7 @@
 
 
 using namespace hlasm_plugin::parser_library;
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 
 const resource_location MACRO_FILE("MAC");
 const resource_location SOURCE_FILE("OPEN");

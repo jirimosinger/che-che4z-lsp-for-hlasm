@@ -22,6 +22,7 @@
 #include <locale>
 #include <string>
 
+#include "utils/content_loader.h"
 #include "utils/utf8text.h"
 
 
@@ -45,31 +46,21 @@ const std::string& file_impl::get_text()
 
 void file_impl::load_text()
 {
-    std::ifstream fin(file_location_.get_path(), std::ios::in | std::ios::binary);
-
-    if (fin)
+    auto loaded_text = utils::resource::load_text(file_location_);
+    if (loaded_text.has_value())
     {
-        fin.seekg(0, std::ios::end);
-        text_.resize((size_t)fin.tellg());
-        fin.seekg(0, std::ios::beg);
-        fin.read(&text_[0], text_.size());
-        fin.close();
-
-        text_ = replace_non_utf8_chars(text_);
-
+        text_ = std::move(loaded_text.value());
         up_to_date_ = true;
         bad_ = false;
         return;
     }
-    else
-    {
-        text_ = "";
-        up_to_date_ = false;
-        bad_ = true;
-        // todo
-        // add_diagnostic(diagnostic_s{file_name_, {}, diagnostic_severity::error,
-        //	"W0001", "HLASM plugin", "Could not open file" + file_name_, {} });
-    }
+
+    text_ = "";
+    up_to_date_ = false;
+    bad_ = true;
+    // todo
+    // add_diagnostic(diagnostic_s{file_name_, {}, diagnostic_severity::error,
+    //	"W0001", "HLASM plugin", "Could not open file" + file_name_, {} });
 }
 
 // adds positions of newlines into vector 'lines'
@@ -207,32 +198,6 @@ bool file_impl::update_and_get_bad()
     return bad_;
 }
 
-bool utf8_one_byte_begin(char ch)
-{
-    return (ch & 0x80) == 0; // 0xxxxxxx
-}
-
-bool utf8_continue_byte(char ch)
-{
-    return (ch & 0xC0) == 0x80; // 10xxxxxx
-}
-
-
-bool utf8_two_byte_begin(char ch)
-{
-    return (ch & 0xE0) == 0xC0; // 110xxxxx
-}
-
-bool utf8_three_byte_begin(char ch)
-{
-    return (ch & 0xF0) == 0xE0; // 1110xxxx
-}
-
-bool utf8_four_byte_begin(char ch)
-{
-    return (ch & 0xF8) == 0xF0; // 11110xxx
-}
-
 size_t file_impl::index_from_position(const std::string& text, const std::vector<size_t>& line_indices, position loc)
 {
     size_t end = (size_t)loc.column;
@@ -243,7 +208,7 @@ size_t file_impl::index_from_position(const std::string& text, const std::vector
 
     while (utf16_counter < end && i < text.size())
     {
-        if (!utf8_one_byte_begin(text[i]))
+        if (!utils::utf8_one_byte_begin(text[i]))
         {
             const auto cs = utils::utf8_prefix_sizes[(unsigned char)text[i]];
 
@@ -260,39 +225,6 @@ size_t file_impl::index_from_position(const std::string& text, const std::vector
         }
     }
     return i;
-}
-
-std::string file_impl::replace_non_utf8_chars(std::string_view text)
-{
-    std::string ret;
-    ret.reserve(text.size());
-    while (!text.empty())
-    {
-        if (utf8_one_byte_begin(text.front()))
-        {
-            ret.push_back(text.front());
-            text.remove_prefix(1);
-            continue;
-        }
-
-        const auto cs = utils::utf8_prefix_sizes[(unsigned char)text.front()];
-        if (cs.utf8 != 0 && cs.utf8 <= text.size() && utils::utf8_valid_multibyte_prefix(text[0], text[1])
-            && std::all_of(text.begin() + 2, text.begin() + cs.utf8, utf8_continue_byte))
-        {
-            // copy the character to output
-            ret.append(text.substr(0, cs.utf8));
-            text.remove_prefix(cs.utf8);
-        }
-        else
-        {
-            // UTF8 replacement for unknown character
-            ret.push_back((uint8_t)0xEF);
-            ret.push_back((uint8_t)0xBF);
-            ret.push_back((uint8_t)0xBD);
-            text.remove_prefix(1);
-        }
-    }
-    return ret;
 }
 
 std::vector<size_t> file_impl::create_line_indices(const std::string& text)

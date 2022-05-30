@@ -29,7 +29,7 @@
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 using hlasm_plugin::utils::platform::is_windows;
 
 class workspace_test : public diagnosable_impl, public testing::Test
@@ -279,12 +279,12 @@ std::string source_using_macro_file_no_error = R"( CORRECT)";
 
 const char* faulty_macro_path = is_windows() ? "lib\\ERROR" : "lib/ERROR";
 const char* correct_macro_path = is_windows() ? "lib\\CORRECT" : "lib/CORRECT";
-std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
+std::string hlasmplugin_folder = "/.hlasmplugin";
 
 resource_location empty_loc = resource_location("");
 
-resource_location proc_grps_loc(hlasmplugin_folder + "proc_grps.json");
-resource_location pgm_conf_loc(hlasmplugin_folder + "pgm_conf.json");
+resource_location proc_grps_loc(hlasmplugin_folder + "/proc_grps.json");
+resource_location pgm_conf_loc(hlasmplugin_folder + "/pgm_conf.json");
 resource_location source1_loc("source1");
 resource_location source2_loc("source2");
 resource_location source3_loc("source3");
@@ -305,7 +305,7 @@ public:
         did_open_file(correct_macro_loc, 1, correct_macro_file);
     }
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location&) override
+    list_directory_result list_directory_files(const hlasm_plugin::utils::resource::resource_location&) override
     {
         if (insert_correct_macro)
             return { { { "ERROR", faulty_macro_loc }, { "CORRECT", correct_macro_loc } },
@@ -370,7 +370,8 @@ public:
         did_open_file(correct_macro_loc, 1, correct_macro_file);
     }
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& location) override
+    list_directory_result list_directory_files(
+        const hlasm_plugin::utils::resource::resource_location& location) override
     {
         if (location == "lib/" || location == "lib\\")
             return { { { "CORRECT", correct_macro_loc } }, hlasm_plugin::utils::path::list_directory_rc::done };
@@ -517,7 +518,8 @@ public:
         : file_manager_opt(file_manager_opt_variant::old_school)
     {}
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& location) override
+    list_directory_result list_directory_files(
+        const hlasm_plugin::utils::resource::resource_location& location) override
     {
         if (location == "lib/" || location == "lib\\")
             return { {}, hlasm_plugin::utils::path::list_directory_rc::other_failure };

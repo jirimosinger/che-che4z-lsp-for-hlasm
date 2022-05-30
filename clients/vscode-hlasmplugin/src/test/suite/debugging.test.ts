@@ -29,6 +29,8 @@ suite('Debugging Test Suite', () => {
     });
 
     suiteTeardown(async function () {
+        this.timeout(10000);
+        
         await helper.removeAllBreakpoints();
         await helper.closeAllEditors();
     });

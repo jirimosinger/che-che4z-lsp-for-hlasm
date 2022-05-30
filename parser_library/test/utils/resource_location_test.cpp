@@ -17,38 +17,8 @@
 #include "utils/platform.h"
 #include "utils/resource_location.h"
 
-using namespace hlasm_plugin;
 using namespace hlasm_plugin::utils::platform;
-using namespace hlasm_plugin::utils::path;
-
-TEST(resource_location, uri_to_path)
-{
-    if (is_windows())
-    {
-        EXPECT_EQ(uri_to_path("file://czprfs50/Public"), "\\\\czprfs50\\Public");
-        EXPECT_EQ(uri_to_path("file:///C%3A/Public"), "c:\\Public");
-    }
-    else
-    {
-        EXPECT_EQ(uri_to_path("file:///home/user/somefile"), "/home/user/somefile");
-        EXPECT_EQ(uri_to_path("file:///C%3A/Public"), "/C:/Public");
-    }
-}
-
-TEST(resource_location, path_to_uri)
-{
-    if (is_windows())
-    {
-        EXPECT_EQ(path_to_uri("\\\\czprfs50\\Public"), "file://czprfs50/Public");
-        EXPECT_EQ(path_to_uri("c:\\Public"), "file:///c%3A/Public");
-    }
-    else
-    {
-        EXPECT_EQ(path_to_uri("/home/user/somefile"), "file:///home/user/somefile");
-        EXPECT_EQ(path_to_uri("/C:/Public"), "file:///C%3A/Public");
-    }
-}
-
+using namespace hlasm_plugin::utils::resource;
 TEST(resource_location, empty_uri)
 {
     resource_location res("");
@@ -98,4 +68,46 @@ TEST(resource_location, untitled_uri)
     resource_location res("untitled:Untitled-1");
     EXPECT_EQ(res.get_uri(), "untitled:Untitled-1");
     EXPECT_EQ(res.get_path(), "untitled:Untitled-1");
+}
+
+
+TEST(resource_location, to_presentable_file_scheme)
+{
+    if (is_windows())
+    {
+        std::string expected = R"(Path: c:\Public
+Raw URI: file:///c%3A/Public)";
+
+        resource_location res("file:///c%3A/Public");
+        EXPECT_EQ(res.to_presentable(), expected);
+    }
+    else
+    {
+        std::string expected = R"(Path: /home/user/somefile
+Raw URI: file:///home/user/somefile)";
+
+        resource_location res("file:///home/user/somefile");
+        EXPECT_EQ(res.to_presentable(), expected);
+    }
+}
+
+TEST(resource_location, to_presentable_other_schemes_full)
+{
+    std::string expected = R"(Scheme: aaa
+Authority: user::pass@127.0.0.1:1234
+Path: /path/to/resource
+Query: fileset=sources
+Fragment: pgm
+Raw URI: aaa://user::pass@127.0.0.1:1234/path/to/resource?fileset=sources#pgm)";
+
+    resource_location res("aaa://user::pass@127.0.0.1:1234/path/to/resource?fileset=sources#pgm");
+    EXPECT_EQ(res.to_presentable(), expected);
+}
+
+TEST(resource_location, join)
+{
+    resource_location res("aaa://src/temp");
+    std::string rel_loc = ".hlasmplugin";
+
+    EXPECT_EQ(resource_location::join(res, rel_loc), "aaa://src/temp/.hlasmplugin");
 }

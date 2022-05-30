@@ -25,7 +25,7 @@
 
 namespace hlasm_plugin::parser_library::workspaces {
 
-using file_location = utils::path::resource_location;
+using file_location = utils::resource::resource_location;
 
 // Interface that represents both file opened in LSP
 // as well as a file opened by parser library from the disk.

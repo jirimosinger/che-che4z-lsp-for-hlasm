@@ -31,8 +31,7 @@
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::debugging;
 using namespace hlasm_plugin::parser_library::workspaces;
-using namespace hlasm_plugin::utils::path;
-
+using namespace hlasm_plugin::utils::resource;
 
 TEST(debugger, stopped_on_entry)
 {
@@ -329,11 +328,12 @@ public:
 
         return false;
     }
-    asm_option get_asm_options(const hlasm_plugin::utils::path::resource_location&) const override
+    asm_option get_asm_options(const hlasm_plugin::utils::resource::resource_location&) const override
     {
         return { "SEVEN", "" };
     }
-    preprocessor_options get_preprocessor_options(const hlasm_plugin::utils::path::resource_location&) const override
+    preprocessor_options get_preprocessor_options(
+        const hlasm_plugin::utils::resource::resource_location&) const override
     {
         return {};
     }

@@ -15,7 +15,7 @@
 #include "../common_testing.h"
 #include "../mock_parse_lib_provider.h"
 
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 
 // test for COPY instruction
 // various cases of instruction occurence in the source

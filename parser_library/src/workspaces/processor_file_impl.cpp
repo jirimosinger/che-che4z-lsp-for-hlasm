@@ -22,7 +22,7 @@
 namespace hlasm_plugin::parser_library::workspaces {
 
 processor_file_impl::processor_file_impl(
-    utils::path::resource_location file_loc, const file_manager& file_mngr, std::atomic<bool>* cancel)
+    utils::resource::resource_location file_loc, const file_manager& file_mngr, std::atomic<bool>* cancel)
     : file_impl(std::move(file_loc))
     , cancel_(cancel)
     , macro_cache_(file_mngr, *this)
@@ -133,7 +133,7 @@ parse_result processor_file_impl::parse_no_lsp_update(
     return true;
 }
 
-const std::set<utils::path::resource_location>& processor_file_impl::dependencies() { return dependencies_; }
+const std::set<utils::resource::resource_location>& processor_file_impl::dependencies() { return dependencies_; }
 
 const semantics::lines_info& processor_file_impl::get_hl_info()
 {
@@ -148,21 +148,24 @@ namespace {
 class empty_feature_provider final : public lsp::feature_provider
 {
     // Inherited via feature_provider
-    location definition(const utils::path::resource_location& document_loc, position pos) const override
+    location definition(const utils::resource::resource_location& document_loc, position pos) const override
     {
         return location(pos, document_loc);
     }
-    location_list references(const utils::path::resource_location&, position) const override { return location_list(); }
-    lsp::hover_result hover(const utils::path::resource_location&, position) const override
+    location_list references(const utils::resource::resource_location&, position) const override
+    {
+        return location_list();
+    }
+    lsp::hover_result hover(const utils::resource::resource_location&, position) const override
     {
         return lsp::hover_result();
     }
     lsp::completion_list_s completion(
-        const utils::path::resource_location&, position, char, completion_trigger_kind) const override
+        const utils::resource::resource_location&, position, char, completion_trigger_kind) const override
     {
         return {};
     }
-    lsp::document_symbol_list_s document_symbol(const utils::path::resource_location&, long long) const override
+    lsp::document_symbol_list_s document_symbol(const utils::resource::resource_location&, long long) const override
     {
         return {};
     }
@@ -178,7 +181,7 @@ const lsp::feature_provider& processor_file_impl::get_lsp_feature_provider()
     return empty_res;
 }
 
-const std::set<utils::path::resource_location>& processor_file_impl::files_to_close() { return files_to_close_; }
+const std::set<utils::resource::resource_location>& processor_file_impl::files_to_close() { return files_to_close_; }
 
 const performance_metrics& processor_file_impl::get_metrics()
 {
@@ -188,7 +191,7 @@ const performance_metrics& processor_file_impl::get_metrics()
     return metrics;
 }
 
-void processor_file_impl::erase_cache_of_opencode(const utils::path::resource_location& opencode_file_location)
+void processor_file_impl::erase_cache_of_opencode(const utils::resource::resource_location& opencode_file_location)
 {
     macro_cache_.erase_cache_of_opencode(opencode_file_location);
 }

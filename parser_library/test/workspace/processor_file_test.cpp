@@ -22,7 +22,7 @@
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 
 TEST(processor_file, empty_file_feature_provider)
 {

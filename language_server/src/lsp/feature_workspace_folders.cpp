@@ -21,6 +21,7 @@
 #include "../logger.h"
 #include "lib_config.h"
 #include "utils/path.h"
+#include "utils/path_conversions.h"
 #include "utils/platform.h"
 
 namespace hlasm_plugin::language_server::lsp {
@@ -82,8 +83,8 @@ void feature_workspace_folders::initialize_feature(const json& initialize_params
     auto root_path = initialize_params.find("rootPath");
     if (root_path != initialize_params.end() && !root_path->is_null())
     {
-        auto path = utils::path::lexically_normal(root_path->get<std::string>()).string();
-        add_workspace(path, path);
+        auto uri = utils::path::path_to_uri(utils::path::lexically_normal(root_path->get<std::string>()).string());
+        add_workspace(uri, uri);
     }
 }
 

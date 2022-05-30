@@ -29,7 +29,7 @@
 
 using namespace hlasm_plugin::parser_library;
 using namespace hlasm_plugin::parser_library::workspaces;
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 using hlasm_plugin::utils::platform::is_windows;
 
 class workspace_instruction_sets_test : public diagnosable_impl, public testing::Test
@@ -101,9 +101,10 @@ std::string sam31_macro = R"( MACRO
         MEND)";
 
 const char* sam31_macro_path = is_windows() ? "lib\\SAM31" : "lib/SAM31";
-std::string hlasmplugin_folder = is_windows() ? ".hlasmplugin\\" : ".hlasmplugin/";
+std::string hlasmplugin_folder = "/.hlasmplugin";
 
-resource_location proc_grps_loc(hlasmplugin_folder + "proc_grps.json");
+resource_location proc_grps_loc(hlasmplugin_folder + "/proc_grps.json");
+resource_location pgm_conf_loc(hlasmplugin_folder + "/pgm_conf.json");
 resource_location source_loc("source");
 
 enum class file_manager_opt_variant
@@ -129,7 +130,6 @@ class file_manager_opt : public file_manager_impl
 public:
     file_manager_opt(file_manager_opt_variant variant)
     {
-        resource_location pgm_conf_loc(hlasmplugin_folder + "pgm_conf.json");
         resource_location sam31_macro_loc(sam31_macro_path);
 
         did_open_file(proc_grps_loc, 1, get_proc_grp(variant));
@@ -138,7 +138,8 @@ public:
         did_open_file(sam31_macro_loc, 1, sam31_macro);
     }
 
-    list_directory_result list_directory_files(const hlasm_plugin::utils::path::resource_location& location) override
+    list_directory_result list_directory_files(
+        const hlasm_plugin::utils::resource::resource_location& location) override
     {
         if (location == "lib/" || location == "lib\\")
             return { { { "SAM31", sam31_macro_path } }, hlasm_plugin::utils::path::list_directory_rc::done };
@@ -153,8 +154,8 @@ void change_instruction_set(
     std::vector<document_change> changes;
     changes.push_back(document_change({ change_range }, process_group.c_str(), process_group.size()));
 
-    fm.did_change_file(hlasmplugin_folder + "proc_grps.json", 1, changes.data(), changes.size());
-    ws.did_change_file(hlasmplugin_folder + "proc_grps.json", changes.data(), changes.size());
+    fm.did_change_file(proc_grps_loc, 1, changes.data(), changes.size());
+    ws.did_change_file(proc_grps_loc, changes.data(), changes.size());
 }
 } // namespace
 

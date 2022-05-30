@@ -50,10 +50,10 @@ public:
     processor_file_ptr get_processor_file(const file_location&) override;
     void remove_file(const file_location&) override;
 
-    file_ptr find(const utils::path::resource_location& key) const override;
-    processor_file_ptr find_processor_file(const utils::path::resource_location& key) override;
+    file_ptr find(const utils::resource::resource_location& key) const override;
+    processor_file_ptr find_processor_file(const utils::resource::resource_location& key) override;
 
-    list_directory_result list_directory_files(const utils::path::resource_location& directory) override;
+    list_directory_result list_directory_files(const utils::resource::resource_location& directory) override;
 
     void did_open_file(const file_location& document_loc, version_t version, std::string text) override;
     void did_change_file(
@@ -72,9 +72,10 @@ public:
 private:
     std::unordered_map<unsigned long long, std::string> m_virtual_files;
     // m_virtual_files must outlive the files_
-    std::
-        unordered_map<utils::path::resource_location, std::shared_ptr<file_impl>, utils::path::resource_location_hasher>
-            files_;
+    std::unordered_map<utils::resource::resource_location,
+        std::shared_ptr<file_impl>,
+        utils::resource::resource_location_hasher>
+        files_;
 
     processor_file_ptr change_into_processor_file_if_not_already_(std::shared_ptr<file_impl>& ret);
     void prepare_file_for_change_(std::shared_ptr<file_impl>& file);

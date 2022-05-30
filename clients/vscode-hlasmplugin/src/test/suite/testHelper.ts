@@ -42,7 +42,7 @@ export async function showDocument(workspace_file: string) {
 export async function closeAllEditors() {
     while (vscode.window.activeTextEditor !== undefined) {
         await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-        sleep(500);
+        await sleep(500);
     }
 }
 

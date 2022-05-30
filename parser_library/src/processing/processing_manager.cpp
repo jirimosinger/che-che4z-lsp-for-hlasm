@@ -31,7 +31,7 @@ namespace hlasm_plugin::parser_library::processing {
 processing_manager::processing_manager(std::unique_ptr<opencode_provider> base_provider,
     analyzing_context ctx,
     workspaces::library_data data,
-    utils::path::resource_location file_loc,
+    utils::resource::resource_location file_loc,
     const std::string& file_text,
     workspaces::parse_lib_provider& lib_provider,
     statement_fields_parser& parser)
@@ -236,7 +236,7 @@ void processing_manager::finish_copy_member(copy_processing_result result)
 void processing_manager::finish_opencode() { lsp_analyzer_.opencode_finished(); }
 
 void processing_manager::start_macro_definition(
-    macrodef_start_data start, std::optional<utils::path::resource_location> file_loc)
+    macrodef_start_data start, std::optional<utils::resource::resource_location> file_loc)
 {
     if (file_loc)
         hlasm_ctx_.push_statement_processing(processing_kind::MACRO, std::move(*file_loc));
@@ -304,7 +304,7 @@ std::unique_ptr<context::opencode_sequence_symbol> processing_manager::create_op
     context::id_index name, range symbol_range)
 {
     auto symbol_pos = symbol_range.start;
-    location loc(symbol_pos, hlasm_ctx_.processing_stack().back().proc_location.get_uri());
+    location loc(symbol_pos, hlasm_ctx_.processing_stack().back().proc_location.resource_loc);
 
     auto&& [statement_position, snapshot] = hlasm_ctx_.get_begin_snapshot(attr_lookahead_active());
 

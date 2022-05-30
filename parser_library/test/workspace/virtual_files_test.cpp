@@ -51,7 +51,7 @@ public:
     MOCK_METHOD(processor_file_ptr, find_processor_file, (const file_location& key), (override));
     MOCK_METHOD(list_directory_result,
         list_directory_files,
-        (const hlasm_plugin::utils::path::resource_location& path),
+        (const hlasm_plugin::utils::resource::resource_location& path),
         (override));
     MOCK_METHOD(bool, file_exists, (const std::string& file_name), (override));
     MOCK_METHOD(bool, lib_file_exists, (const std::string& lib_path, const std::string& file_name), (override));

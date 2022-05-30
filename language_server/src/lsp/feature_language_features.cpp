@@ -105,11 +105,9 @@ void feature_language_features::definition(const json& id, const json& params)
     auto pos =
         parser_library::position(params["position"]["line"].get<int>(), params["position"]["character"].get<int>());
 
-
     auto definition_position_uri = ws_mngr_.definition(document_uri.c_str(), pos);
-    document_uri = definition_position_uri.file_uri().empty() ? document_uri : definition_position_uri.file_uri();
     json to_ret {
-        { "uri", document_uri },
+        { "uri", definition_position_uri.file_uri() },
         { "range", range_to_json({ definition_position_uri.pos(), definition_position_uri.pos() }) },
     };
     response_->respond(id, "", to_ret);

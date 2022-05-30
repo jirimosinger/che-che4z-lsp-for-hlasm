@@ -18,6 +18,7 @@
 
 #include "processor_file_impl.h"
 #include "utils/path.h"
+#include "utils/path_conversions.h"
 #include "utils/platform.h"
 
 namespace hlasm_plugin::parser_library::workspaces {
@@ -86,7 +87,7 @@ void file_manager_impl::remove_file(const file_location& file)
     files_.erase(file);
 }
 
-file_ptr file_manager_impl::find(const utils::path::resource_location& key) const
+file_ptr file_manager_impl::find(const utils::resource::resource_location& key) const
 {
     std::lock_guard guard(files_mutex);
     auto ret = files_.find(key);
@@ -96,7 +97,7 @@ file_ptr file_manager_impl::find(const utils::path::resource_location& key) cons
     return ret->second;
 }
 
-processor_file_ptr file_manager_impl::find_processor_file(const utils::path::resource_location& key)
+processor_file_ptr file_manager_impl::find_processor_file(const utils::resource::resource_location& key)
 {
     std::lock_guard guard(files_mutex);
     auto ret = files_.find(key);
@@ -106,14 +107,14 @@ processor_file_ptr file_manager_impl::find_processor_file(const utils::path::res
     return change_into_processor_file_if_not_already_(ret->second);
 }
 
-list_directory_result file_manager_impl::list_directory_files(const utils::path::resource_location& directory)
+list_directory_result file_manager_impl::list_directory_files(const utils::resource::resource_location& directory)
 {
     std::filesystem::path lib_p(directory.get_path());
     list_directory_result result;
 
     result.second = utils::path::list_directory_regular_files(lib_p, [&result](const std::filesystem::path& f) {
         result.first[utils::path::filename(f).string()] =
-            utils::path::resource_location(utils::path::path_to_uri(utils::path::absolute(f).string()));
+            utils::resource::resource_location(utils::path::path_to_uri(utils::path::absolute(f).string()));
     });
     return result;
 }

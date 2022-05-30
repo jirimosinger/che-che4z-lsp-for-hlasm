@@ -45,14 +45,14 @@ public:
         return false;
     }
 
-    bool has_library(const std::string& library, const utils::path::resource_location& program) const override
+    bool has_library(const std::string& library, const utils::resource::resource_location& program) const override
     {
         return ws_.has_library(library, program);
     }
 
     std::optional<std::string> get_library(const std::string& library,
-        const utils::path::resource_location& program,
-        std::optional<utils::path::resource_location>* location) const override
+        const utils::resource::resource_location& program,
+        std::optional<utils::resource::resource_location>* location) const override
     {
         return ws_.get_library(library, program, location);
     }

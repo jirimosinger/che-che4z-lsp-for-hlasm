@@ -136,9 +136,9 @@ bool macro_cache::load_from_cache(const macro_cache_key& key, const analyzing_co
             // Add all copy members on which this macro is dependant
             for (const auto& copy_ptr : info->macro_definition->used_copy_members)
             {
-                auto def_loc = file_mngr_->find(copy_ptr->definition_location);
+                auto file = file_mngr_->find(copy_ptr->definition_location.resource_loc);
                 ctx.hlasm_ctx->add_copy_member(copy_ptr);
-                ctx.lsp_ctx->add_copy(copy_ptr, lsp::text_data_ref_t(def_loc->get_text()));
+                ctx.lsp_ctx->add_copy(copy_ptr, lsp::text_data_ref_t(file->get_text()));
             }
         }
         else if (key.data.proc_kind == processing::processing_kind::COPY)
@@ -159,7 +159,7 @@ version_stamp macro_cache::get_copy_member_versions(context::macro_def_ptr macro
 
     for (const auto& copy_ptr : macro->used_copy_members)
     {
-        auto file = file_mngr_->find(copy_ptr->definition_location);
+        auto file = file_mngr_->find(copy_ptr->definition_location.resource_loc);
         if (!file)
             throw std::runtime_error("Dependencies of a macro must be open right after parsing the macro.");
         result.try_emplace(file->get_location(), file->get_version());
@@ -189,7 +189,7 @@ void macro_cache::save_macro(const macro_cache_key& key, const analyzer& analyze
         cache_data.cached_member = analyzer.context().hlasm_ctx->get_copy_member(key.data.library_member);
 }
 
-void macro_cache::erase_cache_of_opencode(const utils::path::resource_location& opencode_file_location)
+void macro_cache::erase_cache_of_opencode(const utils::resource::resource_location& opencode_file_location)
 {
     auto it = cache_.begin();
     while (it != cache_.end())

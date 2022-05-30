@@ -15,8 +15,8 @@
 #include "dap_feature.h"
 
 #include "utils/path.h"
+#include "utils/path_conversions.h"
 #include "utils/platform.h"
-#include "utils/resource_location.h"
 
 namespace {
 using namespace hlasm_plugin::language_server::dap;

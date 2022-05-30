@@ -11,11 +11,14 @@
 #   Broadcom, Inc. - initial API and implementation
 
 target_sources(hlasm_utils PUBLIC
-	resource_location.h
+	content_loader.h
+	filesystem_content_loader.h
 	general_hashers.h
 	list_directory_rc.h
 	path.h
+	path_conversions.h
 	platform.h
+	resource_location.h
 	similar.h
 	utf8text.h
 )

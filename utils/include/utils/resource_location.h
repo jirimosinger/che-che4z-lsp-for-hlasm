@@ -18,13 +18,7 @@
 #include <optional>
 #include <string>
 
-namespace hlasm_plugin::utils::path {
-
-// Converts URI (RFC3986) to common filesystem path.
-std::string uri_to_path(const std::string& uri);
-
-// Converts from filesystem path to URI
-std::string path_to_uri(std::string_view path);
+namespace hlasm_plugin::utils::resource {
 
 class resource_location
 {
@@ -42,9 +36,11 @@ public:
 
     const std::string& get_uri() const;
     std::string get_path() const;
+    std::string to_presentable() const;
 
-    bool operator==(const resource_location& r) const;
-    bool operator<(const resource_location& r) const;
+    static resource_location join(const resource_location& rl, std::string relative_path);
+
+    auto operator<=>(const resource_location& rl) const noexcept = default;
 
 private:
     std::string m_uri;
@@ -52,9 +48,9 @@ private:
 
 struct resource_location_hasher
 {
-    std::size_t operator()(const resource_location& r) const;
+    std::size_t operator()(const resource_location& rl) const;
 };
 
-} // namespace hlasm_plugin::utils::path
+} // namespace hlasm_plugin::utils::resource
 
 #endif

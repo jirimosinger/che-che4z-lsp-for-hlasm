@@ -48,15 +48,15 @@ public:
         return true;
     }
 
-    bool has_library(const std::string& library, const utils::path::resource_location&) const override
+    bool has_library(const std::string& library, const utils::resource::resource_location&) const override
     {
         return m_files.count(library);
     }
 
 
     std::optional<std::string> get_library(const std::string& library,
-        const utils::path::resource_location&,
-        std::optional<utils::path::resource_location>* location) const override
+        const utils::resource::resource_location&,
+        std::optional<utils::resource::resource_location>* location) const override
     {
         auto it = m_files.find(library);
         if (it == m_files.end())

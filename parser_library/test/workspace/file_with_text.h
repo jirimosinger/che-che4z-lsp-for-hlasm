@@ -20,7 +20,7 @@
 class file_with_text : public hlasm_plugin::parser_library::workspaces::processor_file_impl
 {
 public:
-    file_with_text(const hlasm_plugin::utils::path::resource_location& location,
+    file_with_text(const hlasm_plugin::utils::resource::resource_location& location,
         const std::string& text,
         const hlasm_plugin::parser_library::workspaces::file_manager& file_mngr)
         : file_impl(location)

@@ -18,7 +18,7 @@
 #include "gtest/gtest.h"
 
 using namespace hlasm_plugin::parser_library;
-using namespace hlasm_plugin::utils::path;
+using namespace hlasm_plugin::utils::resource;
 
 inline void check_location_with_position(const location& result,
     const resource_location& expected_resource_location,

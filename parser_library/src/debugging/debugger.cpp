@@ -115,7 +115,9 @@ class debugger::impl final : public processing::statement_analyzer
     size_t next_var_ref_ = 1;
     context::processing_stack_t proc_stack_;
 
-    std::unordered_map<utils::path::resource_location, std::vector<breakpoint>, utils::path::resource_location_hasher>
+    std::unordered_map<utils::resource::resource_location,
+        std::vector<breakpoint>,
+        utils::resource::resource_location_hasher>
         breakpoints_;
 
     size_t add_variable(std::vector<variable_ptr> vars)
@@ -388,13 +390,13 @@ public:
         return it->second;
     }
 
-    void breakpoints(utils::path::resource_location source, std::vector<breakpoint> bps)
+    void breakpoints(const utils::resource::resource_location& source, std::vector<breakpoint> bps)
     {
         std::lock_guard g(breakpoints_mutex_);
         breakpoints_[source] = std::move(bps);
     }
 
-    [[nodiscard]] std::vector<breakpoint> breakpoints(utils::path::resource_location source) const
+    [[nodiscard]] std::vector<breakpoint> breakpoints(const utils::resource::resource_location& source) const
     {
         std::lock_guard g(breakpoints_mutex_);
         if (auto it = breakpoints_.find(source); it != breakpoints_.end())
