@@ -17,6 +17,7 @@
 
 #include <optional>
 #include <string>
+#include <compare>
 
 namespace hlasm_plugin::utils::resource {
 
@@ -40,7 +41,7 @@ public:
 
     static resource_location join(const resource_location& rl, std::string relative_path);
 
-    auto operator<=>(const resource_location& rl) const noexcept = default;
+    std::strong_ordering operator<=>(const resource_location& rl) const noexcept = default;
 
 private:
     std::string m_uri;
