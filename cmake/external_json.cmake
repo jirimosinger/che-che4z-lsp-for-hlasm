@@ -17,7 +17,7 @@ INCLUDE(FetchContent)
 FetchContent_Declare(
   json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG        v3.3.0
+  GIT_TAG        v3.10.5
   GIT_SHALLOW    ON
   LOG_DOWNLOAD   ON
   GIT_PROGRESS   1
@@ -29,6 +29,7 @@ FetchContent_GetProperties(json)
 if(NOT json_POPULATED)
   message("Populating nlohmann json")
   set(JSON_MultipleHeaders On)
+  set(JSON_ImplicitConversions Off)
   FetchContent_Populate(json)
   add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
