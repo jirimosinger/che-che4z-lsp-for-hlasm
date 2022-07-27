@@ -29,9 +29,9 @@ jobs:
     steps:
      - name: Dump
        run: |
-            echo Previous project ended unsuccessfully with the following conclusion: '${{ github.event.workflow_run.conclusion }}'
-            echo github.event details:
-            echo ${{ toJSON(github.event) }}
+            echo "Previous project ended unsuccessfully with the following conclusion: '${{ github.event.workflow_run.conclusion }}'"
+            echo "github.event details:"
+            echo "${{ toJSON(github.event) }}"
 
   sonar:
     name: SonarCloud scan
