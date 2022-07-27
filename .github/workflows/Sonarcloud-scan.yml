@@ -27,9 +27,14 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion != 'success' }}
 
     steps:
+     - name: Issue error
+       uses: actions/github-script@v3
+       with:
+         script: |
+                 core.setFailed('Previous job ended unsuccessfully with the following conclusion: '${{ github.event.workflow_run.conclusion }}'')
+    
      - name: Dump
        run: |
-            echo 'Previous project ended unsuccessfully with the following conclusion: '${{ github.event.workflow_run.conclusion }}''
             echo 'github.event details:'
             echo '${{ toJSON(github.event) }}'
 
