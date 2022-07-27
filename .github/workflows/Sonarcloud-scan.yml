@@ -29,7 +29,7 @@ jobs:
     steps:
      - name: Dump
        run: |
-            echo "Previous project ended unsuccessfully with the following conclusion: \"$CONCLUSION\""
+            echo Previous project ended unsuccessfully with the following conclusion: \"$CONCLUSION\"
             mkdir logs
             echo ${{ toJSON(github.event) }} > logs/gh-event.txt
        env:
