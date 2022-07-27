@@ -29,9 +29,9 @@ jobs:
     steps:
      - name: Dump
        run: |
-            echo Previous project ended unsuccessfully with conclusion $CONCLUSION
+            echo "Previous project ended unsuccessfully with the following conclusion: '$CONCLUSION'"
             mkdir logs
-            echo ${{ github.event }} > logs/gh-event.txt
+            echo ${{ toJSON(github.event) }} > logs/gh-event.txt
        env:
          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
      - uses: actions/upload-artifact@v2
