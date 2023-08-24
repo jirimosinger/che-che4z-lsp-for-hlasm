@@ -1,0 +1,10 @@
+&LEN SETC 'A'
+&P SETA '1'
+&P.C   EQU   *-&P                    LENGTH OF BLOCK                          
+
+        MAC2  'A'.'AT'&VAR                                   XXXXXXXXXXXxxxxxxxxx
+
+        MAC2  T'&VAR                                      XXXXXXXXXXXXXXXXXXjjjjjj
+
+LLABEL   AIF    ( NOT                                                  Xjjjjjjjjjjjjj
+                'AAA'...T'A ),,REMARK                                        Xj

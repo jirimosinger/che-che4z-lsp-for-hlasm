@@ -1,0 +1,32 @@
+.L20     MNOTE 4,'Length of block does not exceed 256 (&LBL DSECT), &&CX12345678
+               CLEANUP option can be optimized to YES,OP2              X12345678
+               blabla,jdios' dfsd fsd sdf s
+
+.L20     MNOTE 4,'Length of block does not exceed 256 (&LBL DSECT), &&CX12345678
+               LEANUP option can be optimized to YES,OP2                12345678
+    blabla,jdios'
+
+.L20     MNOTE 4,'Length o   lock does not exceed 256 (&LBL DSECT), &&CX12345678
+               LEANUP option can be optimized to YES' OP2               12345678
+
+.L20     MNOTE 4,'Length of block does not exceed 256 (&LBL DSECT), &&CX12345678
+               LEANUP option can be optimized to YES',OP2OP2OP2OP2OP2OA-12345678
+               REMARK,REMARK
+
+assa
+
+LABEL INSTR OP1,OP2,   REMARKS                                         -12345678
+               OP3,OP4,       1                                        -12346578
+               OP5,OP6                                                 -12346578
+               OP6            1                                        -12346578
+               OP7                                                      12345678
+               
+.L20     MNOTE 4,'Length of block does not exceed 256 (&LBL DSECT), &&CX12345678
+               LEANUP option can be optimized to YES ,OP2               12345678
+
+LABEL INSTR OP1,OP2    REMARKS                                         -12345678
+               OP3 OP4,       1                                        -12346578
+               OP5,OP6                                                 -12346578
+               OP6            1                                        -12346578
+               OP7                                                      12345678
+               

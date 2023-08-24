@@ -1,0 +1,76 @@
+>&LEN SETC 'A'
+#^^^^ source.hlasm variable.other.readwrite.hlasm
+#    ^^^^^ source.hlasm entity.name.function.hlasm
+#         ^ source.hlasm
+#          ^ source.hlasm string.hlasm
+#           ^^ source.hlasm string.hlasm
+>&P SETA '1'
+#^^ source.hlasm variable.other.readwrite.hlasm
+#  ^^^^^ source.hlasm entity.name.function.hlasm
+#       ^ source.hlasm
+#        ^ source.hlasm string.hlasm
+#         ^^ source.hlasm string.hlasm
+>&P.C   EQU   *-&P                    LENGTH OF BLOCK                          
+#^^ source.hlasm variable.other.readwrite.hlasm
+#  ^ source.hlasm keyword.operator.hlasm
+#   ^ source.hlasm support.class.hlasm
+#    ^^^^^^ source.hlasm entity.name.function.hlasm
+#          ^^^ source.hlasm
+#             ^^ source.hlasm
+#               ^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
+#                 ^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#                                     ^^^^^^ source.hlasm comment.hlasm
+#                                           ^ source.hlasm
+#                                            ^^ source.hlasm comment.hlasm
+#                                              ^ source.hlasm
+#                                               ^^^^^ source.hlasm comment.hlasm
+#                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm invalid.ignored
+>
+>        MAC2  'A'.'AT'&VAR                                   XXXXXXXXXXXxxxxxxxxx
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^^ source.hlasm
+#              ^ source.hlasm string.hlasm
+#               ^^ source.hlasm string.hlasm
+#                 ^ source.hlasm punctuation.definition.tag.hlasm keyword.operator.hlasm
+#                  ^ source.hlasm string.hlasm
+#                   ^^^ source.hlasm string.hlasm
+#                      ^^^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
+#                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#                                                             ^^^^^^^^^^ source.hlasm comment.hlasm
+#                                                                       ^ source.hlasm keyword.other.hlasm
+#                                                                        ^^^^^^^^^ source.hlasm invalid.ignored
+>
+>        MAC2  T'&VAR                                      XXXXXXXXXXXXXXXXXXjjjjjj
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^^ source.hlasm
+#              ^ source.hlasm entity.name.function.preprocessor.hlasm
+#               ^ source.hlasm
+#                ^^^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
+#                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#                                                          ^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#                                                                       ^ source.hlasm keyword.other.hlasm
+#                                                                        ^^^^^^^^^^ source.hlasm invalid.ignored
+>
+>LLABEL   AIF    ( NOT                                                  Xjjjjjjjjjjjjj
+#^^^^^^ source.hlasm support.class.hlasm
+#      ^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^^^^ source.hlasm
+#                ^^ source.hlasm
+#                  ^^^ source.hlasm punctuation.definition.tag.hlasm
+#                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm keyword.other.hlasm
+#                                                                        ^^^^^^^^^^^^^ source.hlasm invalid.ignored
+>                'AAA'...T'A ),,REMARK                                        Xj
+#^^^^^^^^^^^^^^^^ source.hlasm
+#                ^ source.hlasm string.hlasm
+#                 ^^^^ source.hlasm string.hlasm
+#                     ^ source.hlasm keyword.control.hlasm keyword.operator.hlasm
+#                      ^ source.hlasm keyword.control.hlasm keyword.operator.hlasm
+#                       ^ source.hlasm keyword.control.hlasm keyword.operator.hlasm
+#                        ^ source.hlasm entity.name.function.preprocessor.hlasm
+#                         ^ source.hlasm
+#                          ^ source.hlasm punctuation.definition.tag.hlasm
+#                           ^ source.hlasm
+#                            ^ source.hlasm
+#                             ^^ source.hlasm
+#                               ^^^^^^ source.hlasm punctuation.definition.tag.hlasm
+#                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm invalid.ignored

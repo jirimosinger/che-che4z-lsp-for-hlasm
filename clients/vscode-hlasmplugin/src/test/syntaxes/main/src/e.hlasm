@@ -1,0 +1,10 @@
+LABEL INSTR                                                            -12345678
+               OP4 OP5,   REMARKS                                      -12345678
+               OP6,    R                                               -12346578
+               OP7                                                      12345678
+
+.L20     MNOTE                                                         X
+               4,'Length of block does not exceed 256 (&LBL DSECT), &&CX12345678
+             LEANUP option can be optimized to YES',OP2OP2OP2OP2OP2O -12345678
+               REMARK REMARK
+

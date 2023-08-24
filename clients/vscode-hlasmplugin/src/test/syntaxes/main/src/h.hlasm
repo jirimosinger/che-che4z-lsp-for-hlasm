@@ -1,0 +1,59 @@
+         L     R15,TEEGDT              A(GDT)                                   
+         ICM   R15,15,GDT_COM-GDT(R15) A(CommCT)                                
+         AGO   .trcend                                                          
+         MVC   TEEEDIT(13),=X'F020207A20207A20204B202040'                       
+         CL    R3,=A(1026-2)            Too long?     
+         AIF   (&@trc_ver EQ 1).version_1                       DF17039         
+         GBLA  &__@L_GEN#           Generation # (+1 offset)                    
+         AIF   ('&O' EQ 'N').RESTORE  No cleanup, nothing to check 
+		 
+         LA    R1,L'WA_@TRC_PREFIX         Length(Trace prefix)                 
+         ST    R1,WA_@TRC_BUFFERLIST1_BUFFLEN                                   
+
+*        xdsysrq kdstsrq,              Call the service                X        
+               GetPassword,            To get the password             X        
+               ASCII,                  Of the ASCII persuasion         X        
+               parm1=User,             For this user,                  X        
+               parm2==C'&ESOJT',         type                          X        
+               parm3=Agentname,          qualifier                     X        
+               ok=mrFmt                                                         
+
+         AIF   ('&DSECT' EQ 'YES    '(1,K'&DSECT)).DS                           
+         Chk_Buf S=L'JSPSUSER                                                   
+         ZFMT  -,JSPSUSER,-             Actual RACF user ID                     
+         MNOTE 12,'Length of block is more than 256 (&LBL DSECT), &&CLEX        
+               ANUP option of @BLK macro must be GT256'                         
+			   
+         clc   object_instance_Size,=al(l'object_instance_Size)(@wob_obX        
+               ject_instance_data_length)                                       
+         Chk_Buf S=12+L'ProxyUser                                               
+		 
+.L20     MNOTE 4,'Length of block does not exceed 256 (&LBL DSECT), &&CX12345678
+               LEANUP option can be optimized to YES ,OP2               12345678
+			   
+               INSTR                                                    12345678
+			   
+.* REMARK                                                              X
+               dafaf
+			   
+         AIF   ( NOT ( (('A' LE '&C') AND ('&C' LE 'I'))  OR           X        
+(('J' LE '&C') AND ('&C' LE 'R'))  OR           XXXXXXXXXXXXXXXXXXXX
+
+&VAR SETA 5
+&B SETA &VAR
+&(__@L_L&I.#) SETA &J                Remember it                                
+&(__@L_L&I.N)(&J) SETC '&NAME'       Save name of a local variable              
+&(__@L_L&I.O)(&J) SETC '&O'          Save operands   
+B&SYSNDX DS    0H        
+&P.SEGSZ DS    H 
+B&TMP.&TMP.FLAG1
+
+
+               MVC   TEMP_DSN+00(02),=C'&&&&'                   SENS028         
+         AIF   ('&PARM'(1,1) EQ '&&').CKTYPCP                           00002950
+JEBYGVER L7@H CL1,' ',GDG_VERIFY,,                                     X00022100
+               'Y=VERIFY G000V00 && CATALOG'                            00022200
+         AINSERT '&&__@L_WKA SETA &LEN',BACK                                    
+         MNOTE 12,'Length of block is 0 (&LBL DSECT), &&CLEANUP option X        
+               of @BLK macro must be NO'                                        
+         ZFMT  -,'AGE&&CT',-                                    DF08948         

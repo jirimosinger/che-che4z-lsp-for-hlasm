@@ -1,0 +1,26 @@
+LABEL INSTR OP4,OP5    REMARKS                                         -        
+OP6,                                                                   -12346578 
+               OP7                                                      12345678
+
+LABEL INSTR OP4,OP5,   REMARKS                                         -12345678
+               OP6,                                                    -12346578
+               OP7                                                      12345678
+
+LABEL INSTR OP
+
+LABEL INSTR OP4,OP5,      REMARKS 0                                    -
+               OP6, REMARKS 1                                          -12345678
+               OP7                                                     -12345678
+               REMARKS 2
+
+LABEL INSTR OP4,OP5                                                    -
+               REMARKS 1,                                              -
+               REMARKS 2                                                12345678
+
+LABEL INSTR      O                                                     -
+                                                                       -
+               O,                                                      -
+                                                                       -
+               OP1 REMARKS                                             -
+               OP1 REMARKS                                             -
+               REMARKS 2                                                12345678
