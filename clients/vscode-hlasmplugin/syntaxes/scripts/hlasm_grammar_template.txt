@@ -1,0 +1,352 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "${grammarName}$",
+  "scopeName": "source.${scope}$",
+  "patterns": [
+    {
+      "include": "#hlasm_syntax"
+    }
+  ],
+  "repository": {
+    "hlasm_syntax": {
+      "patterns": [
+        {
+          "include": "#lineComment"
+        },
+        {
+          "include": "#parseLine"
+        },
+        {
+          "include": "#lineEnd"
+        }
+      ]
+    },
+    "lineComment": {
+      "patterns": [
+        {
+          "begin": "(?=${beginLineSkipRule}$)(\\*|\\.\\*)",
+          "end": "${endLineRule}$",
+          "applyEndPatternLast": 1,
+          "beginCaptures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "#remark"
+                }
+              ]
+            }
+          },
+          "patterns": [
+            {
+              "include": "#remarksLine"
+            }
+          ]
+        }
+      ]
+    },
+    "parseLine": {
+      "patterns": [
+        {
+          "begin": "${beginLineSkipRule}$(?=.{1,71})",
+          "end": "${endLineRule}$",
+          "applyEndPatternLast": 1,
+          "patterns": [
+            {
+              "include": "#nameField"
+            },
+            {
+              "include": "#instruction"
+            },
+            {
+              "include": "#operandsAndRemarks"
+            },
+            {
+              "include": "#lineEnd"
+            }
+          ]
+        }
+      ]
+    },
+    "operandsAndRemarks": {
+      "begin": "\\s*(?=\\S)(?<=${beginLineSkipRule}$.{4,71})",
+      "end": "${endLineRule}$",
+      "applyEndPatternLast": 0,
+      "patterns": [
+        {
+          "include": "#illegalMultilineColumns"
+        },
+        {
+          "match": "(${beginLineSkipRule}$\\s{15})",
+          "comment": "Just to get rid of the spaces"
+        },
+        {
+          "include": "#sequenceSymbolOperandField"
+        },
+        {
+          "include": "#asmArguments"
+        },
+        {
+          "match": "(?<=,)\\s(.*)(?<=${hlasmLineContent}$)",
+          "comment": "Operands will continue on next line",
+          "captures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "#remark"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "begin": "(?<!,)(?=\\s(?<=${hlasmLineContent}$))",
+          "end": "${endLineRule}$",
+          "applyEndPatternLast": 1,
+          "comment": "Operands ended on this line",
+          "patterns": [
+            {
+              "include": "#remarksLine"
+            }
+          ]
+        },
+        {
+          "include": "#lineEnd"
+        }
+      ]
+    },
+    "remarksLine": {
+      "patterns": [
+        {
+          "include": "#illegalMultilineColumns"
+        },
+        {
+          "include": "#remark"
+        },
+        {
+          "include": "#lineEnd"
+        }
+      ]
+    },
+    "illegalMultilineColumns": {
+      "match": "(${beginLineSkipRule}$\\s*\\S.*)(?<=${beginLineSkipRule}$.{0,15})",
+      "name": "invalid.illegal"
+    },
+    "asmArguments": {
+      "patterns": [
+        {
+          "include": "#quoteType"
+        },
+        {
+          "include": "#openEndedArgs"
+        },
+        {
+          "match": "([^\\s=(),'*/+-]+)(?<=${hlasmLineContent}$)",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.tag.hlasm",
+              "patterns": [
+                {
+                  "include": "#additionalAsmHighlight"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "quoteType": {
+      "patterns": [
+        {
+          "match": "([^a-zA-Z@$#_0-9()']*?)([LKNTlknt])'(?<=${hlasmLineContent}$)",
+          "captures": {
+            "1": {
+              "name": "keyword.control.hlasm",
+              "patterns": [
+                {
+                  "include": "#additionalAsmHighlight"
+                }
+              ]
+            },
+            "2": {
+              "name": "entity.name.function.preprocessor.hlasm"
+            }
+          }
+        }
+      ]
+    },
+    "openEndedArgs": {
+      "begin": "\\s*(?=(?:[('])(?<=${hlasmLineContent}$))",
+      "end": "(?=.*)",
+      "applyEndPatternLast": 1,
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.hlasm",
+          "patterns": [
+            {
+              "include": "#additionalAsmHighlight"
+            }
+          ]
+        }
+      },
+      "patterns": [
+        {
+          "include": "#parenthesis"
+        },
+        {
+          "include": "#stringType"
+        }
+      ]
+    },
+    "parenthesis": {
+      "patterns": [
+        {
+          "begin": "(?<!${beginLineSkipRule}$)[(]\\s*(?<=${hlasmLineContent}$)",
+          "end": "([)](?<=${hlasmLineContent}$))|(${endLineRule}$)",
+          "applyEndPatternLast": 0,
+          "patterns": [
+            {
+              "include": "#illegalMultilineColumns"
+            },
+            {
+              "include": "#asmArguments"
+            },
+            {
+              "include": "#lineEnd"
+            }
+          ]
+        }
+      ]
+    },
+    "stringType": {
+      "patterns": [
+        {
+          "begin": "(?<!${beginLineSkipRule}$)(')(?<=${hlasmLineContent}$)",
+          "end": "((.*?')(?<=${hlasmLineContent}$)|([^']*)(?<=${beginLineSkipRule}$.{71})(?=\\s)|(${hlasmLineContent}$$))",
+          "applyEndPatternLast": 0,
+          "beginCaptures": {
+            "1": {
+              "name": "string.hlasm"
+            }
+          },
+          "endCaptures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "#stringContents"
+                }
+              ]
+            }
+          },
+          "patterns": [
+            {
+              "include": "#stringContents"
+            }
+          ]
+        }
+      ]
+    },
+    "stringContents": {
+      "patterns": [
+        {
+          "include": "#illegalMultilineColumns"
+        },
+        {
+          "match": "(&{2,}|[^&]+)(?<=${hlasmLineContent}$)",
+          "name": "string.hlasm"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#lineEnd"
+        }
+      ]
+    },
+    "lineEnd": {
+      "patterns": [
+        {
+          "include": "#continuationSymbol"
+        },
+        {
+          "include": "#sequenceNumbers"
+        }
+      ]
+    },
+    "additionalAsmHighlight": {
+      "patterns": [
+        {
+          "include": "#asmSpecialStatements"
+        },
+        {
+          "include": "#operators"
+        },
+        {
+          "include": "#numbers"
+        },
+        {
+          "include": "#variable"
+        }
+      ]
+    },
+    "nameField": {
+      "patterns": [
+        {
+          "include": "#sequenceSymbolNameField"
+        },
+        {
+          "include": "#ordinarySymbol"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#operators"
+        }
+      ]
+    },
+    "sequenceSymbolNameField": {
+      "match": "${beginLineSkipRule}$\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=${hlasmLineContent}$)",
+      "name": "keyword.control.hlasm"
+    },
+    "sequenceSymbolOperandField": {
+      "match": "\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?=,|\\s|$|(?<=${beginLineSkipRule}$.{71}))(?<=${hlasmLineContent}$)",
+      "name": "keyword.control.hlasm"
+    },
+    "instruction": {
+      "match": "(?<=${beginLineSkipRule}$\\S*)\\s+\\S+(?<=${hlasmLineContent}$)",
+      "name": "entity.name.function.hlasm"
+    },
+    "remark": {
+      "match": "(\\S+)(?<=${hlasmLineContent}$)",
+      "name": "comment.hlasm"
+    },
+    "operators": {
+      "match": "[=(),*/+-\\.](?<=${hlasmLineContent}$)",
+      "name": "keyword.operator.hlasm"
+    },
+    "numbers": {
+      "match": "(?<=[=(),*\\s+])-?\\d*((?=[=(),*+\\s]|$)(?<=${hlasmLineContent}$))",
+      "name": "constant.numeric.hlasm"
+    },
+    "variable": {
+      "match": "&(([A-Za-z@#$_][A-Za-z@#$_0-9]*)|([(].*?[)]))(?<=${hlasmLineContent}$)",
+      "name": "variable.other.readwrite.hlasm"
+    },
+    "ordinarySymbol": {
+      "match": "[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=${hlasmLineContent}$)",
+      "name": "support.class.hlasm"
+    },
+    "asmSpecialStatements": {
+      "match": "(?<=[=(),*+\\s])=?\\d*(A|B|C|D|E|F|G|H|P|V|X|Z)(L\\d*)?((?=[=(),*\\s+]|$)(?<=${hlasmLineContent}$))",
+      "name": "punctuation.definition.tag.hlasm"
+    },
+    "continuationSymbol": {
+      "match": "\\s*(?<=${beginLineSkipRule}$.{71})\\S",
+      "name": "keyword.other.hlasm"
+    },
+    "sequenceNumbers": {
+      "match": "\\s*.?(?<=${beginLineSkipRule}$.{72}).+$",
+      "name": "invalid.ignored"
+    }
+  }
+}

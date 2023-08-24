@@ -10,6 +10,7 @@ hlasmplugin.log
 build/bin/**
 lib/**
 dist_test/**
+lib_syntaxes/**
 terse/**
 prepare_release.sh
 start_release.sh

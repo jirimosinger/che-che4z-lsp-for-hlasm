@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declaration": true,
+    "stripInternal": true,
+    "lib": [
+      "es2021"
+    ],
+    "outDir": "../../lib_syntaxes",
+    "rootDir": ".",
+    "alwaysStrict": true,
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "strict": true
+  }
+}

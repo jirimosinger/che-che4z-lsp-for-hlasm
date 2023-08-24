@@ -2,6 +2,7 @@ node_modules/
 dist/
 dist_test/
 lib/
+lib_syntaxes/
 hlasmplugin.log
 .vscode-test/
 .vscode-test-web/

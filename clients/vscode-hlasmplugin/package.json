@@ -75,6 +75,7 @@
     "compile:test": "npm run compile && tsc -p ./tsconfig.json",
     "compile:web": "node ./build/bin/bundle.mjs extension web",
     "compile:webtest": "node ./build/bin/bundle.mjs both web",
+    "compile:grammar": "tsc -p ./syntaxes/scripts/tsconfig.json && node ./lib_syntaxes/grammarGenerator.js",
     "clean": "node ./build/bin/clean.js",
     "test": "npm run compile:test && node ./build/bin/prepareWorkspace.js && node ./dist_test/test/runTest.js",
     "test:web": "npm run compile:webtest && node ./build/bin/prepareWorkspace.js && npx vscode-test-web --browserType=chromium --coi --extensionDevelopmentPath=. --headless --verbose --extensionTestsPath=dist_test/index.web.js dist_test/workspace/",
