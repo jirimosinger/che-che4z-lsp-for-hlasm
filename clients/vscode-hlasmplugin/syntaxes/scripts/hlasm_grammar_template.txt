@@ -9,16 +9,22 @@
   ],
   "repository": {
     "code_block": {
-        "begin": "${codeBlockBegin}$",
-        "end": "${codeBlockEnd}$",
-        "patterns": [
-            {
-                "include": "#hlasm_syntax"
-            }
-        ]
+      "begin": "${codeBlockBegin}$",
+      "end": "${codeBlockEnd}$",
+      "patterns": [
+        {
+          "include": "#hlasm_syntax"
+        }
+      ]
     },
     "hlasm_syntax": {
       "patterns": [
+        {
+          "include": "#pageAnnotation"
+        },
+        {
+          "include": "#asma"
+        },
         {
           "include": "#lineComment"
         },
@@ -30,10 +36,22 @@
         }
       ]
     },
+    "asma": {
+      "patterns": [
+        {
+          "match": "${beginAsmaRule}$ ASMA...[I|N|W].*",
+          "name": "string.hlasm markup.italic"
+        },
+        {
+          "match": "${beginAsmaRule}$ ASMA(?:(?:...[E|S|C|U])|(?:CMS...E)).*",
+          "name": "invalid.illegal markup.italic"
+        }
+      ]
+    },
     "lineComment": {
       "patterns": [
         {
-          "begin": "(?=${beginLineSkipRule}$)(\\*|\\.\\*)",
+          "begin": "${beginLineSkipRule}$(\\*|\\.\\*)",
           "end": "${endLineRule}$",
           "applyEndPatternLast": 1,
           "beginCaptures": {
@@ -46,6 +64,9 @@
             }
           },
           "patterns": [
+            {
+              "include": "#pageAnnotation"
+            },
             {
               "include": "#remarksLine"
             }
@@ -60,6 +81,9 @@
           "end": "${endLineRule}$",
           "applyEndPatternLast": 1,
           "patterns": [
+            {
+              "include": "#pageAnnotation"
+            },
             {
               "include": "#nameField"
             },
@@ -81,6 +105,9 @@
       "end": "${endLineRule}$",
       "applyEndPatternLast": 0,
       "patterns": [
+        {
+          "include": "#pageAnnotation"
+        },
         {
           "include": "#illegalMultilineColumns"
         },
@@ -113,6 +140,9 @@
           "applyEndPatternLast": 1,
           "comment": "Operands ended on this line",
           "patterns": [
+            {
+              "include": "#pageAnnotation"
+            },
             {
               "include": "#remarksLine"
             }
@@ -199,6 +229,9 @@
       },
       "patterns": [
         {
+          "include": "#pageAnnotation"
+        },
+        {
           "include": "#parenthesis"
         },
         {
@@ -213,6 +246,9 @@
           "end": "([)](?<=${hlasmLineContent}$))|(${endLineRule}$)",
           "applyEndPatternLast": 0,
           "patterns": [
+            {
+              "include": "#pageAnnotation"
+            },
             {
               "include": "#illegalMultilineColumns"
             },
@@ -247,6 +283,9 @@
             }
           },
           "patterns": [
+            {
+              "include": "#pageAnnotation"
+            },
             {
               "include": "#stringContents"
             }
@@ -356,6 +395,10 @@
     "sequenceNumbers": {
       "match": "\\s*.?(?<=${beginLineSkipRule}$.{72}).+$",
       "name": "invalid.ignored"
+    },
+    "pageAnnotation": {
+      "begin": "(?=^.{112}Page....\\d.*)",
+      "end": "${codeBlockBegin}$"
     }
   }
 }

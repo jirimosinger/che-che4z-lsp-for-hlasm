@@ -238,11 +238,20 @@
         "language": "hlasmListing",
         "scopeName": "source.hlasmListing",
         "path": "./syntaxes/hlasmListing.tmLanguage.json"
+      },      {
+        "language": "hlasmListingLong",
+        "scopeName": "source.hlasmListingLong",
+        "path": "./syntaxes/hlasmListingLong.tmLanguage.json"
       },
       {
         "language": "hlasmListingEndevor",
         "scopeName": "source.hlasmListingEndevor",
         "path": "./syntaxes/hlasmListingEndevor.tmLanguage.json"
+      },
+      {
+        "language": "hlasmListingEndevorLong",
+        "scopeName": "source.hlasmListingEndevorLong",
+        "path": "./syntaxes/hlasmListingEndevorLong.tmLanguage.json"
       }
     ],
     "semanticTokenTypes": [
