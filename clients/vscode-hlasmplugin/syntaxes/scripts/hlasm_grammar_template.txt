@@ -4,10 +4,19 @@
   "scopeName": "source.${scope}$",
   "patterns": [
     {
-      "include": "#hlasm_syntax"
+      "include": "#${entryPattern}$"
     }
   ],
   "repository": {
+    "code_block": {
+        "begin": "${codeBlockBegin}$",
+        "end": "${codeBlockEnd}$",
+        "patterns": [
+            {
+                "include": "#hlasm_syntax"
+            }
+        ]
+    },
     "hlasm_syntax": {
       "patterns": [
         {
@@ -221,7 +230,7 @@
       "patterns": [
         {
           "begin": "(?<!${beginLineSkipRule}$)(')(?<=${hlasmLineContent}$)",
-          "end": "((.*?')(?<=${hlasmLineContent}$)|([^']*)(?<=${beginLineSkipRule}$.{71})(?=\\s)|(${hlasmLineContent}$$))",
+          "end": "(?<=${beginLineSkipRule}$.*?)((.*?')(?<=${hlasmLineContent}$)|([^']*)(?<=${beginLineSkipRule}$.{71})(?=\\s)|(${hlasmLineContent}$$))",
           "applyEndPatternLast": 0,
           "beginCaptures": {
             "1": {
@@ -251,7 +260,7 @@
           "include": "#illegalMultilineColumns"
         },
         {
-          "match": "(&{2,}|[^&]+)(?<=${hlasmLineContent}$)",
+          "match": "(?<=${beginLineSkipRule}$.*?)(&{2,}|[^&]+)(?<=${hlasmLineContent}$)",
           "name": "string.hlasm"
         },
         {

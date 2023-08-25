@@ -196,6 +196,36 @@
           "HLASMListing"
         ],
         "filenames": []
+      },
+      {
+        "id": "hlasmListingLong",
+        "extensions": [
+          ".listing"
+        ],
+        "aliases": [
+          "HLASMListingLong"
+        ],
+        "filenames": []
+      },
+      {
+        "id": "hlasmListingEndevor",
+        "extensions": [
+          ".listing"
+        ],
+        "aliases": [
+          "HLASMListingEndevor"
+        ],
+        "filenames": []
+      },
+      {
+        "id": "hlasmListingEndevorLong",
+        "extensions": [
+          ".listing"
+        ],
+        "aliases": [
+          "HLASMListingEndevorLong"
+        ],
+        "filenames": []
       }
     ],
     "grammars": [
@@ -208,6 +238,11 @@
         "language": "hlasmListing",
         "scopeName": "source.hlasmListing",
         "path": "./syntaxes/hlasmListing.tmLanguage.json"
+      },
+      {
+        "language": "hlasmListingEndevor",
+        "scopeName": "source.hlasmListingEndevor",
+        "path": "./syntaxes/hlasmListingEndevor.tmLanguage.json"
       }
     ],
     "semanticTokenTypes": [
