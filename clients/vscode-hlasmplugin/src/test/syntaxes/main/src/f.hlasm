@@ -1,8 +1,0 @@
-         AIF   ( NOT ( (('A' LE '&C') AND ('&C' LE 'I')).AAAA OR       X        
-                       (('J' LE '&C') AND ('&C' LE 'R'))  OR           X        
-                       (('S' LE '&C') AND ('&C' LE 'Z'))  OR           X       
-                                                                       X
-                       ('&C' EQ '$') OR ('&C' EQ '_')     OR           X        
-                       ('&C' EQ '#') OR ('&C' EQ '@')                  X        
-                     )                                                 X        
-               ).NAMERR         
