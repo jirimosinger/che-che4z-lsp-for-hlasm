@@ -9,8 +9,8 @@
   ],
   "repository": {
     "code_block": {
-      "begin": "${codeBlockBegin}$",
-      "end": "${codeBlockEnd}$",
+      "begin": "^${listingOffset}$${codeBlockBegin}$",
+      "end": "^${listingOffset}$.*(?:Relocation Dictionary|Ordinary Symbol and Literal Cross Reference|Macro and Copy Code Source Summary|Dsect Cross Reference|Using Map|General Purpose Register Cross Reference|Diagnostic Cross Reference and Assembler Summary).*Page....\\d(?<=^${listingOffset}$.{120}).*",
       "patterns": [
         {
           "include": "#hlasm_syntax"
@@ -39,11 +39,11 @@
     "asma": {
       "patterns": [
         {
-          "match": "${beginAsmaRule}$ ASMA...[I|N|W].*",
+          "match": "^${listingOffset}$\\*\\* ASMA...[I|N|W].*",
           "name": "string.hlasm markup.italic"
         },
         {
-          "match": "${beginAsmaRule}$ ASMA(?:(?:...[E|S|C|U])|(?:CMS...E)).*",
+          "match": "^${listingOffset}$\\*\\* ASMA(?:(?:...[E|S|C|U])|(?:CMS...E)).*",
           "name": "invalid.illegal markup.italic"
         }
       ]
@@ -51,8 +51,8 @@
     "lineComment": {
       "patterns": [
         {
-          "begin": "${beginLineSkipRule}$(\\*|\\.\\*)",
-          "end": "${endLineRule}$",
+          "begin": "^${listingDetails}$(\\*|\\.\\*)",
+          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
           "applyEndPatternLast": 1,
           "beginCaptures": {
             "1": {
@@ -77,8 +77,8 @@
     "parseLine": {
       "patterns": [
         {
-          "begin": "${beginLineSkipRule}$(?=.{1,71})",
-          "end": "${endLineRule}$",
+          "begin": "^${listingDetails}$(?=.{1,71})",
+          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
           "applyEndPatternLast": 1,
           "patterns": [
             {
@@ -101,8 +101,8 @@
       ]
     },
     "operandsAndRemarks": {
-      "begin": "\\s*(?=\\S)(?<=${beginLineSkipRule}$.{4,71})",
-      "end": "${endLineRule}$",
+      "begin": "\\s*(?=\\S)(?<=^${listingDetails}$.{4,71})",
+      "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
       "applyEndPatternLast": 0,
       "patterns": [
         {
@@ -112,7 +112,7 @@
           "include": "#illegalMultilineColumns"
         },
         {
-          "match": "(${beginLineSkipRule}$\\s{15})",
+          "match": "(^${listingDetails}$\\s{15})",
           "comment": "Just to get rid of the spaces"
         },
         {
@@ -122,7 +122,7 @@
           "include": "#asmArguments"
         },
         {
-          "match": "(?<=,)\\s(.*)(?<=${hlasmLineContent}$)",
+          "match": "(?<=,)\\s(.*)(?<=^${listingDetails}$.{0,71})",
           "comment": "Operands will continue on next line",
           "captures": {
             "1": {
@@ -135,8 +135,8 @@
           }
         },
         {
-          "begin": "(?<!,)(?=\\s(?<=${hlasmLineContent}$))",
-          "end": "${endLineRule}$",
+          "begin": "(?<!,)(?=\\s(?<=^${listingDetails}$.{0,71}))",
+          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
           "applyEndPatternLast": 1,
           "comment": "Operands ended on this line",
           "patterns": [
@@ -167,7 +167,7 @@
       ]
     },
     "illegalMultilineColumns": {
-      "match": "(${beginLineSkipRule}$\\s*\\S.*)(?<=${beginLineSkipRule}$.{0,15})",
+      "match": "(^${listingDetails}$\\s*\\S.*)(?<=^${listingDetails}$.{0,15})",
       "name": "invalid.illegal"
     },
     "asmArguments": {
@@ -179,7 +179,7 @@
           "include": "#openEndedArgs"
         },
         {
-          "match": "([^\\s=(),'*/+-]+)(?<=${hlasmLineContent}$)",
+          "match": "([^\\s=(),'*/+-]+)(?<=^${listingDetails}$.{0,71})",
           "captures": {
             "1": {
               "name": "punctuation.definition.tag.hlasm",
@@ -196,7 +196,7 @@
     "quoteType": {
       "patterns": [
         {
-          "match": "([^a-zA-Z@$#_0-9()']*?)([LKNTlknt])'(?<=${hlasmLineContent}$)",
+          "match": "([^a-zA-Z@$#_0-9()']*?)([LKNTlknt])'(?<=^${listingDetails}$.{0,71})",
           "captures": {
             "1": {
               "name": "keyword.control.hlasm",
@@ -214,7 +214,7 @@
       ]
     },
     "openEndedArgs": {
-      "begin": "\\s*(?=(?:[('])(?<=${hlasmLineContent}$))",
+      "begin": "\\s*(?=(?:[('])(?<=^${listingDetails}$.{0,71}))",
       "end": "(?=.*)",
       "applyEndPatternLast": 1,
       "beginCaptures": {
@@ -242,8 +242,8 @@
     "parenthesis": {
       "patterns": [
         {
-          "begin": "(?<!${beginLineSkipRule}$)[(]\\s*(?<=${hlasmLineContent}$)",
-          "end": "([)](?<=${hlasmLineContent}$))|(${endLineRule}$)",
+          "begin": "(?<!^${listingDetails}$)[(]\\s*(?<=^${listingDetails}$.{0,71})",
+          "end": "([)](?<=^${listingDetails}$.{0,71}))|(((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$)",
           "applyEndPatternLast": 0,
           "patterns": [
             {
@@ -265,8 +265,8 @@
     "stringType": {
       "patterns": [
         {
-          "begin": "(?<!${beginLineSkipRule}$)(')(?<=${hlasmLineContent}$)",
-          "end": "(?<=${beginLineSkipRule}$.*?)((.*?')(?<=${hlasmLineContent}$)|([^']*)(?<=${beginLineSkipRule}$.{71})(?=\\s)|(${hlasmLineContent}$$))",
+          "begin": "(?<!^${listingDetails}$)(')(?<=^${listingDetails}$.{0,71})",
+          "end": "(?<=^${listingDetails}$.*?)((.*?')(?<=^${listingDetails}$.{0,71})|([^']*)(?<=^${listingDetails}$.{71})(?=\\s)|(^${listingDetails}$.{0,71}$))",
           "applyEndPatternLast": 0,
           "beginCaptures": {
             "1": {
@@ -299,7 +299,7 @@
           "include": "#illegalMultilineColumns"
         },
         {
-          "match": "(?<=${beginLineSkipRule}$.*?)(&{2,}|[^&]+)(?<=${hlasmLineContent}$)",
+          "match": "(?<=^${listingDetails}$.*?)(&{2,}|[^&]+)(?<=^${listingDetails}$.{0,71})",
           "name": "string.hlasm"
         },
         {
@@ -353,52 +353,52 @@
       ]
     },
     "sequenceSymbolNameField": {
-      "match": "${beginLineSkipRule}$\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=${hlasmLineContent}$)",
+      "match": "^${listingDetails}$\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=^${listingDetails}$.{0,71})",
       "name": "keyword.control.hlasm"
     },
     "sequenceSymbolOperandField": {
-      "match": "\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?=,|\\s|$|(?<=${beginLineSkipRule}$.{71}))(?<=${hlasmLineContent}$)",
+      "match": "\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?=,|\\s|$|(?<=^${listingDetails}$.{71}))(?<=^${listingDetails}$.{0,71})",
       "name": "keyword.control.hlasm"
     },
     "instruction": {
-      "match": "(?<=${beginLineSkipRule}$\\S*)\\s+\\S+(?<=${hlasmLineContent}$)",
+      "match": "(?<=^${listingDetails}$\\S*)\\s+\\S+(?<=^${listingDetails}$.{0,71})",
       "name": "entity.name.function.hlasm"
     },
     "remark": {
-      "match": "(\\S+)(?<=${hlasmLineContent}$)",
+      "match": "(\\S+)(?<=^${listingDetails}$.{0,71})",
       "name": "comment.hlasm"
     },
     "operators": {
-      "match": "[=(),*/+-\\.](?<=${hlasmLineContent}$)",
+      "match": "[=(),*/+-\\.](?<=^${listingDetails}$.{0,71})",
       "name": "keyword.operator.hlasm"
     },
     "numbers": {
-      "match": "(?<=[=(),*\\s+])-?\\d*((?=[=(),*+\\s]|$)(?<=${hlasmLineContent}$))",
+      "match": "(?<=[=(),*\\s+])-?\\d*((?=[=(),*+\\s]|$)(?<=^${listingDetails}$.{0,71}))",
       "name": "constant.numeric.hlasm"
     },
     "variable": {
-      "match": "&(([A-Za-z@#$_][A-Za-z@#$_0-9]*)|([(].*?[)]))(?<=${hlasmLineContent}$)",
+      "match": "&(([A-Za-z@#$_][A-Za-z@#$_0-9]*)|([(].*?[)]))(?<=^${listingDetails}$.{0,71})",
       "name": "variable.other.readwrite.hlasm"
     },
     "ordinarySymbol": {
-      "match": "[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=${hlasmLineContent}$)",
+      "match": "[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=^${listingDetails}$.{0,71})",
       "name": "support.class.hlasm"
     },
     "asmSpecialStatements": {
-      "match": "(?<=[=(),*+\\s])=?\\d*(A|B|C|D|E|F|G|H|P|V|X|Z)(L\\d*)?((?=[=(),*\\s+]|$)(?<=${hlasmLineContent}$))",
+      "match": "(?<=[=(),*+\\s])=?\\d*(A|B|C|D|E|F|G|H|P|V|X|Z)(L\\d*)?((?=[=(),*\\s+]|$)(?<=^${listingDetails}$.{0,71}))",
       "name": "punctuation.definition.tag.hlasm"
     },
     "continuationSymbol": {
-      "match": "\\s*(?<=${beginLineSkipRule}$.{71})\\S",
+      "match": "\\s*(?<=^${listingDetails}$.{71})\\S",
       "name": "keyword.other.hlasm"
     },
     "sequenceNumbers": {
-      "match": "\\s*.?(?<=${beginLineSkipRule}$.{72}).+$",
+      "match": "\\s*.?(?<=^${listingDetails}$.{72}).+$",
       "name": "invalid.ignored"
     },
     "pageAnnotation": {
-      "begin": "(?=^.{112}Page....\\d.*)",
-      "end": "${codeBlockBegin}$"
+      "begin": "(?=^${listingOffset}$.{111}Page....\\d.*)",
+      "end": "^${listingOffset}$${codeBlockBegin}$"
     }
   }
 }
