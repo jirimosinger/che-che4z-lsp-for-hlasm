@@ -196,36 +196,6 @@
           "HLASMListing"
         ],
         "filenames": []
-      },
-      {
-        "id": "hlasmListingLong",
-        "extensions": [
-          ".listing"
-        ],
-        "aliases": [
-          "HLASMListingLong"
-        ],
-        "filenames": []
-      },
-      {
-        "id": "hlasmListingEndevor",
-        "extensions": [
-          ".listing"
-        ],
-        "aliases": [
-          "HLASMListingEndevor"
-        ],
-        "filenames": []
-      },
-      {
-        "id": "hlasmListingEndevorLong",
-        "extensions": [
-          ".listing"
-        ],
-        "aliases": [
-          "HLASMListingEndevorLong"
-        ],
-        "filenames": []
       }
     ],
     "grammars": [
@@ -235,21 +205,27 @@
         "path": "./syntaxes/hlasm.tmLanguage.json"
       },
       {
+        "scopeName": "source.hlasmGeneral",
+        "path": "./syntaxes/hlasmGeneral.tmLanguage.json"
+      },
+      {
         "language": "hlasmListing",
         "scopeName": "source.hlasmListing",
         "path": "./syntaxes/hlasmListing.tmLanguage.json"
-      },      {
-        "language": "hlasmListingLong",
-        "scopeName": "source.hlasmListingLong",
-        "path": "./syntaxes/hlasmListingLong.tmLanguage.json"
       },
       {
-        "language": "hlasmListingEndevor",
+        "scopeName": "source.hlasmListingGeneral",
+        "path": "./syntaxes/hlasmListingGeneral.tmLanguage.json"
+      },
+      {
+        "scopeName": "source.hlasmListingGeneralLong",
+        "path": "./syntaxes/hlasmListingGeneralLong.tmLanguage.json"
+      },
+      {
         "scopeName": "source.hlasmListingEndevor",
         "path": "./syntaxes/hlasmListingEndevor.tmLanguage.json"
       },
       {
-        "language": "hlasmListingEndevorLong",
         "scopeName": "source.hlasmListingEndevorLong",
         "path": "./syntaxes/hlasmListingEndevorLong.tmLanguage.json"
       }
