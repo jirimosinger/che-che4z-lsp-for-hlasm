@@ -216,17 +216,7 @@
 #              ^^^^^ source.hlasm entity.name.function.hlasm
 #                   ^ source.hlasm
 #                    ^^^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
->&(__V@R_V&R.N)(&VAR) SETC '&VAR'
-#^^^^^^^^^^^^^^ source.hlasm variable.other.readwrite.hlasm
-#              ^ source.hlasm keyword.operator.hlasm
-#               ^^^^ source.hlasm variable.other.readwrite.hlasm
-#                   ^ source.hlasm keyword.operator.hlasm
-#                    ^^^^^ source.hlasm entity.name.function.hlasm
-#                         ^ source.hlasm
-#                          ^ source.hlasm string.hlasm
-#                           ^^^^ source.hlasm variable.other.readwrite.hlasm
-#                               ^ source.hlasm string.hlasm
->&(__V@R_V&R.O)(&VAR) SETC '&VAR'
+>&(__V@R_V&R.#)(&VAR) SETC '&VAR'
 #^^^^^^^^^^^^^^ source.hlasm variable.other.readwrite.hlasm
 #              ^ source.hlasm keyword.operator.hlasm
 #               ^^^^ source.hlasm variable.other.readwrite.hlasm
@@ -254,7 +244,7 @@
 #                                           ^ source.hlasm
 #                                            ^^^^^^^^ source.hlasm comment.hlasm
 >
->&(__V@R_V&R.O)(&VAR) SETC '&VAR
+>&(__V@R_V&R.#)(&VAR) SETC '&VAR
 #^^^^^^^^^^^^^^ source.hlasm variable.other.readwrite.hlasm
 #              ^ source.hlasm keyword.operator.hlasm
 #               ^^^^ source.hlasm variable.other.readwrite.hlasm
@@ -280,3 +270,4 @@
 #                                         ^^ source.hlasm comment.hlasm
 #                                           ^ source.hlasm
 #                                            ^^^^^^^^ source.hlasm comment.hlasm
+>

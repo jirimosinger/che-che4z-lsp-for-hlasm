@@ -266,7 +266,7 @@
       "patterns": [
         {
           "begin": "(?<!^${listingDetails}$)(')(?<=^${listingDetails}$.{0,71})",
-          "end": "(?<=^${listingDetails}$.*?)((.*?')(?<=^${listingDetails}$.{0,71})|([^']*)(?<=^${listingDetails}$.{71})(?=\\s)|(^${listingDetails}$.{0,71}$))",
+          "end": "(?<=^${listingDetails}$.*?)((.*?')(?<=^${listingDetails}$.{0,71})|([^']*)(?<=^${listingDetails}$.{71})(?=\\s)|(^${listingDetails}$.{0,71}$))|(((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$)",
           "applyEndPatternLast": 0,
           "beginCaptures": {
             "1": {
