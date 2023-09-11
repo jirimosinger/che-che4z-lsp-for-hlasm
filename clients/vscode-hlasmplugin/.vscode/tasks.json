@@ -69,9 +69,9 @@
             ]
         },
         {
-            "label": "Run hlasm general textmate tests",
+            "label": "Run hlasm textmate tests",
             "type": "shell",
-            "command": "vscode-tmgrammar-snap  -g syntaxes/hlasm.tmLanguage.json  'src\\test\\syntaxes\\main\\src\\*'",
+            "command": "vscode-tmgrammar-snap  -g syntaxes/hlasm.tmLanguage.json  'src/test/syntaxes/**/*.hlasm' ; vscode-tmgrammar-snap  -g syntaxes/hlasmListing.tmLanguage.json  'src/test/syntaxes/**/*.listing'",
             "group": "test",
             "presentation": {
                 "reveal": "always",
