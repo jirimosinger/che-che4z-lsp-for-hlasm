@@ -7,7 +7,6 @@
 #                  ^^^^ source.hlasm comment.hlasm
 #                      ^ source.hlasm
 #                       ^^^^ source.hlasm comment.hlasm
-#                           ^ source.hlasm
 #                            ^^^^^^ source.hlasm comment.hlasm
 #                                  ^ source.hlasm
 #                                   ^^^ source.hlasm comment.hlasm
