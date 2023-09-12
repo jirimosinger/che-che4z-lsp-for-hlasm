@@ -7,7 +7,6 @@
 - Show active USINGs in the instruction hover text
 - Add reachable ordinary symbols into the completion list
 - Support Web extension environment
-- Enhanced multiline support in TextMate grammar for listings
 
 #### Fixed
 - Program to processor group mapping precedence
@@ -16,6 +15,7 @@
 - Auto-select WebAssembly image on platforms without native support
 - Querying current directory fails on Windows (WASM)
 - Implicit workspaces should not attempt reading configuration files
+- Enhanced multiline support in TextMate grammar for listings
 
 ## [1.9.0](https://github.com/eclipse-che4z/che-che4z-lsp-for-hlasm/compare/1.8.0...1.9.0) (2023-08-03)
 
