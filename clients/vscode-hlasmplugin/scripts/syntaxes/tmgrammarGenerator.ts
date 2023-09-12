@@ -2,7 +2,7 @@ import * as fs from 'fs'
 
 const syntaxesDir = "syntaxes";
 
-const grammar_details_template = './scripts/syntaxes/hlasm_grammar_template.txt';
+const grammar_details_template = './scripts/syntaxes/hlasm_tmgrammar_template.txt';
 const grammar_base_template = './scripts/syntaxes/hlasm_base_template.txt';
 
 const code_block_listing_begin = '.{2}Loc  Object Code    Addr1 Addr2  Stmt   Source Statement.*';

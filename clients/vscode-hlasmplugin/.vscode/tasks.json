@@ -32,6 +32,7 @@
 
             // we run the custom script "compile" as defined in package.json
             "args": ["run", "compile:test", "--loglevel", "silent"],
+            
             // The tsc compiler is started in watching mode
             "isBackground": false,
 
@@ -48,7 +49,7 @@
             ]
         },
         {
-            "label": "generateGrammar",
+            "label": "generateTMGrammar",
             "command": "npm",
             "type": "shell",
             "presentation": {
@@ -57,7 +58,7 @@
                 "group": "tmgrammar"
             },
             "group": "build",
-            "args": ["run", "generate:grammar"],
+            "args": ["run", "generate:tmgrammar"],
             "problemMatcher": "$tsc-watch"
         },
         {
@@ -71,7 +72,7 @@
                 "group": "tmgrammar"
             },
             "dependsOn": [
-                "generateGrammar"
+                "generateTMGrammar"
             ]
         }
     ]

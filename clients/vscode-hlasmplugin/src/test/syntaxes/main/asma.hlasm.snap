@@ -1,0 +1,39 @@
+>LABEL    INSTR OP THIS LINE SHOULD NOT BE AFFECTED
+#^^^^^ source.hlasm support.class.hlasm
+#     ^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#              ^ source.hlasm
+#               ^^ source.hlasm punctuation.definition.tag.hlasm
+#                 ^ source.hlasm
+#                  ^^^^ source.hlasm comment.hlasm
+#                      ^ source.hlasm
+#                       ^^^^ source.hlasm comment.hlasm
+#                           ^ source.hlasm
+#                            ^^^^^^ source.hlasm comment.hlasm
+#                                  ^ source.hlasm
+#                                   ^^^ source.hlasm comment.hlasm
+#                                      ^ source.hlasm
+#                                       ^^ source.hlasm comment.hlasm
+#                                         ^ source.hlasm
+#                                          ^^^^^^^^ source.hlasm comment.hlasm
+>** ASMA123I - This is just a remark in general hlasm grammar
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm string.hlasm markup.italic
+>** ASMA123E - This is just a remark in general hlasm grammar
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm invalid.illegal markup.italic
+>LABEL    INSTR OP THIS LINE SHOULD NOT BE AFFECTED
+#^^^^^ source.hlasm support.class.hlasm
+#     ^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#              ^ source.hlasm
+#               ^^ source.hlasm punctuation.definition.tag.hlasm
+#                 ^ source.hlasm
+#                  ^^^^ source.hlasm comment.hlasm
+#                      ^ source.hlasm
+#                       ^^^^ source.hlasm comment.hlasm
+#                           ^ source.hlasm
+#                            ^^^^^^ source.hlasm comment.hlasm
+#                                  ^ source.hlasm
+#                                   ^^^ source.hlasm comment.hlasm
+#                                      ^ source.hlasm
+#                                       ^^ source.hlasm comment.hlasm
+#                                         ^ source.hlasm
+#                                          ^^^^^^^^ source.hlasm comment.hlasm
+>
