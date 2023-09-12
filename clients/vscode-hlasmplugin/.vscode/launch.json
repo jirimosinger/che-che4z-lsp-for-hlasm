@@ -48,17 +48,6 @@
                 "${workspaceFolder}/dist/**/*.js",
                 "${workspaceFolder}/dist_test/**/*.js"
             ]
-        },
-        {
-            "name": "Debug Grammar Generator",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/scripts/syntaxes/grammarGenerator.ts",
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/lib_syntaxes/**/*.js"
-            ],
-            "preLaunchTask": "generateGrammar"
-        },
+        }
     ]
 }

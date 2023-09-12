@@ -5,17 +5,23 @@
 // ${fileDirname}: the current opened file's dirname
 // ${fileExtname}: the current opened file's extension
 // ${cwd}: the current working directory of the spawned process
+
 // A task runner that calls a custom npm script that compiles the extension.
 {
     "version": "2.0.0",
+
     "tasks": [
         {
             "label": "npm",
+
             // we want to run npm
             "command": "npm",
+
             // the command is a shell script
             "type": "shell",
+
             // show the output window only if unrecognized errors occur.
+
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
@@ -25,12 +31,7 @@
             "group": "build",
 
             // we run the custom script "compile" as defined in package.json
-            "args": [
-                "run",
-                "compile:test",
-                "--loglevel",
-                "silent"
-            ],
+            "args": ["run", "compile:test", "--loglevel", "silent"],
             // The tsc compiler is started in watching mode
             "isBackground": false,
 
@@ -41,9 +42,7 @@
             "label": "prepareTest",
             "command": "node",
             "type": "shell",
-            "args": [
-                "'${workspaceFolder}/build/bin/prepareWorkspace.js'"
-            ],
+            "args": ["'${workspaceFolder}/build/bin/prepareWorkspace.js'"],
             "dependsOn": [
                 "npm"
             ]
@@ -54,43 +53,22 @@
             "type": "shell",
             "presentation": {
                 "reveal": "always",
-                "panel": "new"
+                "panel": "shared",
+                "group": "tmgrammar"
             },
             "group": "build",
-            "args": [
-                "run",
-                "generate:grammar",
-                "--loglevel",
-                "silent"
-            ],
-            "isBackground": true,
+            "args": ["run", "generate:grammar"],
             "problemMatcher": "$tsc-watch"
         },
         {
-            "label": "Run hlasm textmate tests",
+            "label": "Run hlasm textmate grammar tests",
             "type": "shell",
             "command": "vscode-tmgrammar-snap  -g syntaxes/hlasm.tmLanguage.json  'src/test/syntaxes/**/*.hlasm' ; vscode-tmgrammar-snap  -g syntaxes/hlasmListing.tmLanguage.json  'src/test/syntaxes/**/*.listing'",
             "group": "test",
             "presentation": {
                 "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": {
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}"
-                ],
-                "pattern": [
-                    {
-                        "regexp": "^(ERROR)\\s([^:]+):(\\d+):(\\d+):(\\d+)\\s(.*)$",
-                        "severity": 1,
-                        "file": 2,
-                        "line": 3,
-                        "column": 4,
-                        "endColumn": 5,
-                        "message": 6
-                    }
-                ]
+                "panel": "shared",
+                "group": "tmgrammar"
             },
             "dependsOn": [
                 "generateGrammar"

@@ -1,4 +1,6 @@
-var fs = require('fs')
+import * as fs from 'fs'
+
+const syntaxesDir = "syntaxes";
 
 const grammar_details_template = './scripts/syntaxes/hlasm_grammar_template.txt';
 const grammar_base_template = './scripts/syntaxes/hlasm_base_template.txt';
@@ -7,14 +9,6 @@ const code_block_listing_begin = '.{2}Loc  Object Code    Addr1 Addr2  Stmt   So
 const code_block_listing_long_begin = '.{2}Loc    Object Code      Addr1    Addr2    Stmt  Source Statement.*';
 const code_block_listing_annotation_length = '.{40}';
 const code_block_listing_long_annotation_length = '.{49}';
-
-enum GrammarTypes {
-  Main = 1,
-  ListingLong,
-  Listing,
-  ListingEndevorLong,
-  ListingEndevor
-}
 
 interface GrammarFile {
   file: string;
@@ -105,7 +99,7 @@ const hlasmListingBase: GrammarBase = {
 function generateGrammarsDetails(props: GrammarDetails) {
   const listingDetails = props.listingOffset + props.beginLineSkipRule;
 
-  fs.readFile(grammar_details_template, 'utf8', (err: Error, data: string) => {
+  fs.readFile(grammar_details_template, 'utf8', (err, data: string) => {
     if (err) {
       return console.log(err);
     }
@@ -124,7 +118,7 @@ function generateGrammarsDetails(props: GrammarDetails) {
 }
 
 function generateGrammarBase(props: GrammarBase) {
-  fs.readFile(grammar_base_template, 'utf8', (err: Error, data: string) => {
+  fs.readFile(grammar_base_template, 'utf8', (err, data: string) => {
     let includeRule = 'include: #{}';
 
     if (err) {
@@ -134,7 +128,7 @@ function generateGrammarBase(props: GrammarBase) {
     if (props.includedGrammars.length !== 0) {
       includeRule = '{"include": "source.' + props.includedGrammars[0].scope + '"}'
 
-      for (let i = 1; i < props.includedGrammars.length; ++i) 
+      for (let i = 1; i < props.includedGrammars.length; ++i)
         includeRule += ',{"include": "source.' + props.includedGrammars[i].scope + '"}'
     }
 
@@ -148,8 +142,7 @@ function generateGrammarBase(props: GrammarBase) {
   });
 }
 
-const syntaxesDir = "syntaxes";
-if (!fs.existsSync(syntaxesDir)){
+if (!fs.existsSync(syntaxesDir)) {
   fs.mkdirSync(syntaxesDir);
 }
 
