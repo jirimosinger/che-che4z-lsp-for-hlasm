@@ -7,6 +7,7 @@
 - Show active USINGs in the instruction hover text
 - Add reachable ordinary symbols into the completion list
 - Support Web extension environment
+- Enhanced multiline support in TextMate grammar for listings
 
 #### Fixed
 - Program to processor group mapping precedence
