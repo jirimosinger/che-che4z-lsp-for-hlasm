@@ -81,7 +81,7 @@
     "test:web": "npm run compile:webtest && node ./build/bin/prepareWorkspace.js && npx vscode-test-web --browserType=chromium --coi --extensionDevelopmentPath=. --headless --verbose --extensionTestsPath=dist_test/index.web.js dist_test/workspace/ && npm run test:tmgrammar",
     "test:wasm": "npm run compile:test && node ./build/bin/prepareWorkspace.js wasm && node ./dist_test/test/runTest.js && npm run test:tmgrammar",
     "test:insiders": "npm run compile:test && node ./build/bin/prepareWorkspace.js && node ./dist_test/test/runTest.js insiders && npm run test:tmgrammar",
-    "test:theia": "npm run compile:test && node ./build/bin/prepareWorkspace.js && node ./build/bin/theiaTest.js && npm run test:tmgrammar",
+    "test:theia": "npm run compile:test && node ./build/bin/prepareWorkspace.js && npm run test:tmgrammar && node ./build/bin/theiaTest.js",
     "test:tmgrammar": "vscode-tmgrammar-snap -g syntaxes/hlasm.tmLanguage.json src/test/syntaxes/**/*.hlasm && vscode-tmgrammar-snap -g syntaxes/hlasmListing.tmLanguage.json src/test/syntaxes/**/*.listing",
     "run:web": "npx vscode-test-web --browserType=chromium --coi --extensionDevelopmentPath=. --open-devtools --verbose ../../example_workspace/"
   },
