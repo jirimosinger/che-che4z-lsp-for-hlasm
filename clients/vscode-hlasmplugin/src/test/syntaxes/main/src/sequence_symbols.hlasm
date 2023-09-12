@@ -1,3 +1,0 @@
-&LABEL   INSTR ('AA'.((2 EQ 2)) SLA 'AAA').SEQ
-
-.SEQ     END
