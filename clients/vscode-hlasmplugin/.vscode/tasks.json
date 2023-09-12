@@ -32,7 +32,7 @@
 
             // we run the custom script "compile" as defined in package.json
             "args": ["run", "compile:test", "--loglevel", "silent"],
-            
+
             // The tsc compiler is started in watching mode
             "isBackground": false,
 
@@ -62,9 +62,10 @@
             "problemMatcher": "$tsc-watch"
         },
         {
-            "label": "Run hlasm textmate grammar tests",
+            "label": "textmateTests",
             "type": "shell",
-            "command": "vscode-tmgrammar-snap  -g syntaxes/hlasm.tmLanguage.json  'src/test/syntaxes/**/*.hlasm' ; vscode-tmgrammar-snap  -g syntaxes/hlasmListing.tmLanguage.json  'src/test/syntaxes/**/*.listing'",
+            "command": "npm",
+            "args": ["run", "test:tmgrammar"],
             "group": "test",
             "presentation": {
                 "reveal": "always",

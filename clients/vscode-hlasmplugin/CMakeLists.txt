@@ -82,8 +82,6 @@ add_custom_command(
 			${CALL} ${NPM_RETURN} --unsafe-perm run compile
 			#the --unsafe-perm is needed when user with root rights runs the build on linux
 		COMMAND
-			${CALL} ${NPM_RETURN} --unsafe-perm run generate:tmgrammar
-		COMMAND
 			${CMAKE_COMMAND} -E make_directory ${BIN_FOLDER}
 		COMMAND
 			${COPY_PARSER_LIBRARY_COMMAND}
