@@ -10,23 +10,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "generateGrammar",
-            "command": "npm",
-            "type": "shell",
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "args": [
-                "run",
-                "compile:grammar",
-                "--loglevel",
-                "silent"
-            ],
-            "isBackground": true,
-            "problemMatcher": "$tsc-watch"
-        },
-        {
             "label": "npm",
             // we want to run npm
             "command": "npm",
@@ -52,10 +35,7 @@
             "isBackground": false,
 
             // use the standard tsc in watch mode problem matcher to find compile problems in the output.
-            "problemMatcher": "$tsc-watch",
-            "dependsOn": [
-                "generateGrammar"
-            ]
+            "problemMatcher": "$tsc-watch"
         },
         {
             "label": "prepareTest",
@@ -67,6 +47,24 @@
             "dependsOn": [
                 "npm"
             ]
+        },
+        {
+            "label": "generateGrammar",
+            "command": "npm",
+            "type": "shell",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "group": "build",
+            "args": [
+                "run",
+                "generate:grammar",
+                "--loglevel",
+                "silent"
+            ],
+            "isBackground": true,
+            "problemMatcher": "$tsc-watch"
         },
         {
             "label": "Run hlasm textmate tests",

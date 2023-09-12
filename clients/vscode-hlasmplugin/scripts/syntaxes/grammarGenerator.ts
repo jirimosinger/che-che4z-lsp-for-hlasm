@@ -1,7 +1,7 @@
 var fs = require('fs')
 
-const grammar_details_template = './syntaxes/scripts/hlasm_grammar_template.txt';
-const grammar_base_template = './syntaxes/scripts/hlasm_base_template.txt';
+const grammar_details_template = './scripts/syntaxes/hlasm_grammar_template.txt';
+const grammar_base_template = './scripts/syntaxes/hlasm_base_template.txt';
 
 const code_block_listing_begin = '.{2}Loc  Object Code    Addr1 Addr2  Stmt   Source Statement.*';
 const code_block_listing_long_begin = '.{2}Loc    Object Code      Addr1    Addr2    Stmt  Source Statement.*';
@@ -146,6 +146,11 @@ function generateGrammarBase(props: GrammarBase) {
       if (err) return console.log(err);
     });
   });
+}
+
+const syntaxesDir = "syntaxes";
+if (!fs.existsSync(syntaxesDir)){
+  fs.mkdirSync(syntaxesDir);
 }
 
 generateGrammarsDetails(hlasmGeneralGrammar);

@@ -53,7 +53,7 @@
             "name": "Debug Grammar Generator",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/syntaxes/scripts/grammarGenerator.ts",
+            "program": "${workspaceFolder}/scripts/syntaxes/grammarGenerator.ts",
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/lib_syntaxes/**/*.js"
