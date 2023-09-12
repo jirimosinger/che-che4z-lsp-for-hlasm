@@ -113,7 +113,7 @@
                                                                                             HLASM R1.0  2000/01/01 00.00            
      No Statements Flagged in this Assembly                                                                                         
 HIGH LEVEL ASSEMBLER, 5696-234, RELEASE 1.0, PTF AB12345                                                                            
-SYSTEM: z/OS 01.00.00              JOBNAME: JOB    STEPNAME: STEP1      PROCSTEP: (NOPROC)                                     
+SYSTEM: z/OS 01.00.00              JOBNAME: JOB         STEPNAME: STEP1      PROCSTEP: (NOPROC)                                     
 Unicode Module:   ASMA047C   From Page     1148   To Page    17584           ECECP: International 1                                 
 Data Sets Allocated for this Assembly                                                                                               
  Con DDname   Data Set Name                                Volume  Member                                                           
