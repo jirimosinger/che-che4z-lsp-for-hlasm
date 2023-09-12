@@ -23,7 +23,7 @@
   "exclude": [
     "src/**/*.web.ts",
     "dist_test/**",
-    "scripts/**",
+    "scripts/syntaxes/**",
     "lib_syntaxes/**"
   ]
 }

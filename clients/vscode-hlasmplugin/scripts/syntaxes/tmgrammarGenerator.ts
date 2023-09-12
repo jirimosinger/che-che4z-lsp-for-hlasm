@@ -99,7 +99,7 @@ const hlasmListingBase: GrammarBase = {
 function generateGrammarsDetails(props: GrammarDetails) {
   const listingDetails = props.listingOffset + props.beginLineSkipRule;
 
-  fs.readFile(grammar_details_template, 'utf8', (err, data: string) => {
+  fs.readFile(grammar_details_template, 'utf8', (err: any, data: string) => {
     if (err) {
       return console.log(err);
     }
@@ -118,7 +118,7 @@ function generateGrammarsDetails(props: GrammarDetails) {
 }
 
 function generateGrammarBase(props: GrammarBase) {
-  fs.readFile(grammar_base_template, 'utf8', (err, data: string) => {
+  fs.readFile(grammar_base_template, 'utf8', (err: any, data: string) => {
     let includeRule = 'include: #{}';
 
     if (err) {
