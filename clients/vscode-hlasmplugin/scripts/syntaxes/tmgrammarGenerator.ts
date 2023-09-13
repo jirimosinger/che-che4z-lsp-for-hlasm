@@ -24,6 +24,10 @@ const code_block_listing_long_begin = '.{2}Loc    Object Code      Addr1    Addr
 const code_block_listing_annotation_length = '.{40}';
 const code_block_listing_long_annotation_length = '.{49}';
 
+const emptyRule = 'emptyRule'
+const asmaRule = 'asma'
+const pageAnnotationRule = 'pageAnnotation'
+
 interface GrammarFile {
   file: string;
   grammarName: string;
@@ -35,6 +39,8 @@ interface GrammarDetails extends GrammarFile {
   codeBlockBegin: string;
   beginLineSkipRule: string;
   listingOffset: string;
+  asmaRule: string;
+  pageAnnotationRule: string;
 }
 
 const hlasmGeneralGrammar: GrammarDetails = {
@@ -44,7 +50,9 @@ const hlasmGeneralGrammar: GrammarDetails = {
   entryPattern: 'hlasm_syntax',
   codeBlockBegin: '',
   beginLineSkipRule: '',
-  listingOffset: ''
+  listingOffset: '',
+  asmaRule: emptyRule,
+  pageAnnotationRule: emptyRule
 }
 
 const hlasmListingGeneralGrammar: GrammarDetails = {
@@ -54,7 +62,9 @@ const hlasmListingGeneralGrammar: GrammarDetails = {
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_begin,
   beginLineSkipRule: code_block_listing_annotation_length,
-  listingOffset: ''
+  listingOffset: '',
+  asmaRule: asmaRule,
+  pageAnnotationRule: pageAnnotationRule
 }
 
 const hlasmListingGeneralLongGrammar: GrammarDetails = {
@@ -64,7 +74,9 @@ const hlasmListingGeneralLongGrammar: GrammarDetails = {
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_long_begin,
   beginLineSkipRule: code_block_listing_long_annotation_length,
-  listingOffset: ''
+  listingOffset: '',
+  asmaRule: asmaRule,
+  pageAnnotationRule: pageAnnotationRule
 }
 
 const hlasmListingEndevorGrammar: GrammarDetails = {
@@ -74,7 +86,9 @@ const hlasmListingEndevorGrammar: GrammarDetails = {
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_begin,
   beginLineSkipRule: code_block_listing_annotation_length,
-  listingOffset: '.'
+  listingOffset: '.',
+  asmaRule: asmaRule,
+  pageAnnotationRule: pageAnnotationRule
 }
 
 const hlasmListingEndevorLongGrammar: GrammarDetails = {
@@ -84,7 +98,9 @@ const hlasmListingEndevorLongGrammar: GrammarDetails = {
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_long_begin,
   beginLineSkipRule: code_block_listing_long_annotation_length,
-  listingOffset: '.'
+  listingOffset: '.',
+  asmaRule: asmaRule,
+  pageAnnotationRule: pageAnnotationRule
 }
 
 interface GrammarBase extends GrammarFile {
@@ -121,6 +137,8 @@ function generateGrammarsDetails(props: GrammarDetails) {
     let result = data.replaceAll('${grammarName}$', props.grammarName);
     result = result.replaceAll('${scope}$', props.scope);
     result = result.replaceAll('${entryPattern}$', props.entryPattern);
+    result = result.replaceAll('${asma}$', props.asmaRule);
+    result = result.replaceAll('${pageAnnotation}$', props.pageAnnotationRule);
     result = result.replaceAll('${codeBlockBegin}$', props.codeBlockBegin);
     result = result.replaceAll('${listingOffset}$', props.listingOffset);
     result = result.replaceAll('${listingDetails}$', listingDetails);

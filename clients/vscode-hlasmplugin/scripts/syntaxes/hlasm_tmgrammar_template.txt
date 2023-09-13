@@ -20,10 +20,10 @@
     "hlasm_syntax": {
       "patterns": [
         {
-          "include": "#pageAnnotation"
+          "include": "#${pageAnnotation}$"
         },
         {
-          "include": "#asma"
+          "include": "#${asma}$"
         },
         {
           "include": "#lineComment"
@@ -65,7 +65,7 @@
           },
           "patterns": [
             {
-              "include": "#pageAnnotation"
+              "include": "#${pageAnnotation}$"
             },
             {
               "include": "#remarksLine"
@@ -82,7 +82,7 @@
           "applyEndPatternLast": 1,
           "patterns": [
             {
-              "include": "#pageAnnotation"
+              "include": "#${pageAnnotation}$"
             },
             {
               "include": "#nameField"
@@ -106,7 +106,7 @@
       "applyEndPatternLast": 0,
       "patterns": [
         {
-          "include": "#pageAnnotation"
+          "include": "#${pageAnnotation}$"
         },
         {
           "include": "#illegalMultilineColumns"
@@ -141,7 +141,7 @@
           "comment": "Operands ended on this line",
           "patterns": [
             {
-              "include": "#pageAnnotation"
+              "include": "#${pageAnnotation}$"
             },
             {
               "include": "#remarksLine"
@@ -229,7 +229,7 @@
       },
       "patterns": [
         {
-          "include": "#pageAnnotation"
+          "include": "#${pageAnnotation}$"
         },
         {
           "include": "#parenthesis"
@@ -247,7 +247,7 @@
           "applyEndPatternLast": 0,
           "patterns": [
             {
-              "include": "#pageAnnotation"
+              "include": "#${pageAnnotation}$"
             },
             {
               "include": "#illegalMultilineColumns"
@@ -284,7 +284,7 @@
           },
           "patterns": [
             {
-              "include": "#pageAnnotation"
+              "include": "#${pageAnnotation}$"
             },
             {
               "include": "#stringContents"
@@ -399,6 +399,9 @@
     "pageAnnotation": {
       "begin": "(?=^${listingOffset}$.{111}Page....\\d.*)",
       "end": "^${listingOffset}$${codeBlockBegin}$"
+    },
+    "emptyRule": {
+      "comment": "Just an empty rule"
     }
   }
 }
