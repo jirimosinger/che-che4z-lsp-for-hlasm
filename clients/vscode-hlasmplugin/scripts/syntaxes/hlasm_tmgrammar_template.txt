@@ -353,7 +353,7 @@
       ]
     },
     "sequenceSymbolNameField": {
-      "match": "^${listingDetails}$\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=^${listingDetails}$.{0,71})",
+      "match": "(?<=^${listingDetails}$)\\.[A-Za-z@#$_][A-Za-z@#$_0-9]*(?<=^${listingDetails}$.{0,71})",
       "name": "keyword.control.hlasm"
     },
     "sequenceSymbolOperandField": {

@@ -158,8 +158,7 @@
 #                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               3 .SEQ     END                                                                       
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
-#                                                 ^ source.hlasmListing keyword.operator.hlasm
-#                                                  ^^^ source.hlasmListing support.class.hlasm
+#                                                 ^^^^ source.hlasmListing keyword.control.hlasm
 #                                                     ^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                                                    
