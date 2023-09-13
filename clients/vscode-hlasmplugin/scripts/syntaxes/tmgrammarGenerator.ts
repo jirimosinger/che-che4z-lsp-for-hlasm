@@ -125,6 +125,11 @@ function generateGrammarsDetails(props: GrammarDetails) {
     result = result.replaceAll('${listingOffset}$', props.listingOffset);
     result = result.replaceAll('${listingDetails}$', listingDetails);
 
+    if (props.codeBlockBegin.length === 0)
+      result = result.replaceAll('${noPrecedingCodeBlock}$', '');
+    else
+      result = result.replaceAll('${noPrecedingCodeBlock}$', '(?<!^' + props.listingOffset + props.codeBlockBegin + ')');
+
     fs.writeFile(props.file, result, 'utf8', (err: any) => {
       if (err) return console.log(err);
     });

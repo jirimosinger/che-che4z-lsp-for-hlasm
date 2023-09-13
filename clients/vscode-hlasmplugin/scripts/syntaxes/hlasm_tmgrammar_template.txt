@@ -52,7 +52,7 @@
       "patterns": [
         {
           "begin": "^${listingDetails}$(\\*|\\.\\*)",
-          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
+          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71}))${noPrecedingCodeBlock}$)$",
           "applyEndPatternLast": 1,
           "beginCaptures": {
             "1": {
@@ -78,7 +78,7 @@
       "patterns": [
         {
           "begin": "^${listingDetails}$(?=.{1,71})",
-          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
+          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71}))${noPrecedingCodeBlock}$)$",
           "applyEndPatternLast": 1,
           "patterns": [
             {
@@ -102,7 +102,7 @@
     },
     "operandsAndRemarks": {
       "begin": "\\s*(?=\\S)(?<=^${listingDetails}$.{4,71})",
-      "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
+      "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71}))${noPrecedingCodeBlock}$)$",
       "applyEndPatternLast": 0,
       "patterns": [
         {
@@ -136,7 +136,7 @@
         },
         {
           "begin": "(?<!,)(?=\\s(?<=^${listingDetails}$.{0,71}))",
-          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$",
+          "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71}))${noPrecedingCodeBlock}$)$",
           "applyEndPatternLast": 1,
           "comment": "Operands ended on this line",
           "patterns": [
@@ -243,7 +243,7 @@
       "patterns": [
         {
           "begin": "(?<!^${listingDetails}$)[(]\\s*(?<=^${listingDetails}$.{0,71})",
-          "end": "([)](?<=^${listingDetails}$.{0,71}))|(((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$)",
+          "end": "([)](?<=^${listingDetails}$.{0,71}))|(((?<=^${listingDetails}$(.{71}\\s.*|.{0,71}))${noPrecedingCodeBlock}$)$)",
           "applyEndPatternLast": 0,
           "patterns": [
             {
@@ -266,7 +266,7 @@
       "patterns": [
         {
           "begin": "(?<!^${listingDetails}$)(')(?<=^${listingDetails}$.{0,71})",
-          "end": "(?<=^${listingDetails}$.*?)((.*?')(?<=^${listingDetails}$.{0,71})|([^']*)(?<=^${listingDetails}$.{71})(?=\\s)|(^${listingDetails}$.{0,71}$))|(((?<=^${listingDetails}$(.{71}\\s.*|.{0,71})))$)",
+          "end": "(?<=^${listingDetails}$.*?)((.*?')(?<=^${listingDetails}$.{0,71})|([^']*)(?<=^${listingDetails}$.{71})(?=\\s)|(^${listingDetails}$.{0,71}$))|(((?<=^${listingDetails}$(.{71}\\s.*|.{0,71}))${noPrecedingCodeBlock}$)$)",
           "applyEndPatternLast": 0,
           "beginCaptures": {
             "1": {

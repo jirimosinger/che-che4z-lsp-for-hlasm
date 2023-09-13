@@ -473,10 +473,10 @@
 >  Loc    Object Code      Addr1    Addr2    Stmt  Source Statement                          HLASM R1.0  2000/01/01 00.00            
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 >                                                                REMARKS REMARKS                                         -           
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
-#                                                 ^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                ^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                       ^ source.hlasmListing
-#                                                                        ^^^^^^^ source.hlasmListing punctuation.definition.tag.hlasm
+#                                                                        ^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                REMARKS REMARKS                                         -           
