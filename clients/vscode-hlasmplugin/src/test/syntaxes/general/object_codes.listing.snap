@@ -194,14 +194,16 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^ source.hlasmListing constant.numeric.hlasm
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#           ^ source.hlasmListing
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >000002 4100 0001            00001    12+LBL1     LA 0,1                                                         01-00006            
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                ^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                ^ source.hlasmListing
+#                 ^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^ source.hlasmListing support.class.hlasm
 #                                            ^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^ source.hlasmListing
@@ -213,7 +215,8 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                     ^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                     ^ source.hlasmListing
+#                      ^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                     ^^ source.hlasmListing
 #                                                       ^ source.hlasmListing punctuation.definition.tag.hlasm constant.numeric.hlasm
@@ -234,14 +237,16 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^ source.hlasmListing constant.numeric.hlasm
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#           ^ source.hlasmListing
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >00000E 4100 0002            00002    16+LBL2     LA 0,2                                                         01-00006            
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                ^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                ^ source.hlasmListing
+#                 ^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^ source.hlasmListing support.class.hlasm
 #                                            ^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^ source.hlasmListing
@@ -253,7 +258,8 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                     ^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                     ^ source.hlasmListing
+#                      ^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                     ^^ source.hlasmListing
 #                                                       ^ source.hlasmListing punctuation.definition.tag.hlasm constant.numeric.hlasm
@@ -274,14 +280,16 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^ source.hlasmListing constant.numeric.hlasm
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#           ^ source.hlasmListing
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >00001A 4100 0003            00003    20+LBL3     LA 0,3                                                         01-00006            
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                ^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                ^ source.hlasmListing
+#                 ^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^ source.hlasmListing support.class.hlasm
 #                                            ^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^ source.hlasmListing
@@ -293,7 +301,8 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                     ^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                     ^ source.hlasmListing
+#                      ^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                     ^^ source.hlasmListing
 #                                                       ^ source.hlasmListing punctuation.definition.tag.hlasm constant.numeric.hlasm
@@ -314,14 +323,16 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^ source.hlasmListing constant.numeric.hlasm
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#           ^ source.hlasmListing
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >000026 4100 0004            00004    24+LBL4     LA 0,4                                                         01-00006            
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                ^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                ^ source.hlasmListing
+#                 ^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^ source.hlasmListing support.class.hlasm
 #                                            ^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^ source.hlasmListing
@@ -333,7 +344,8 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                     ^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                     ^ source.hlasmListing
+#                      ^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                     ^^ source.hlasmListing
 #                                                       ^ source.hlasmListing punctuation.definition.tag.hlasm constant.numeric.hlasm
@@ -354,14 +366,16 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^ source.hlasmListing constant.numeric.hlasm
-#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#           ^ source.hlasmListing
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >000032 4100 0005            00005    28+LBL5     LA 0,5                                                         01-00006            
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                ^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                ^ source.hlasmListing
+#                 ^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^ source.hlasmListing support.class.hlasm
 #                                            ^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                   ^ source.hlasmListing
@@ -373,7 +387,8 @@
 #^^^^^^^ source.hlasmListing
 #       ^^ source.hlasmListing entity.name.function.hlasm
 #         ^^^^^^^^^^^^ source.hlasmListing constant.numeric.hlasm
-#                     ^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                     ^ source.hlasmListing
+#                      ^^^^^^^^^^^^^^^^^^ source.hlasmListing
 #                                        ^^^^^^^^^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                     ^^ source.hlasmListing
 #                                                       ^ source.hlasmListing punctuation.definition.tag.hlasm constant.numeric.hlasm

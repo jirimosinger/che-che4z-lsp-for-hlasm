@@ -406,7 +406,7 @@
       "name": "invalid.ignored"
     },
     "listingSyntax": {
-      "match": "^${listingOffset}$\\S+\\s([0-3][0-9A-F]{3}|[4-9AB][0-9A-F]{3} [0-9A-F]{4}|[CDEF][0-9A-F]{3} [0-9A-F]{4} [0-9A-F]{4})",
+      "match": "^${listingOffset}$\\S+\\s([0-3][0-9A-F]{3}|[4-9AB][0-9A-F]{3} [0-9A-F]{4}|[CDEF][0-9A-F]{3} [0-9A-F]{4} [0-9A-F]{4}) ",
       "captures": {
         "1": {
           "patterns": [
