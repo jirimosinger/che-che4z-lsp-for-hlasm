@@ -122,9 +122,9 @@
      SYSPRINT /my/path/to/commented_lines.o.lst                                                                                     
      SYSTERM  DATASET1.DATASET2.DATASET3.DATASET4          VOL123                                                                   
                                                                                                                                     
-1077976K allocated to Buffer Pool       Storage required     200K                                                                   
+1234567B allocated to Buffer Pool       Storage required     200K                                                                   
      22 Primary Input Records Read            0 Library Records Read                  0 Work File Reads                             
       0 ASMAOPT Records Read                130 Primary Print Records Written         0 Work File Writes                            
       0 Object Records Written               29 ADATA Records Written                                                               
-Assembly Start Time: 11.39.25 Stop Time: 11.39.25 Processor Time: 00.11.22.3333                                                     
+Assembly Start Time: 00.11.22 Stop Time: 00.11.22 Processor Time: 00.11.22.3333                                                     
 Return Code 000                                                                                                                     
