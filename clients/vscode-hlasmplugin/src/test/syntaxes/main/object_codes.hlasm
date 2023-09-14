@@ -1,0 +1,15 @@
+         CSECT
+
+         MACRO
+         MAC   &A
+         L &A,0
+         LA 0,&A
+         MEND
+
+         MAC 1
+         MAC 2
+         MAC 3
+         MAC 4
+         MAC 5
+
+         END

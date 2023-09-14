@@ -1,0 +1,48 @@
+>         CSECT
+#^^^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+>
+>         MACRO
+#^^^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+>         MAC   &A
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^^^ source.hlasm
+#               ^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
+>         L &A,0
+#^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#          ^ source.hlasm
+#           ^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
+#             ^ source.hlasm
+#              ^ source.hlasm punctuation.definition.tag.hlasm constant.numeric.hlasm
+>         LA 0,&A
+#^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#           ^ source.hlasm
+#            ^ source.hlasm punctuation.definition.tag.hlasm constant.numeric.hlasm
+#             ^ source.hlasm
+#              ^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
+>         MEND
+#^^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+>
+>         MAC 1
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^ source.hlasm
+#             ^ source.hlasm punctuation.definition.tag.hlasm constant.numeric.hlasm
+>         MAC 2
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^ source.hlasm
+#             ^ source.hlasm punctuation.definition.tag.hlasm constant.numeric.hlasm
+>         MAC 3
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^ source.hlasm
+#             ^ source.hlasm punctuation.definition.tag.hlasm constant.numeric.hlasm
+>         MAC 4
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^ source.hlasm
+#             ^ source.hlasm punctuation.definition.tag.hlasm constant.numeric.hlasm
+>         MAC 5
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+#            ^ source.hlasm
+#             ^ source.hlasm punctuation.definition.tag.hlasm constant.numeric.hlasm
+>
+>         END
+#^^^^^^^^^^^^ source.hlasm entity.name.function.hlasm
+>
