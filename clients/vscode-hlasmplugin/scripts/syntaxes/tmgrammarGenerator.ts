@@ -45,7 +45,7 @@ interface GrammarDetails extends GrammarFile {
 
 const hlasmGeneralGrammar: GrammarDetails = {
   file: './syntaxes/hlasmGeneral.tmLanguage.json',
-  grammarName: 'IBM HLASM General',
+  grammarName: 'HLASM General',
   scope: 'hlasmGeneral',
   entryPattern: 'hlasm_syntax',
   codeBlockBegin: '',
@@ -57,7 +57,7 @@ const hlasmGeneralGrammar: GrammarDetails = {
 
 const hlasmListingGeneralGrammar: GrammarDetails = {
   file: './syntaxes/hlasmListingGeneral.tmLanguage.json',
-  grammarName: 'IBM HLASM Listing General',
+  grammarName: 'HLASM Listing General',
   scope: 'hlasmListingGeneral',
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_begin,
@@ -69,7 +69,7 @@ const hlasmListingGeneralGrammar: GrammarDetails = {
 
 const hlasmListingGeneralLongGrammar: GrammarDetails = {
   file: './syntaxes/hlasmListingGeneralLong.tmLanguage.json',
-  grammarName: 'IBM HLASM Listing General Long',
+  grammarName: 'HLASM Listing General Long',
   scope: 'hlasmListingGeneralLong',
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_long_begin,
@@ -81,7 +81,7 @@ const hlasmListingGeneralLongGrammar: GrammarDetails = {
 
 const hlasmListingEndevorGrammar: GrammarDetails = {
   file: './syntaxes/hlasmListingEndevor.tmLanguage.json',
-  grammarName: 'IBM HLASM Listing Endevor',
+  grammarName: 'HLASM Listing Endevor',
   scope: 'hlasmListingEndevor',
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_begin,
@@ -93,7 +93,7 @@ const hlasmListingEndevorGrammar: GrammarDetails = {
 
 const hlasmListingEndevorLongGrammar: GrammarDetails = {
   file: './syntaxes/hlasmListingEndevorLong.tmLanguage.json',
-  grammarName: 'IBM HLASM Listing Endevor Long',
+  grammarName: 'HLASM Listing Endevor Long',
   scope: 'hlasmListingEndevorLong',
   entryPattern: 'code_block',
   codeBlockBegin: code_block_listing_long_begin,
@@ -109,14 +109,14 @@ interface GrammarBase extends GrammarFile {
 
 const hlasmBase: GrammarBase = {
   file: './syntaxes/hlasm.tmLanguage.json',
-  grammarName: 'IBM HLASM',
+  grammarName: 'HLASM',
   scope: 'hlasm',
   includedGrammars: [hlasmGeneralGrammar]
 }
 
 const hlasmListingBase: GrammarBase = {
   file: './syntaxes/hlasmListing.tmLanguage.json',
-  grammarName: 'IBM HLASM Listing',
+  grammarName: 'HLASM Listing',
   scope: 'hlasmListing',
   includedGrammars: [
     hlasmListingGeneralGrammar,
