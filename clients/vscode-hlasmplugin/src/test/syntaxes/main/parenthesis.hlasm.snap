@@ -6,8 +6,8 @@
 #                  ^ source.hlasm
 #                   ^^^ source.hlasm punctuation.definition.tag.hlasm
 #                      ^^^^^^^^^^^^^^ source.hlasm
-#                                    ^^^^^^^^^^^ source.hlasm comment.hlasm
-#                                               ^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#                                                                       ^ source.hlasm
 #                                                                        ^^^^^^^^ source.hlasm invalid.ignored
 >         INSTR OP1,12,OP2-ARR(R15)  REMARK(REM)                                 
 #^^^^^^^^^ source.hlasm
@@ -24,8 +24,8 @@
 #                              ^^^ source.hlasm punctuation.definition.tag.hlasm
 #                                 ^ source.hlasm
 #                                  ^^ source.hlasm
-#                                    ^^^^^^^^^^^ source.hlasm comment.hlasm
-#                                               ^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#                                                                       ^ source.hlasm
 #                                                                        ^^^^^^^^ source.hlasm invalid.ignored
 >
 >         INSTR ARR(12),=SYM'F12345678'                           
@@ -226,8 +226,7 @@
 #                                   ^ source.hlasm
 #                                    ^ source.hlasm
 #                                     ^^ source.hlasm
-#                                       ^^^^^^ source.hlasm comment.hlasm
-#                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 #                                                                        ^^^^^^^^ source.hlasm invalid.ignored
 >
@@ -264,17 +263,7 @@
 #              ^^^ source.hlasm
 #                 ^^ source.hlasm punctuation.definition.tag.hlasm
 #                   ^ source.hlasm
-#                    ^^^^ source.hlasm comment.hlasm
-#                        ^ source.hlasm
-#                         ^^^^ source.hlasm comment.hlasm
-#                             ^ source.hlasm
-#                              ^^^^^^ source.hlasm comment.hlasm
-#                                    ^ source.hlasm
-#                                     ^^^ source.hlasm comment.hlasm
-#                                        ^ source.hlasm
-#                                         ^^ source.hlasm comment.hlasm
-#                                           ^ source.hlasm
-#                                            ^^^^^^^^ source.hlasm comment.hlasm
+#                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >&(__V@R_V&R.#)(&VAR) SETC '&VAR
 #^ source.hlasm support.class.hlasm variable.other.readwrite.hlasm
@@ -298,17 +287,7 @@
 #              ^^^ source.hlasm
 #                 ^^ source.hlasm punctuation.definition.tag.hlasm
 #                   ^ source.hlasm
-#                    ^^^^ source.hlasm comment.hlasm
-#                        ^ source.hlasm
-#                         ^^^^ source.hlasm comment.hlasm
-#                             ^ source.hlasm
-#                              ^^^^^^ source.hlasm comment.hlasm
-#                                    ^ source.hlasm
-#                                     ^^^ source.hlasm comment.hlasm
-#                                        ^ source.hlasm
-#                                         ^^ source.hlasm comment.hlasm
-#                                           ^ source.hlasm
-#                                            ^^^^^^^^ source.hlasm comment.hlasm
+#                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >&(__V@R_V&R.#)(OP.OP) SETC '&VAR'
 #^ source.hlasm support.class.hlasm variable.other.readwrite.hlasm

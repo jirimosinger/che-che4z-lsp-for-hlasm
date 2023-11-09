@@ -400,8 +400,12 @@
       }
     },
     "remark": {
-      "match": "(\\S+)(?<=^${listingDetails}$.{0,71})",
-      "name": "comment.hlasm"
+      "match": "\\s*(\\S.*)(?<=^${listingDetails}$.{0,71})",
+      "captures": {
+        "1": {
+          "name": "comment.hlasm"
+        }
+      }
     },
     "operators": {
       "match": "[=(),*/+-\\.](?<=^${listingDetails}$.{0,71})",

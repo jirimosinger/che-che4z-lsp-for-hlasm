@@ -139,8 +139,8 @@
 #                                                                   ^ source.hlasmListing
 #                                                                    ^^^ source.hlasmListing punctuation.definition.tag.hlasm
 #                                                                       ^^^^^^^^^^^^^^ source.hlasmListing
-#                                                                                     ^^^^^^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                                        ^ source.hlasmListing
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               2          INSTR OP1,12,OP2-ARR(R15)  REMARK(REM)                                    
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -158,8 +158,8 @@
 #                                                                               ^^^ source.hlasmListing punctuation.definition.tag.hlasm
 #                                                                                  ^ source.hlasmListing
 #                                                                                   ^^ source.hlasmListing
-#                                                                                     ^^^^^^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                                        ^ source.hlasmListing
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               4          INSTR ARR(12),=SYM'F12345678'                                             
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -214,8 +214,8 @@
 #                                                                ^^^^^^^^^ source.hlasmListing punctuation.definition.tag.hlasm
 #                                                                         ^ source.hlasmListing
 #                                                                          ^ source.hlasmListing
-#                                                                           ^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                                        ^ source.hlasmListing
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               7          INSTR SYMBOL+12(34),=C'&&&&'                                              
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -375,8 +375,7 @@
 #                                                                                    ^ source.hlasmListing
 #                                                                                     ^ source.hlasmListing
 #                                                                                      ^^ source.hlasmListing
-#                                                                                        ^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                        ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                                                    
@@ -421,18 +420,8 @@
 #                                                               ^^^ source.hlasmListing
 #                                                                  ^^ source.hlasmListing punctuation.definition.tag.hlasm
 #                                                                    ^ source.hlasmListing
-#                                                                     ^^^^ source.hlasmListing comment.hlasm
-#                                                                         ^ source.hlasmListing
-#                                                                          ^^^^ source.hlasmListing comment.hlasm
-#                                                                              ^ source.hlasmListing
-#                                                                               ^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                     ^ source.hlasmListing
-#                                                                                      ^^^ source.hlasmListing comment.hlasm
-#                                                                                         ^ source.hlasmListing
-#                                                                                          ^^ source.hlasmListing comment.hlasm
-#                                                                                            ^ source.hlasmListing
-#                                                                                             ^^^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                                     ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                                        ^ source.hlasmListing
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                              19 &(__V@R_V&R.#)(&VAR) SETC '&VAR                                                    
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -461,18 +450,8 @@
 #                                                               ^^^ source.hlasmListing
 #                                                                  ^^ source.hlasmListing punctuation.definition.tag.hlasm
 #                                                                    ^ source.hlasmListing
-#                                                                     ^^^^ source.hlasmListing comment.hlasm
-#                                                                         ^ source.hlasmListing
-#                                                                          ^^^^ source.hlasmListing comment.hlasm
-#                                                                              ^ source.hlasmListing
-#                                                                               ^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                     ^ source.hlasmListing
-#                                                                                      ^^^ source.hlasmListing comment.hlasm
-#                                                                                         ^ source.hlasmListing
-#                                                                                          ^^ source.hlasmListing comment.hlasm
-#                                                                                            ^ source.hlasmListing
-#                                                                                             ^^^^^^^^ source.hlasmListing comment.hlasm
-#                                                                                                     ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                                        ^ source.hlasmListing
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                              22 &(__V@R_V&R.#)(OP.OP) SETC '&VAR'                                                  
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing

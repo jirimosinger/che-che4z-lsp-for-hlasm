@@ -490,13 +490,11 @@
 #^^^^^^^^^^^^^^^ source.hlasm
 #               ^^^ source.hlasm punctuation.definition.tag.hlasm
 #                  ^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
-#                                           ^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
-#                                                           ^^^^^^^^^^^^ source.hlasm
+#                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >               REMARKS,                                                -12345678
 #^^^^^^^^^^^^^^^ source.hlasm
-#               ^^^^^^^^ source.hlasm comment.hlasm
-#                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 #                                                                        ^^^^^^^^ source.hlasm invalid.ignored
 >                                                
@@ -510,17 +508,7 @@
 #              ^ source.hlasm
 #               ^^ source.hlasm punctuation.definition.tag.hlasm
 #                 ^ source.hlasm
-#                  ^^^^ source.hlasm comment.hlasm
-#                      ^ source.hlasm
-#                       ^^^^ source.hlasm comment.hlasm
-#                           ^ source.hlasm
-#                            ^^^^^^ source.hlasm comment.hlasm
-#                                  ^ source.hlasm
-#                                   ^^^ source.hlasm comment.hlasm
-#                                      ^ source.hlasm
-#                                       ^^ source.hlasm comment.hlasm
-#                                         ^ source.hlasm
-#                                          ^^^^^^^^ source.hlasm comment.hlasm
+#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >B&VAR1.&VAR2.INCMPLT
 #^ source.hlasm support.class.hlasm
@@ -535,17 +523,7 @@
 #              ^ source.hlasm
 #               ^^ source.hlasm punctuation.definition.tag.hlasm
 #                 ^ source.hlasm
-#                  ^^^^ source.hlasm comment.hlasm
-#                      ^ source.hlasm
-#                       ^^^^ source.hlasm comment.hlasm
-#                           ^ source.hlasm
-#                            ^^^^^^ source.hlasm comment.hlasm
-#                                  ^ source.hlasm
-#                                   ^^^ source.hlasm comment.hlasm
-#                                      ^ source.hlasm
-#                                       ^^ source.hlasm comment.hlasm
-#                                         ^ source.hlasm
-#                                          ^^^^^^^^ source.hlasm comment.hlasm
+#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >&VAR.C   INSTR   *-&P                    REMARK                                 
 #^^^^ source.hlasm support.class.hlasm variable.other.readwrite.hlasm
@@ -556,8 +534,8 @@
 #                 ^^ source.hlasm
 #                   ^^ source.hlasm punctuation.definition.tag.hlasm variable.other.readwrite.hlasm
 #                     ^^^^^^^^^^^^^^^^^^^^ source.hlasm
-#                                         ^^^^^^ source.hlasm comment.hlasm
-#                                               ^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#                                                                       ^ source.hlasm
 #                                                                        ^^^^^^^^ source.hlasm invalid.ignored
 >LABEL    INSTR OP THIS LINE SHOULD NOT BE AFFECTED
 #^^^^^ source.hlasm support.class.hlasm
@@ -566,17 +544,7 @@
 #              ^ source.hlasm
 #               ^^ source.hlasm punctuation.definition.tag.hlasm
 #                 ^ source.hlasm
-#                  ^^^^ source.hlasm comment.hlasm
-#                      ^ source.hlasm
-#                       ^^^^ source.hlasm comment.hlasm
-#                           ^ source.hlasm
-#                            ^^^^^^ source.hlasm comment.hlasm
-#                                  ^ source.hlasm
-#                                   ^^^ source.hlasm comment.hlasm
-#                                      ^ source.hlasm
-#                                       ^^ source.hlasm comment.hlasm
-#                                         ^ source.hlasm
-#                                          ^^^^^^^^ source.hlasm comment.hlasm
+#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >B&VAR    INSTR OP
 #^ source.hlasm support.class.hlasm
@@ -592,17 +560,7 @@
 #              ^ source.hlasm
 #               ^^ source.hlasm punctuation.definition.tag.hlasm
 #                 ^ source.hlasm
-#                  ^^^^ source.hlasm comment.hlasm
-#                      ^ source.hlasm
-#                       ^^^^ source.hlasm comment.hlasm
-#                           ^ source.hlasm
-#                            ^^^^^^ source.hlasm comment.hlasm
-#                                  ^ source.hlasm
-#                                   ^^^ source.hlasm comment.hlasm
-#                                      ^ source.hlasm
-#                                       ^^ source.hlasm comment.hlasm
-#                                         ^ source.hlasm
-#                                          ^^^^^^^^ source.hlasm comment.hlasm
+#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >LABEL    AIF    ( NOT                                                  -12345678invalid
 #^^^^^ source.hlasm support.class.hlasm
@@ -637,17 +595,7 @@
 #              ^ source.hlasm
 #               ^^ source.hlasm punctuation.definition.tag.hlasm
 #                 ^ source.hlasm
-#                  ^^^^ source.hlasm comment.hlasm
-#                      ^ source.hlasm
-#                       ^^^^ source.hlasm comment.hlasm
-#                           ^ source.hlasm
-#                            ^^^^^^ source.hlasm comment.hlasm
-#                                  ^ source.hlasm
-#                                   ^^^ source.hlasm comment.hlasm
-#                                      ^ source.hlasm
-#                                       ^^ source.hlasm comment.hlasm
-#                                         ^ source.hlasm
-#                                          ^^^^^^^^ source.hlasm comment.hlasm
+#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >         INSTR  &__V@R_GEN#                                                     
 #^^^^^^^^^ source.hlasm
