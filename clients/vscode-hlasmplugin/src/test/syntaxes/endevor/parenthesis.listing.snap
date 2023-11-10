@@ -384,7 +384,8 @@
 #                                                                                                                ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                 ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                                                    
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                ^ source.hlasmListing
 #                                                                                                                 ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                     15 &(__V@R_V&R.#) SETA &VAR                                                                    

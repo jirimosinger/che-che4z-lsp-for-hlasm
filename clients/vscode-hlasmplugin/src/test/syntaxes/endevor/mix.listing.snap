@@ -645,11 +645,13 @@
 #                                                                                                                ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                 ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                       REMARKS,                                                -1234567             
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                 ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                                                    
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                ^ source.hlasmListing
 #                                                                                                                 ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                      8 INCMPLT                                                                                     

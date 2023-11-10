@@ -324,14 +324,16 @@
 #                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >                                                                       -
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#^^^^^^^^^^^^^^^ source.hlasm
+#               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >               REMARKS,                                                -
 #^^^^^^^^^^^^^^^ source.hlasm
 #               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >                                                                       -
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm
+#^^^^^^^^^^^^^^^ source.hlasm
+#               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >               REMARKS REMARKS                                         -
 #^^^^^^^^^^^^^^^ source.hlasm

@@ -476,7 +476,8 @@
 #                                                                                                               ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                               -                    
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                               ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                       REMARKS,                                                -                    
@@ -485,7 +486,8 @@
 #                                                                                                               ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                               -                    
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                               ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                               Page    4            

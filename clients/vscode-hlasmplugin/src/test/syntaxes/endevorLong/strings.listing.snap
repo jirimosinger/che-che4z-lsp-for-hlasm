@@ -180,7 +180,8 @@
 #                                                                                                                         ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                                                                                    
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                         ^ source.hlasmListing
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               6          INSTR  T'&VAR                                    XXXXXXXXXXXXX-xxxxxxx    
@@ -214,7 +215,8 @@
 #                                                                                                                         ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                REMARK                                                              
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                         ^ source.hlasmListing
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               8          INSTR  T'&VAR                                                 -xxxxxxx    
@@ -229,7 +231,8 @@
 #                                                                                                                         ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                REMARK                                                              
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                         ^ source.hlasmListing
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               9          INSTR  T'&VAR                                                             
@@ -432,7 +435,8 @@
 #                                                                                                                         ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                REMARK,REMARK REMARK                                                
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                         ^ source.hlasmListing
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                              23 LABEL    INSTR 4,'Just  a  random  string:   word 256 (&LBL DSECT), &&V-1234567    
@@ -495,7 +499,8 @@
 #                                                                                                                         ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                REMARK REMARK                                                       
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                         ^ source.hlasmListing
 #                                                                                                                          ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                              26 LABEL    INSTR 4,                                                      -1234567    
