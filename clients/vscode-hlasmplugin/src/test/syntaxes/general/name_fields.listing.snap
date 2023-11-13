@@ -139,7 +139,9 @@
 #                                                       ^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                            ^ source.hlasmListing
 #                                                             ^^ source.hlasmListing punctuation.definition.tag.hlasm
-#                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                               ^ source.hlasmListing
+#                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                               ^ source.hlasmListing
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                      2 ORD&VARSYM     INSTR OP                                                                     
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -149,7 +151,9 @@
 #                                                       ^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                            ^ source.hlasmListing
 #                                                             ^^ source.hlasmListing punctuation.definition.tag.hlasm
-#                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                               ^ source.hlasmListing
+#                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                               ^ source.hlasmListing
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                      4 =LBL.LBL       INSTR OP                                                                     
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -158,7 +162,9 @@
 #                                                       ^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                            ^ source.hlasmListing
 #                                                             ^^ source.hlasmListing punctuation.definition.tag.hlasm
-#                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                               ^ source.hlasmListing
+#                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                               ^ source.hlasmListing
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                      5 !@#$%^*()"     INSTR OP                                                                     
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -167,7 +173,9 @@
 #                                                       ^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                            ^ source.hlasmListing
 #                                                             ^^ source.hlasmListing punctuation.definition.tag.hlasm
-#                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                               ^ source.hlasmListing
+#                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                               ^ source.hlasmListing
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                      6 123456789      INSTR OP                                                                     
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
@@ -176,7 +184,9 @@
 #                                                       ^^^^^ source.hlasmListing entity.name.function.hlasm
 #                                                            ^ source.hlasmListing
 #                                                             ^^ source.hlasmListing punctuation.definition.tag.hlasm
-#                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
+#                                                               ^ source.hlasmListing
+#                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                                                                               ^ source.hlasmListing
 #                                                                                                                ^^^^^^^^^^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                      8 ''             INSTR  OP REM                                                                
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing

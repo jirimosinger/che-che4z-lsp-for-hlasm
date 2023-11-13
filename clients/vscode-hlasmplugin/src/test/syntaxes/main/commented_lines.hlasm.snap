@@ -1,7 +1,5 @@
 >* dadsa                                                                - 
-#^ source.hlasm comment.hlasm
-# ^ source.hlasm
-#  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 #                                                                        ^ source.hlasm invalid.ignored
 >               asd as d
@@ -16,9 +14,7 @@
 #                   ^ source.hlasm
 #                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >.* REMARK                                                              -
-#^^ source.hlasm comment.hlasm
-#  ^ source.hlasm
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >               dafaf
 #^^^^^^^^^^^^^^^ source.hlasm
@@ -32,9 +28,7 @@
 #                   ^ source.hlasm
 #                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >.* REMARK                                                              -
-#^^ source.hlasm comment.hlasm
-#  ^ source.hlasm
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >               dafaf                                                   -
 #^^^^^^^^^^^^^^^ source.hlasm
@@ -42,9 +36,7 @@
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >
 >.* REMARK                                                              -
-#^^ source.hlasm comment.hlasm
-#  ^ source.hlasm
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 >               dafaf                                                   -
 #^^^^^^^^^^^^^^^ source.hlasm
@@ -61,9 +53,7 @@
 #                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >
 >*        Multiline remarks                                             -        
-#^ source.hlasm comment.hlasm
-# ^^^^^^^^ source.hlasm
-#         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 #                                                                       ^ source.hlasm keyword.other.hlasm
 #                                                                        ^^^^^^^^ source.hlasm invalid.ignored
 >               remarks                                                 -12345678

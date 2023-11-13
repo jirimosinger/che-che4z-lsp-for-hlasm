@@ -132,9 +132,7 @@
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
 >                                               1 * remark                                                               -           
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
-#                                                 ^ source.hlasmListing comment.hlasm
-#                                                  ^ source.hlasmListing
-#                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                        ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                rem re r                                                            
@@ -155,9 +153,7 @@
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               3 .* REMARK                                                              -           
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
-#                                                 ^^ source.hlasmListing comment.hlasm
-#                                                   ^ source.hlasmListing
-#                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                        ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                remark                                                              
@@ -178,9 +174,7 @@
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               5 .* REMARK                                                              -           
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
-#                                                 ^^ source.hlasmListing comment.hlasm
-#                                                   ^ source.hlasmListing
-#                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                        ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                remark                                                  -           
@@ -191,9 +185,7 @@
 >                                                                                                                                    
 >                                               6 .* REMARK                                                              -           
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
-#                                                 ^^ source.hlasmListing comment.hlasm
-#                                                   ^ source.hlasmListing
-#                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                        ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                remark                                                  -           
@@ -215,9 +207,7 @@
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                               9 *        Multiline remarks                                             -           
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing
-#                                                 ^ source.hlasmListing comment.hlasm
-#                                                  ^^^^^^^^ source.hlasmListing
-#                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
+#                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasmListing comment.hlasm
 #                                                                                                                        ^ source.hlasmListing keyword.other.hlasm
 #                                                                                                                         ^^^^^^^^^^^ source.hlasmListing invalid.ignored
 >                                                                remarks                                                 -1234567    

@@ -7,11 +7,9 @@
 #                 ^ source.hlasm
 #                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >** ASMA123I - This is just a remark in general hlasm grammar
-#^ source.hlasm comment.hlasm
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >** ASMA123E - This is just a remark in general hlasm grammar
-#^ source.hlasm comment.hlasm
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ source.hlasm comment.hlasm
 >LABEL    INSTR OP THIS LINE SHOULD NOT BE AFFECTED
 #^^^^^ source.hlasm support.class.hlasm
 #     ^^^^ source.hlasm

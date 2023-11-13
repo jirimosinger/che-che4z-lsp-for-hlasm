@@ -51,16 +51,12 @@
     "lineComment": {
       "patterns": [
         {
-          "begin": "^${listingDetails}$(\\*|\\.\\*)",
+          "begin": "^${listingDetails}$((?:\\*|\\.\\*).*)(?<=^${listingDetails}$.{1,71})",
           "end": "((?<=^${listingDetails}$(.{71}\\s.*|.{0,71}))${noPrecedingCodeBlock}$)$",
           "applyEndPatternLast": 1,
           "beginCaptures": {
             "1": {
-              "patterns": [
-                {
-                  "include": "#remark"
-                }
-              ]
+              "name": "comment.hlasm"
             }
           },
           "patterns": [
@@ -128,7 +124,7 @@
           "include": "#asmArguments"
         },
         {
-          "match": "(?<=,)\\s(.*)(?<=^${listingDetails}$.{0,71})",
+          "match": "(?<=,)(\\s.*)(?<=^${listingDetails}$.{0,71})",
           "comment": "Operands will continue on next line",
           "captures": {
             "1": {
@@ -410,8 +406,12 @@
           }
         },
         {
-          "match": "(?<=^${listingDetails}$.{0,71})\\S.*(?<=^${listingDetails}$.{0,71})",
-          "name": "comment.hlasm"
+          "match": "(?<=^${listingDetails}$.{0,71})\\s(.*)(?<=^${listingDetails}$.{0,71})",
+          "captures": {
+            "1": {
+              "name": "comment.hlasm"
+            }
+          }
         }
       ]
     },
